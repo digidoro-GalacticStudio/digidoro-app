@@ -1,10 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <!--   MAIN PALETTE -->
+    <color name="dominant_color_light">#FFFFFFFF</color>
+    <color name="secondary_color">#202124</color>
+    <color name="accent_color">#4880FF</color>
+    <color name="secondary_color_variant">#E8EAED</color>
+
+    <!--   ACCENT COLOR PALETTE -->
+    <color name="cherry_red_accent">#E15A51</color>
+    <color name="mint_accent">#85E0A3</color>
+    <color name="azure_light_blue_accent">#8CC6E7</color>
+    <color name="honey_yellow_accent">#FFC700</color>
+    <color name="lavender_accent">#C7B9FF</color>
+
+    <!--   TEXT COLOR PALETTE -->
+    <color name="white_text_color">#FFFFFFFF</color>
+    <color name="black_text_color">#FF000000</color>
+    <color name="gray_text_color">#E8EAED</color>s
 </resources>
