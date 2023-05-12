@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -26,6 +27,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.galacticstudio.digidoro.R
+import com.galacticstudio.digidoro.ui.shared.solid_shadow.SolidShadow
 import com.galacticstudio.digidoro.ui.theme.Nunito
 
 enum class TextFieldType {
@@ -47,12 +49,10 @@ fun TextFieldItem(
     val borderRadius = LocalDensity.current.run { 18.toDp() }
 
     Box {
-        Box(
-            modifier = Modifier
-                .offset(5.dp, 5.dp)
-                .matchParentSize()
-                .background(colorResource(id = R.color.secondary_color), shape = RoundedCornerShape(borderRadius))
-        )
+        SolidShadow(
+            color = colorResource(id = R.color.secondary_color),
+            modifier = Modifier.matchParentSize())
+
         TextField(
             value = value,
             onValueChange = { value = it },
@@ -71,10 +71,7 @@ fun TextFieldItem(
                 unfocusedIndicatorColor = Color.Transparent,
                 placeholderColor = colorResource(id = R.color.secondary_color)
             ),
-            textStyle = TextStyle(
-                fontFamily = Nunito,
-                fontWeight = FontWeight.W500,
-            ),
+            textStyle = MaterialTheme.typography.titleSmall,
             keyboardOptions = when (type) {
                 TextFieldType.TEXT -> KeyboardOptions(keyboardType = KeyboardType.Text)
                 TextFieldType.NUMBER -> KeyboardOptions(keyboardType = KeyboardType.Number)
