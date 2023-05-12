@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--   MAIN PALETTE -->
+    <color name="dominant_color_light">#FFFFFFFF</color>
+    <color name="secondary_color">#202124</color>
+    <color name="accent_color">#4880FF</color>
+    <color name="secondary_color_variant">#E8EAED</color>
+
+    <!--   ACCENT COLOR PALETTE -->
+    <color name="cherry_red_accent">#E15A51</color>
+    <color name="mint_accent">#85E0A3</color>
+    <color name="azure_light_blue_accent">#8CC6E7</color>
+    <color name="honey_yellow_accent">#FFC700</color>
+    <color name="lavender_accent">#C7B9FF</color>
+
+    <!--   TEXT COLOR PALETTE -->
+    <color name="white_text_color">#FFFFFFFF</color>
+    <color name="black_text_color">#FF000000</color>
+    <color name="gray_text_color">#E8EAED</color>s
+</resources>
