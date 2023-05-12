@@ -1,4 +1,4 @@
-package com.galacticstudio.digidoro.ui.shared.solid_shadow
+package com.galacticstudio.digidoro.ui.shared.solidShadow
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
