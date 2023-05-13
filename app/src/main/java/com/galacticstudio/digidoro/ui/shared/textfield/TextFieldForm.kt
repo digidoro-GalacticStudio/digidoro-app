@@ -36,8 +36,6 @@ fun TextFieldForm(
             )
         )
         Spacer(modifier = Modifier.height( 6.dp ))
-
-        val myIcon = painterResource(R.drawable.email_icon)
         TextFieldItem(
             placeholder = placeholder,
             type = type,
