@@ -1,4 +1,4 @@
-package com.galacticstudio.digidoro.ui.shared.cards.todocard
+package com.galacticstudio.digidoro.ui.shared.cards.todoCard
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border

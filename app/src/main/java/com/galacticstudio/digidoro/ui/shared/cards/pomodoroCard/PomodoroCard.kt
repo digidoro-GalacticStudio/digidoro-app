@@ -1,4 +1,4 @@
-package com.galacticstudio.digidoro.ui.shared.cards.pomodorocard
+package com.galacticstudio.digidoro.ui.shared.cards.pomodoroCard
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
