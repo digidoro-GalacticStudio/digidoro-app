@@ -19,6 +19,12 @@ import androidx.compose.ui.unit.sp
 import com.galacticstudio.digidoro.R
 import com.galacticstudio.digidoro.ui.theme.Nunito
 
+/**
+ * A composable function that represents a custom button.
+ *
+ * @param text The text to be displayed on the button.
+ * @param onClick The callback to be invoked when the button is clicked.
+ */
 @Composable
 fun CustomButton(
     text: String,

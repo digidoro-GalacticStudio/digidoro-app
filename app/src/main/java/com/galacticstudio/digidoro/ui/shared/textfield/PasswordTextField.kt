@@ -1,5 +1,6 @@
 package com.galacticstudio.digidoro.ui.shared.textfield
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
@@ -9,49 +10,47 @@ import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.galacticstudio.digidoro.R
 import com.galacticstudio.digidoro.util.shadowWithCorner
 
 /**
- * An enum class representing the type of a text field.
- */
-enum class TextFieldType {
-    TEXT,
-    NUMBER,
-    PASSWORD,
-    PHONE,
-}
-
-/**
- * A composable function that represents a text field item.
+ * A composable function that represents a password text field with an optional leading icon.
  *
  * @param placeholder The placeholder text to be displayed when the text field is empty.
- * @param modifier The modifier to be applied to the text field item.
- * @param type The type of the text field.
  * @param leadingIcon The leading icon to be displayed in the text field.
+ * @param modifier The modifier to be applied to the text field.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TextFieldItem(
+fun PasswordTextField(
     placeholder: String,
+    leadingIcon: Painter?,
     modifier: Modifier = Modifier,
-    type: TextFieldType = TextFieldType.TEXT,
-    leadingIcon: Painter? = null,
 ) {
     var value: String by remember { mutableStateOf("") }
+    var showPassword by remember { mutableStateOf(false) }
 
     val borderWidth = LocalDensity.current.run { 2.toDp() }
     val borderRadius = LocalDensity.current.run { 18.toDp() }
@@ -95,12 +94,30 @@ fun TextFieldItem(
                     )
                 }
             },
-            textStyle = MaterialTheme.typography.titleMedium,
-            keyboardOptions = when (type) {
-                TextFieldType.TEXT -> KeyboardOptions(keyboardType = KeyboardType.Text)
-                TextFieldType.NUMBER -> KeyboardOptions(keyboardType = KeyboardType.Number)
-                TextFieldType.PASSWORD -> KeyboardOptions(keyboardType = KeyboardType.Password)
-                TextFieldType.PHONE -> KeyboardOptions(keyboardType = KeyboardType.Phone)
+            textStyle = MaterialTheme.typography.titleSmall,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            visualTransformation = if (showPassword) {
+                VisualTransformation.None
+            } else {
+                PasswordVisualTransformation()
+            }, trailingIcon = {
+                if (showPassword) {
+                    IconButton(onClick = { showPassword = false }) {
+                        Image(
+                            painter = painterResource(R.drawable.visibility_icom),
+                            contentDescription = null,
+                            modifier = Modifier.size(25.dp)
+                        )
+                    }
+                } else {
+                    IconButton(onClick = { showPassword = true }) {
+                        Image(
+                            painter = painterResource(R.drawable.visibility_off_icon),
+                            contentDescription = null,
+                            modifier = Modifier.size(25.dp)
+                        )
+                    }
+                }
             }
         )
     }
