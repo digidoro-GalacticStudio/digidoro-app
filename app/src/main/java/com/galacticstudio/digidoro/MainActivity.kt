@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+//import com.galacticstudio.digidoro.ui.login.LoginScreen
 import com.galacticstudio.digidoro.ui.theme.DigidoroTheme
 
 class MainActivity : ComponentActivity() {
@@ -37,10 +38,11 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
     )
 }
 
-@Preview(showBackground = true)
+@Preview(showSystemUi = true)
 @Composable
 fun GreetingPreview() {
     DigidoroTheme {
-        Greeting("Android")
+//        Greeting("Android")
+//        LoginScreen()
     }
 }
