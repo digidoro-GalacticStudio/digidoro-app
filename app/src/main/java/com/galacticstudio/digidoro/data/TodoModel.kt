@@ -6,5 +6,6 @@ import java.util.Date
 data class TodoModel(
     val title: String,
     val theme: String,
-    val createdAt: Date? = null
+    val createdAt: Date? = null,
+    val state: Boolean ?= false,
 )
