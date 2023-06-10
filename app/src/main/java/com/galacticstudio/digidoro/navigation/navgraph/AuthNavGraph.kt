@@ -6,10 +6,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.galacticstudio.digidoro.navigation.AUTH_GRAPH_ROUTE
 import com.galacticstudio.digidoro.navigation.Screen
+import com.galacticstudio.digidoro.screens.login.LoginScreen
 import com.galacticstudio.digidoro.ui.SignUpScreen
 import com.galacticstudio.digidoro.ui.forgotpassword.ForgotPasswordScreen
 import com.galacticstudio.digidoro.ui.forgotpassword.VerifyAccountScreen
-import com.galacticstudio.digidoro.ui.login.LoginScreen
 
 fun NavGraphBuilder.authNavGraph(
     navController: NavHostController
