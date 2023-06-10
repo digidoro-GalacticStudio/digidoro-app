@@ -6,7 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import com.galacticstudio.digidoro.navigation.HOME_GRAPH_ROUTE
 import com.galacticstudio.digidoro.navigation.Screen
-import com.galacticstudio.digidoro.ui.home.HomeScreen
+import com.galacticstudio.digidoro.ui.screens.home.HomeScreen
 
 fun NavGraphBuilder.homeNavGraph(
     navController: NavHostController

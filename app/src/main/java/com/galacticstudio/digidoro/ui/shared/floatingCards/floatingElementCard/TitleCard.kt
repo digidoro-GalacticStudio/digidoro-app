@@ -37,12 +37,12 @@ fun TitleCard(
                 placeholder = { Text(placeHolder, style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.ExtraBold) },
                 modifier = Modifier
                     .fillMaxWidth(),
-                colors = TextFieldDefaults.textFieldColors(
-                    containerColor = Color.Transparent,
+                colors = TextFieldDefaults.colors(
+//                    containerColor = Color.Transparent,
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
-                    placeholderColor = colorResource(id = R.color.black_text_color),
-                    textColor = colorResource(id = R.color.black_text_color)
+//                    placeholderColor = colorResource(id = R.color.black_text_color),
+//                    textColor = colorResource(id = R.color.black_text_color)
                 ),
             )
 
