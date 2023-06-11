@@ -80,7 +80,8 @@ fun ActionNote(
                 modifier = Modifier
                     .padding(start = 6.dp)
                     .weight(1f),
-                style = MaterialTheme.typography.bodySmall
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.Black,
             )
         }
     }

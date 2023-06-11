@@ -3,7 +3,7 @@ package com.galacticstudio.digidoro.data
 import java.util.Date
 
 //TODO Verify the attributes (user_id)
-data class Note(
+data class NoteModel(
     val user_id: Int,
     val title: String,
     val message: String,

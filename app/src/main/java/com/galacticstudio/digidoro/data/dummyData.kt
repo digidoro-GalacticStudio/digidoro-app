@@ -73,52 +73,52 @@ val todoList = mutableListOf<TodoModel>().apply {
 }
 
 val itemNotesList = listOf(
-    Note(
+    NoteModel(
         user_id = 1,
         title = "Abstract Libro 1",
         message = "Simplicity boils down to two steps: Identify the essential. Eliminate the rest.",
         tags = emptyList(),
-        theme = Color.White.toString(),
+        theme = "#FFFFFF",
         is_trashed = false,
         createdAt = Calendar.getInstance().time,
         updatedAt = Calendar.getInstance().time
     ),
-    Note(
+    NoteModel(
         user_id = 2,
         title = "Abstract Libro 2",
         message = "Simplicity boils down to two steps: Identify the essential. Eliminate the rest.",
         tags = emptyList(),
-        theme = Color(0xFFD1EBFF).toString(),
+        theme = "#D1EBFF",
         is_trashed = false,
         createdAt = Calendar.getInstance().time,
         updatedAt = Calendar.getInstance().time
     ),
-    Note(
+    NoteModel(
         user_id = 3,
         title = "Abstract Libro 3",
         message = "Simplicity boils down to two steps: Identify the essential. Eliminate the rest.",
         tags = emptyList(),
-        theme = Color(0xFFFFD2D2).toString(),
+        theme = "#FFD2D2",
         is_trashed = false,
         createdAt = Calendar.getInstance().time,
         updatedAt = Calendar.getInstance().time
     ),
-    Note(
+    NoteModel(
         user_id = 4,
         title = "Abstract Libro 4",
         message = "Simplicity boils down to two steps: Identify the essential. Eliminate the rest.",
         tags = emptyList(),
-        theme = Color.White.toString(),
+        theme = "#FFFFFF",
         is_trashed = false,
         createdAt = Calendar.getInstance().time,
         updatedAt = Calendar.getInstance().time
     ),
-    Note(
+    NoteModel(
         user_id = 5,
         title = "Abstract Libro 5",
         message = "Simplicity boils down to two steps: Identify the essential. Eliminate the rest.",
         tags = emptyList(),
-        theme = Color(0xFFE3D4FF).toString(),
+        theme = "#FFFFFF",
         is_trashed = false,
         createdAt = Calendar.getInstance().time,
         updatedAt = Calendar.getInstance().time
