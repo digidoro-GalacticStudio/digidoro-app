@@ -30,7 +30,7 @@ fun SignUpScreen(
 }
 
 @Composable
-fun TodoScreen(
+fun NoteScreen(
     navController: NavHostController
 ) {
     AppScaffold(
@@ -41,7 +41,10 @@ fun TodoScreen(
                 Text(text = "Hello - dMedium", style = MaterialTheme.typography.displayMedium)
                 Text(text = "Hello - displaySmall", style = MaterialTheme.typography.displaySmall)
                 Text(text = "Hello - headlineLarge", style = MaterialTheme.typography.headlineLarge)
-                Text(text = "Hello - headlineMedium", style = MaterialTheme.typography.headlineMedium)
+                Text(
+                    text = "Hello - headlineMedium",
+                    style = MaterialTheme.typography.headlineMedium
+                )
                 Text(text = "Hello - headlineSmall", style = MaterialTheme.typography.headlineSmall)
                 Text(text = "Hello - titleLarge", style = MaterialTheme.typography.titleLarge)
                 Text(text = "Hello - titleMedium", style = MaterialTheme.typography.titleMedium)
@@ -70,22 +73,7 @@ fun TodoScreen(
                     fontWeight = FontWeight.W800,
                     color = Color(0xFF202124),
                 )
-
             }
-        }
-    )
-}
-
-@Composable
-fun NoteScreen(
-    navController: NavHostController
-) {
-    AppScaffold(
-        navController = navController,
-        content = {
-            Sample("This is the NOTE screen",
-                onClick = { navController.navigate(AUTH_GRAPH_ROUTE) }
-            )
         }
     )
 }

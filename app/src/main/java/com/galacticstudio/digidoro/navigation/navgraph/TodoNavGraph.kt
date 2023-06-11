@@ -6,7 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.galacticstudio.digidoro.navigation.Screen
 import com.galacticstudio.digidoro.navigation.TODO_GRAPH_ROUTE
-import com.galacticstudio.digidoro.ui.TodoScreen
+import com.galacticstudio.digidoro.ui.screens.todo.TodoScreen
 
 fun NavGraphBuilder.todoNavGraph(
     navController: NavHostController
