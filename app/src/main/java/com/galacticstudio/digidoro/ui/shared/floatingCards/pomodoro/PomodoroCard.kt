@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -64,7 +65,14 @@ fun PomodoroFloatingBox(){
                         placeHolder = "1",
                         fieldWidth = 80.dp
                     )
-                    ColorBox()
+                    Column () {
+                        Text(
+                            text = "Color",
+                            style = MaterialTheme.typography.titleLarge,
+                            modifier = Modifier.padding(vertical = 4.dp)
+                        )
+                        ColorBox()
+                    }
                     Spacer(modifier = Modifier.height(14.dp))
                     PomodoroControler()
                 }

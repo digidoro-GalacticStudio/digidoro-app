@@ -25,8 +25,10 @@ data class CustomMessageData(val title: String, val subTitle: String)
 @Composable
 fun Title(
     message: CustomMessageData,
-    alignment: Alignment.Horizontal,
     modifier: Modifier = Modifier,
+    alignment: Alignment.Horizontal = Alignment.Start,
+    titleStyle: TextStyle = MaterialTheme.typography.headlineLarge,
+    subtitleStyle: TextStyle = MaterialTheme.typography.bodyMedium
 ) {
     Column(
         horizontalAlignment = alignment,
@@ -36,12 +38,12 @@ fun Title(
     ) {
         TextElement(
             text = message.title,
-            textStyle = MaterialTheme.typography.headlineLarge,
+            textStyle = titleStyle,
             fontWeight = FontWeight.W800,
         )
         TextElement(
             text = message.subTitle,
-            textStyle = MaterialTheme.typography.bodyMedium
+            textStyle = subtitleStyle
         )
     }
 }
