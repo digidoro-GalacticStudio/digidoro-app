@@ -57,7 +57,8 @@ fun NoteItem(
             Text(
                 text = text,
                 overflow = TextOverflow.Ellipsis,
-                style = MaterialTheme.typography.bodySmall
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.Black,
             )
         }
     }
