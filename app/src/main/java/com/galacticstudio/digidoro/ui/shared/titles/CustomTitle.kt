@@ -27,7 +27,8 @@ fun Title(
     message: CustomMessageData,
     modifier: Modifier = Modifier,
     alignment: Alignment.Horizontal = Alignment.Start,
-    titleStyle: TextStyle = MaterialTheme.typography.headlineLarge
+    titleStyle: TextStyle = MaterialTheme.typography.headlineLarge,
+    subtitleStyle: TextStyle = MaterialTheme.typography.bodyMedium
 ) {
     Column(
         horizontalAlignment = alignment,
@@ -42,7 +43,7 @@ fun Title(
         )
         TextElement(
             text = message.subTitle,
-            textStyle = MaterialTheme.typography.bodyMedium
+            textStyle = subtitleStyle
         )
     }
 }

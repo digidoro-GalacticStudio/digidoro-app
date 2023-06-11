@@ -36,5 +36,12 @@ class DateUtils {
                 else -> "In the future!, " to formattedDate
             }
         }
+
+        fun formatDateToString(date: Date?): String {
+            if (date == null) {
+                return "Invalid Date"
+            }
+            return SimpleDateFormat("EEEE d", Locale.getDefault()).format(date)
+        }
     }
 }

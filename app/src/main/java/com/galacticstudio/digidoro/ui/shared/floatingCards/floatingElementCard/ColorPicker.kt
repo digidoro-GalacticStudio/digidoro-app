@@ -21,32 +21,37 @@ import com.galacticstudio.digidoro.ui.theme.DigidoroTheme
 val buttonSize = 28.dp
 
 @Composable
-fun ColorBox(){
+fun ColorBox() {
     DigidoroTheme() {
-        Column {
-            Text(
-                text = "Color",
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(vertical = 4.dp)
-            )
-            Row {
-                ColorButton(color = colorResource(id = R.color.secondary_color), onClick = { /*todo*/ })
-                ColorButton(color = colorResource(id = R.color.cherry_red_accent), onClick = { /*todo*/ })
-                ColorButton(color = colorResource(id = R.color.mint_accent), onClick = { /*todo*/ })
-                ColorButton(color = colorResource(id = R.color.azure_light_blue_accent), onClick = { /*todo*/ })
-                ColorButton(color = colorResource(id = R.color.honey_yellow_accent), onClick = { /*todo*/ })
-                ColorButton(color = colorResource(id = R.color.lavender_accent), onClick = { /*todo*/ })
-                ColorButton(color = colorResource(id = R.color.gray_text_color), onClick = { /*todo*/ })
-            }
+        Row {
+            ColorButton(
+                color = colorResource(id = R.color.secondary_color),
+                onClick = { /*todo*/ })
+            ColorButton(
+                color = colorResource(id = R.color.cherry_red_accent),
+                onClick = { /*todo*/ })
+            ColorButton(
+                color = colorResource(id = R.color.mint_accent),
+                onClick = { /*todo*/ })
+            ColorButton(
+                color = colorResource(id = R.color.azure_light_blue_accent),
+                onClick = { /*todo*/ })
+            ColorButton(
+                color = colorResource(id = R.color.honey_yellow_accent),
+                onClick = { /*todo*/ })
+            ColorButton(
+                color = colorResource(id = R.color.lavender_accent),
+                onClick = { /*todo*/ })
+            ColorButton(
+                color = colorResource(id = R.color.gray_text_color),
+                onClick = { /*todo*/ })
         }
-
     }
-
 }
 
 
 @Composable
-fun ColorButton(color: Color, onClick: ()-> Unit){
+fun ColorButton(color: Color, onClick: () -> Unit) {
 
     Button(
         onClick = onClick,

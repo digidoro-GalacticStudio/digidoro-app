@@ -71,11 +71,11 @@ fun GrayInput(
                                 RoundedCornerShape(roundCorner)
                             ),
                         shape = RoundedCornerShape(roundCorner),
-                        colors = TextFieldDefaults.textFieldColors(
-                            containerColor = colorResource(id = R.color.gray_text_color),
+                        colors = TextFieldDefaults.colors(
+//                            containerColor = colorResource(id = R.color.gray_text_color),
                             focusedIndicatorColor = Color.Transparent,
                             unfocusedIndicatorColor = Color.Transparent,
-                            placeholderColor = colorResource(id = R.color.lavender_accent)
+//                            placeholderColor = colorResource(id = R.color.lavender_accent)
                         ),
                         keyboardOptions = when (type) {
                             TextFieldType.NUMBER -> KeyboardOptions(keyboardType = KeyboardType.Number)
