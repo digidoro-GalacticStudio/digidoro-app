@@ -16,5 +16,5 @@
     <!--   TEXT COLOR PALETTE -->
     <color name="white_text_color">#FFFFFFFF</color>
     <color name="black_text_color">#FF000000</color>
-    <color name="gray_text_color">#E8EAED</color>s
+    <color name="gray_text_color">#7A7A7A</color>s
 </resources>
