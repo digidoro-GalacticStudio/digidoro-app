@@ -7,16 +7,15 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 
 private val DarkColorScheme = darkColorScheme(
-
-    //btns y asi
+    //btns
     primary = Gray60,
     onPrimary = White60,
 
     secondary = BabyGray30,
     onSecondary = White60,
-    
+
     tertiary = AzureBlue10,
-    onTertiary = Gray60,
+    onTertiary = DarkNotes_accent,
 
     background = Gray60,
     onBackground = Gray60,
@@ -26,8 +25,6 @@ private val DarkColorScheme = darkColorScheme(
     onSurface = DarkNotes_accent,
     surfaceVariant = OnGray_accent, //menu's color hover
     onSurfaceVariant = DarkNotes_accent, //notes background
-
-
 
     //accents, ni modo, no hay otras variables
     //Gray from the note taking squares
@@ -39,10 +36,7 @@ private val DarkColorScheme = darkColorScheme(
     // for pomo bar
     error = Cherry_accent,
     onError = GreenPepper_accent,
-
-
-
-    )
+)
 
 private val LightColorScheme = lightColorScheme(
     //https://m2.material.io/design/color/the-color-system.html#color-theme-creation
@@ -73,18 +67,17 @@ private val LightColorScheme = lightColorScheme(
     // for pomo bar
     error = Cherry_accent,
     onError = GreenPepper_accent,
-    )
-
+)
 
 
 @Composable
 fun DigidoroTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    content: @Composable ()-> Unit
-    ){
+    content: @Composable () -> Unit
+) {
     MaterialTheme(
         typography = Typography,
-        colorScheme = if(darkTheme) DarkColorScheme else LightColorScheme ,
+        colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme,
         content = content
     )
 }

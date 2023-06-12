@@ -64,6 +64,5 @@ fun TextElement(
         style = textStyle,
         fontFamily = Nunito,
         fontWeight = fontWeight,
-        color = Color(0xFF202124)
     )
 }

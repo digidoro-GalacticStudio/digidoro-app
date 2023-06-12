@@ -145,3 +145,90 @@ val tagList = mutableListOf<TagModel>().apply {
         TagModel(name = "Last Tags")
     )
 }
+
+val userList: MutableList<UserModel> = mutableListOf(
+    UserModel(
+        name = "John",
+        lastname = "Doe",
+        email = "johndoe@example.com",
+        phone_number = "+123456789",
+        password_hash = "password123",
+        date_birth = Calendar.getInstance().time,
+        profile_pic = "https://example.com/profiles/johndoe.jpg",
+        level = "Dreamer",
+        daily_score = 10,
+        weekly_score = 75,
+        monthly_score = 250,
+        total_score = 1200
+    ),
+    UserModel(
+        name = "Alice",
+        lastname = "Smith",
+        email = "alice.smith@example.com",
+        phone_number = "+987654321",
+        password_hash = "qwerty",
+        date_birth = Calendar.getInstance().time,
+        profile_pic = "https://example.com/profiles/alicesmith.jpg",
+        level = "Explorer",
+        daily_score = 5,
+        weekly_score = 40,
+        monthly_score = 150,
+        total_score = 800
+    ),
+    UserModel(
+        name = "Michael",
+        lastname = "Johnson",
+        email = "michael.johnson@example.com",
+        phone_number = "+555555555",
+        password_hash = "abcdef",
+        date_birth = Calendar.getInstance().time,
+        profile_pic = "https://example.com/profiles/michaeljohnson.jpg",
+        level = "Adventurer",
+        daily_score = 2,
+        weekly_score = 20,
+        monthly_score = 80,
+        total_score = 400
+    ),
+    UserModel(
+        name = "Emily",
+        lastname = "Brown",
+        email = "emily.brown@example.com",
+        phone_number = "+111222333",
+        password_hash = "password456",
+        date_birth = Calendar.getInstance().time,
+        profile_pic = "https://example.com/profiles/emilybrown.jpg",
+        level = "Dreamer",
+        daily_score = 8,
+        weekly_score = 60,
+        monthly_score = 200,
+        total_score = 1000
+    ),
+    UserModel(
+        name = "William",
+        lastname = "Davis",
+        email = "william.davis@example.com",
+        phone_number = "+444555666",
+        password_hash = "qwerty123",
+        date_birth = Calendar.getInstance().time,
+        profile_pic = "https://example.com/profiles/williamdavis.jpg",
+        level = "Explorer",
+        daily_score = 4,
+        weekly_score = 30,
+        monthly_score = 120,
+        total_score = 600
+    ),
+    UserModel(
+        name = "Sophia",
+        lastname = "Wilson",
+        email = "sophia.wilson@example.com",
+        phone_number = "+777888999",
+        password_hash = "abcdef123",
+        date_birth = Calendar.getInstance().time,
+        profile_pic = "https://example.com/profiles/sophiawilson.jpg",
+        level = "Adventurer",
+        daily_score = 1,
+        weekly_score = 10,
+        monthly_score = 40,
+        total_score = 200
+    )
+)

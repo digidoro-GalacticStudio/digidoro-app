@@ -69,5 +69,5 @@ fun Modifier.shadowWithBorder(
             size = size,
             cornerRadius = CornerRadius(cornerRadius.toPx()),
         )
-    }.clip(RoundedCornerShape(cornerRadius))
+    }
 }
