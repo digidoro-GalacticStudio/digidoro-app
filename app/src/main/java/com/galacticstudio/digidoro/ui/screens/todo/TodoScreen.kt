@@ -1,35 +1,52 @@
 package com.galacticstudio.digidoro.ui.screens.todo
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.FabPosition
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.galacticstudio.digidoro.R
 import com.galacticstudio.digidoro.data.TodoModel
 import com.galacticstudio.digidoro.data.todoList
 import com.galacticstudio.digidoro.navigation.AppScaffold
-import com.galacticstudio.digidoro.ui.shared.cards.todoItems.TodoItem
-import com.galacticstudio.digidoro.ui.shared.cards.todoItems.TodoMessageData
+import com.galacticstudio.digidoro.ui.screens.todo.components.DisplayTodo
+import com.galacticstudio.digidoro.ui.shared.floatingCards.todo.TodoFloatingBox
 import com.galacticstudio.digidoro.ui.shared.titles.CustomMessageData
 import com.galacticstudio.digidoro.ui.shared.titles.Title
 import com.galacticstudio.digidoro.ui.theme.DigidoroTheme
@@ -73,6 +90,75 @@ fun TodoScreen(
  */
 @Composable
 fun TodoContent(modifier: Modifier = Modifier){
+
+//    variables and functions to use
+    var isFloatingTodoVisible by remember {
+        mutableStateOf(false)
+    }
+    val density = LocalDensity.current
+
+    fun FloatingTodoVisibleHandler (){ isFloatingTodoVisible = true}
+    fun FloatingTodoHideHandler (){ isFloatingTodoVisible = false}
+
+    Scaffold(
+        floatingActionButtonPosition = FabPosition.Center,
+        floatingActionButton = {
+
+            //floating elements
+            FloatingActionButton(
+                onClick = { FloatingTodoVisibleHandler() },
+                containerColor = MaterialTheme.colorScheme.secondary,
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .width(68.dp)
+                    .height(68.dp)
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.add_icon),
+                    contentDescription = "Create new todo"
+                )
+            }
+        },
+    ){
+        contentPadding ->
+        Box(modifier = Modifier.padding(contentPadding)) {
+            //static element
+            TodoStaticBody()
+
+            //floating no scrollable element
+            if(isFloatingTodoVisible)
+                Box(modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                )
+
+            //animated floating card
+           AnimatedVisibility(
+               visible = isFloatingTodoVisible,
+               enter = slideInVertically {
+                   // Slide in from 40 dp from the top.
+                   with(density) { -40.dp.roundToPx() }
+               } + expandVertically(
+                   // Expand from the top.
+                   expandFrom = Alignment.Top
+               ) + fadeIn(
+                   // Fade in with the initial alpha of 0.3f.
+                   initialAlpha = 0.3f
+               ),
+               exit = slideOutVertically() + shrinkVertically() + fadeOut()
+           ) {
+               TodoFloatingBox(
+                   modifier = Modifier
+                       .offset(x = 0.dp, y = 90.dp),
+                   FloatingTodoHideHandler = { FloatingTodoHideHandler() }
+               )
+           }
+        }
+    }
+}
+
+@Composable
+fun TodoStaticBody(modifier: Modifier = Modifier){
     //const
     val dateFormatter = SimpleDateFormat("EEE. MMMM dd", Locale.getDefault())
     val currentDate = dateFormatter.format(Date())
@@ -83,6 +169,8 @@ fun TodoContent(modifier: Modifier = Modifier){
             .fillMaxSize()
             .padding(24.dp)
     ) {
+
+        //static elements
         Spacer(modifier = Modifier.height(16.dp))
         Title(
             message = CustomMessageData("Tus task", "Comienza tu día paso a paso"),
@@ -101,27 +189,7 @@ fun TodoContent(modifier: Modifier = Modifier){
             .padding(end = 16.dp)
             .background(MaterialTheme.colorScheme.secondary))
 
-        LazyColumn(
-            modifier = Modifier.heightIn(100.dp, 270.dp),
-            contentPadding = PaddingValues(16.dp),
-            state = rememberLazyListState()
-        ){
-
-            itemsIndexed(todayFilter(todoList)){ _, item ->
-                val date = dayFormat(item.createdAt!!)
-
-                TodoItem(
-                    message = TodoMessageData(
-                        mainMessage = item.title,
-                        messageBold = date.day,
-                        messageNoBold = date.date
-                    ),
-                    colorTheme = Color(android.graphics.Color.parseColor(item.theme))
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-        }
+        DisplayTodo(todoList = todayFilter(todoList))
 
         Spacer(modifier = Modifier.height(16.dp))
         Title(
@@ -130,62 +198,15 @@ fun TodoContent(modifier: Modifier = Modifier){
         )
         Spacer(modifier = Modifier.height(16.dp))
 
-        LazyColumn(
-            modifier = Modifier.heightIn(100.dp, 270.dp),
-            contentPadding = PaddingValues(16.dp),
-            state = rememberLazyListState()
-        ){
-            itemsIndexed(noTodayFilter(todoList)){ _, item ->
-                val date = dayFormat(item.createdAt!!)
-
-                TodoItem(
-                    message = TodoMessageData(
-                        mainMessage = item.title,
-                        messageBold = date.day,
-                        messageNoBold = date.date
-                    ),
-                    colorTheme = Color(android.graphics.Color.parseColor(item.theme))
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-        }
+        DisplayTodo(todoList = noTodayFilter(todoList))
 
         Spacer(modifier = Modifier.height(24.dp))
         Title(
             message = CustomMessageData("¡Lo lograste!", "Mira tus tareas completadas"),
             alignment = Alignment.CenterHorizontally
         )
-        LazyColumn(
-            modifier = Modifier.heightIn(100.dp, 270.dp),
-            contentPadding = PaddingValues(16.dp),
-            state = rememberLazyListState()
-        ){
-            itemsIndexed(doneFilter(todoList)){ _, item ->
-                val date = dayFormat(item.createdAt!!)
-
-                TodoItem(
-                    message = TodoMessageData(
-                        mainMessage = item.title,
-                        messageBold = date.day,
-                        messageNoBold = date.date
-                    ),
-                    colorTheme = Color(android.graphics.Color.parseColor(item.theme)),
-                    done = item.state!!
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-        }
-
+        DisplayTodo(todoList = doneFilter(todoList))
     }
-}
-
-private fun dayFormat(date: Date): DateFormatData{
-    val day = SimpleDateFormat("EEE", Locale.getDefault()).format(date)
-    val completeDate = SimpleDateFormat("dd MM yyyy", Locale.getDefault()).format(date)
-
-    return DateFormatData(day, completeDate)
 }
 
 //display today todos

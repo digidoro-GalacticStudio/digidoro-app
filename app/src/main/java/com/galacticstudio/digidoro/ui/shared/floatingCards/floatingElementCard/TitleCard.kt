@@ -17,15 +17,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import com.galacticstudio.digidoro.R
 import com.galacticstudio.digidoro.ui.theme.DigidoroTheme
-
-
-@OptIn(ExperimentalMaterial3Api::class)
+/**
+ * Function that works us Title field for elements created in the app
+ * @param placeHolder string that work us place holder of the element
+ * @param value intial value the field will have with default value as ""
+ */
 @Composable
 fun TitleCard(
+    placeHolder: String,
     value: String = "",
-    placeHolder: String
 ){
     var value by remember { mutableStateOf(value) }
     DigidoroTheme {
@@ -38,11 +41,14 @@ fun TitleCard(
                 modifier = Modifier
                     .fillMaxWidth(),
                 colors = TextFieldDefaults.colors(
-//                    containerColor = Color.Transparent,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-//                    placeholderColor = colorResource(id = R.color.black_text_color),
-//                    textColor = colorResource(id = R.color.black_text_color)
+                    unfocusedIndicatorColor = Color.Transparent ,
+                    focusedIndicatorColor = MaterialTheme.colorScheme.secondary,
+                    unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurface,
+                    focusedPlaceholderColor = MaterialTheme.colorScheme.onSurface,
+                    focusedTextColor = MaterialTheme.colorScheme.secondary,
+                    unfocusedTextColor = MaterialTheme.colorScheme.secondary,
+                    unfocusedContainerColor = Color.Transparent,
+                    focusedContainerColor = Color.Transparent
                 ),
             )
 

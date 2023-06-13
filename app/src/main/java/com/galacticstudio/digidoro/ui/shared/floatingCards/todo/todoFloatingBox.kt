@@ -1,4 +1,4 @@
-package com.galacticstudio.digidoro.ui.shared.floatingCards.pomodoro
+package com.galacticstudio.digidoro.ui.shared.floatingCards.todo
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -26,23 +27,39 @@ import com.galacticstudio.digidoro.R
 import com.galacticstudio.digidoro.ui.shared.floatingCards.floatingElementCard.ButtonControl
 import com.galacticstudio.digidoro.ui.shared.floatingCards.floatingElementCard.ColorBox
 import com.galacticstudio.digidoro.ui.shared.floatingCards.floatingElementCard.GrayInput
+import com.galacticstudio.digidoro.ui.shared.floatingCards.floatingElementCard.TextFieldType
 import com.galacticstudio.digidoro.ui.shared.floatingCards.floatingElementCard.TitleCard
 import com.galacticstudio.digidoro.ui.theme.DigidoroTheme
 import com.galacticstudio.digidoro.util.shadowWithCorner
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
+
 
 @Preview()
 @Composable
-fun previewPomodoroFloatingCard(){
-    PomodoroFloatingBox()
+fun todoFloatingBox(){
+    TodoFloatingBox(FloatingTodoHideHandler = fun(){})
 }
 
 val cornerRadius = 5.dp
 
+/**
+ * This composable function represent a floating box to create new todo elements
+ *  @param modifier is a dinamic modifier
+ *  @param FloatingTodoHideHandler  handles on cancel method
+ */
+
 @Composable
-fun PomodoroFloatingBox(){
+fun TodoFloatingBox(
+    modifier: Modifier = Modifier,
+    FloatingTodoHideHandler: ()-> Unit
+){
+
+    val day = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault()).format(Calendar.getInstance().time)
     DigidoroTheme {
         Box(
-            modifier = Modifier
+            modifier = modifier
                 .wrapContentWidth()
                 .fillMaxHeight()
         ){
@@ -55,7 +72,7 @@ fun PomodoroFloatingBox(){
                         shadowColor = MaterialTheme.colorScheme.secondary
                     )
                     .border(
-                        width = (0.5).dp,
+                        width = (1).dp,
                         color = MaterialTheme.colorScheme.secondary,
                         shape = RoundedCornerShape(cornerRadius)
                     )
@@ -65,11 +82,13 @@ fun PomodoroFloatingBox(){
 
             ){
                 Column(Modifier.wrapContentWidth()) {
-                    TitleCard(placeHolder = "Agregar Flujo de Datos")
+                    TitleCard(placeHolder = "Nombra tu task")
                     GrayInput(
-                        label = "Número de sesiones",
-                        placeHolder = "1",
-                        fieldWidth = 80.dp
+                        label = "Fecha",
+                        placeHolder = day,
+                        fieldWidth = 100.dp,
+                        type = TextFieldType.DATE,
+                        modifier = Modifier.selectable(true, false, null, fun(){})
                     )
                     Column () {
                         Text(
@@ -80,15 +99,23 @@ fun PomodoroFloatingBox(){
                         ColorBox()
                     }
                     Spacer(modifier = Modifier.height(14.dp))
-                    PomodoroControler()
+                    PomodoroControler(
+                        FloatingTodoHideHandler
+                    )
                 }
             }
         }
     }
 }
 
+/**
+ * Composable function that control save and cancel buttons of todo floating card
+ * @param FloatingTodoHideHandler handles on cancel method
+ */
 @Composable
-fun PomodoroControler(){
+fun PomodoroControler(
+    FloatingTodoHideHandler: () -> Unit
+){
     Row(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -97,7 +124,7 @@ fun PomodoroControler(){
             contentColor = MaterialTheme.colorScheme.secondary,
             backgroundColor = Color.Transparent,
             borderColor = Color.Transparent,
-            onClick = { /*todo*/ }
+            onClick = { FloatingTodoHideHandler() }
         )
         Spacer(modifier = Modifier.width(110.dp))
         ButtonControl(

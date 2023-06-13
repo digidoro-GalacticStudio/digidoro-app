@@ -124,7 +124,8 @@ fun TodoInformation(
                     checked = done,
                     colors = CheckboxDefaults.colors(
                         checkedColor =  MaterialTheme.colorScheme.secondary,
-                        uncheckedColor = MaterialTheme.colorScheme.secondary
+                        uncheckedColor = MaterialTheme.colorScheme.secondary,
+                        checkmarkColor = MaterialTheme.colorScheme.primary
                     ),
                     onCheckedChange = {
                         stateHandler()
