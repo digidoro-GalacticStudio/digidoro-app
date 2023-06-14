@@ -12,60 +12,58 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.galacticstudio.digidoro.R
 import com.galacticstudio.digidoro.ui.theme.Nunito
-import com.galacticstudio.digidoro.util.shadowWithBorder
 
-
+/**
+ * Composable function for displaying a ranking card.
+ *
+ * @param username The username.
+ * @param levelName The name of the level.
+ * @param currentScore The current score.
+ * @param nextLevelScore The score required to reach the next level.
+ * @param modifier The modifier for styling the card.
+ */
 @Composable
 fun RankingCard(
     username: String,
     levelName: String,
     currentScore: Int,
     nextLevelScore: Int,
-    colorShadow: Color = Color.Yellow
+    modifier: Modifier = Modifier,
 ) {
     val borderWidth = 1.dp
     val gap = 7.dp
 
     Card(
         colors = CardDefaults.cardColors(
-            containerColor = Color.White,
+            containerColor = MaterialTheme.colorScheme.background,
         ),
         shape = RoundedCornerShape(16.dp),
-        border = BorderStroke(borderWidth, Color.Black),
-        modifier = Modifier
-            .padding(16.dp)
-            .shadowWithBorder(
-                borderWidth = borderWidth,
-                borderColor = Color.Black,
-                cornerRadius = 11.8825.dp,
-                shadowColor = colorShadow,
-                shadowOffset = Offset(15f, 15f)
-            )
+        border = BorderStroke(borderWidth, MaterialTheme.colorScheme.onPrimary),
+        modifier = Modifier.padding(start = 13.dp, top = 10.dp, end = 13.dp, bottom = 13.dp)
+            .then(modifier),
     ) {
         Box(
             modifier = Modifier
-                .width(500.dp)
                 .fillMaxWidth()
                 .padding(16.dp),
             contentAlignment = Alignment.TopEnd
@@ -75,49 +73,47 @@ fun RankingCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Image(
-                    painter = painterResource(R.drawable.heart_border_icon),
+                    painter = painterResource(R.drawable.fire_icon),
                     contentDescription = null,
                     modifier = Modifier
-                        .size(80.dp)
+                        .size(70.dp)
                         .clip(CircleShape)
-                        .border(2.dp, Color.Black, CircleShape)
+                        .border(2.dp, MaterialTheme.colorScheme.onPrimary, CircleShape)
                         .background(Color.White),
                     contentScale = ContentScale.Crop
                 )
 
                 Column(
-                    modifier = Modifier.padding(start = 24.dp)
+                    modifier = Modifier.padding(start = 20.dp)
                 ) {
                     Text(
                         text = username,
-                        color = Color.Black,
                         fontWeight = FontWeight.W800,
                         fontSize = 20.sp,
                         fontFamily = Nunito,
+                        color = MaterialTheme.colorScheme.onPrimary,
                     )
 
-                    Spacer(modifier = Modifier.height(gap * 2))
-
                     Text(
-                        text = "Nivel",
-                        color = Color.Black,
-                        fontSize = 12.sp,
+                        text = stringResource(R.string.level_text_card),
+                        style = MaterialTheme.typography.bodySmall,
                         fontFamily = Nunito,
+                        color = MaterialTheme.colorScheme.onPrimary,
                     )
 
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             text = levelName,
-                            style = TextStyle(color = Color.Black),
-                            fontSize = 14.sp,
+                            style = MaterialTheme.typography.bodyMedium,
                             fontFamily = Nunito,
+                            color = MaterialTheme.colorScheme.onPrimary,
                         )
                         Text(
-                            text = " ${currentScore}/${nextLevelScore} EXP",
-                            style = TextStyle(color = Color.Blue),
-                            fontSize = 14.sp,
+                            text = " ${currentScore}/${nextLevelScore} XP",
+                            style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.W700,
                             fontFamily = Nunito,
+                            color = MaterialTheme.colorScheme.tertiary,
                         )
                     }
 
@@ -125,7 +121,8 @@ fun RankingCard(
 
                     LinearProgressIndicator(
                         progress = currentScore.toFloat() / nextLevelScore.toFloat(),
-                        color = Color.hsl(220f, 1f, 0.75f),
+                        color = MaterialTheme.colorScheme.tertiary,
+                        trackColor = MaterialTheme.colorScheme.secondary,
                         modifier = Modifier.fillMaxWidth(0.7f),
                     )
                 }

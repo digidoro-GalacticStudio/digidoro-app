@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Digidoro</string>
+    <string name="level_text_card">Level</string>
+    <string name="ranking_screen_title">Ranking</string>
+    <string name="ranking_screen_statement">Stay up to date with your productivity.</string>
+    <string name="ranking_screen_subtitle">Scores</string>
+    <string name="ranking_screen_score">Stay up to date with other users</string>
 </resources>

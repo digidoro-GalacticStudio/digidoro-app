@@ -188,14 +188,7 @@ fun TopBarNote(
             modifier = Modifier
                 .padding(padding)
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .zIndex(100f)
-                    .background(if (showMenu) Color.Black.copy(alpha = 0.4f) else Color.Transparent)
-            ) {
-                content()
-            }
+            content()
         }
     }
 }
