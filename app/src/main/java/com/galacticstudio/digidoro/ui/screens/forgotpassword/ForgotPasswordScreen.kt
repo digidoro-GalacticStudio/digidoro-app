@@ -57,10 +57,12 @@ fun ForgotPasswordScreen(
         Header()
         Spacer(modifier = Modifier.height(largegap))
         TextFieldForm(
+            value = "",
             label = "Your username",
             placeholder = "digidoro4U",
             type = TextFieldType.TEXT,
             leadingIcon = painterResource(R.drawable.email_icon),
+            onTextFieldChanged = { /* TODO */}
         )
         Spacer(modifier = Modifier.height(largegap))
         VerificationInstructions()

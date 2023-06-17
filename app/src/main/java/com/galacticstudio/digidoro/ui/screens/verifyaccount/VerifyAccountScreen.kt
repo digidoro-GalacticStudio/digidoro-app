@@ -79,10 +79,12 @@ fun VerifyAccountScreen(
         )
         Spacer(modifier = Modifier.height(smallgap))
         TextFieldForm(
+            value = "",
             label = "Code",
             placeholder = "Verification code",
             type = TextFieldType.NUMBER,
             leadingIcon = painterResource(R.drawable.tag_icon),
+            onTextFieldChanged = { /* TODO */},
         )
         Spacer(modifier = Modifier.height(largegap))
         Text(

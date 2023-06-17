@@ -7,7 +7,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -24,11 +23,14 @@ import com.galacticstudio.digidoro.ui.theme.Nunito
  */
 @Composable
 fun TextFieldForm(
+    value: String,
     label: String,
     placeholder: String,
     type: TextFieldType = TextFieldType.TEXT,
     leadingIcon: Painter? = null,
     isPassword: Boolean = false,
+    isError: Boolean = false,
+    onTextFieldChanged: (String) -> Unit,
 ) {
     Column {
         Text(
@@ -36,19 +38,24 @@ fun TextFieldForm(
             style = MaterialTheme.typography.bodyLarge,
             fontFamily = Nunito,
             fontWeight = FontWeight.W800,
-            color = Color(0xFF202124),
         )
         Spacer(modifier = Modifier.height(6.dp))
         if (isPassword) {
             PasswordTextField(
                 placeholder = placeholder,
-                leadingIcon = leadingIcon
+                leadingIcon = leadingIcon,
+                value = value,
+                isError = isError,
+                onTextFieldChanged = onTextFieldChanged
             )
         } else {
             TextFieldItem(
                 placeholder = placeholder,
                 type = type,
-                leadingIcon = leadingIcon
+                leadingIcon = leadingIcon,
+                value = value,
+                isError = isError,
+                onTextFieldChanged = onTextFieldChanged
             )
         }
     }
