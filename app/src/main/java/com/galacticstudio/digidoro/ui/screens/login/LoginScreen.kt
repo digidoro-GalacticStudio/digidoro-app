@@ -76,7 +76,6 @@ fun LoginPreview() {
 @Composable
 fun LoginScreen(
     navController: NavController,
-//    viewModel: LoginViewModel = viewModel<LoginViewModel>(),
     loginViewModel: LoginViewModel = viewModel<LoginViewModel>(factory = LoginViewModel.Factory),
 ) {
     // Retrieve the application instance from the current context

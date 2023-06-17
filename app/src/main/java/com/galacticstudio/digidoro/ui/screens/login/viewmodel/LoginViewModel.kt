@@ -148,11 +148,11 @@ class LoginViewModel(
     }
 
     companion object {
-        // Factory for creating instances of LoginViewModel
+        // Factory for creating instances of LoginViewModel.
         val Factory = viewModelFactory {
             initializer {
                 val app = this[APPLICATION_KEY] as RetrofitApplication
-                // Create a new instance of LoginViewModel with dependencies
+                // Create a new instance of LoginViewModel with dependencies.
                 LoginViewModel(
                     validateEmail = ValidateEmail(),
                     validatePassword = ValidatePassword(),
