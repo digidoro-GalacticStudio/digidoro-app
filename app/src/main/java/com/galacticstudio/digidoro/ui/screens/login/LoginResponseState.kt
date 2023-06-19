@@ -7,5 +7,9 @@ sealed class LoginResponseState {
     object Resume : LoginResponseState()
     class Error(val exception: Exception) : LoginResponseState()
     data class ErrorWithMessage(val message: String) : LoginResponseState()
-    data class Success(val token: String) : LoginResponseState()
+    data class Success(
+        val token: String,
+        val username: String,
+        val roles: List<String> = emptyList()
+    ) : LoginResponseState()
 }

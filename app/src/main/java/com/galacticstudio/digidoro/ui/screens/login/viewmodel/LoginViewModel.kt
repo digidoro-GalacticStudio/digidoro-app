@@ -37,7 +37,7 @@ class LoginViewModel(
     var state by mutableStateOf(LoginFormState())
 
     // The current state of the login response from the API (nullable)
-    var apiState by mutableStateOf<LoginResponseState?>(LoginResponseState.Resume)
+    private var apiState by mutableStateOf<LoginResponseState?>(LoginResponseState.Resume)
 
     // Channel for emitting login response states.
     private val responseEventChannel = Channel<LoginResponseState>()
@@ -128,7 +128,13 @@ class LoginViewModel(
                 }
 
                 is ApiResponse.Success -> {
-                    sendResponseEvent(LoginResponseState.Success(response.data))
+                    sendResponseEvent(
+                        LoginResponseState.Success(
+                            response.data.token,
+                            response.data.username,
+                            response.data.roles
+                        )
+                    )
                 }
             }
         }
@@ -161,4 +167,5 @@ class LoginViewModel(
             }
         }
     }
+
 }

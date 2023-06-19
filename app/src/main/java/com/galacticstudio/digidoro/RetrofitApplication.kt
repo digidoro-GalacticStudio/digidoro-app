@@ -13,11 +13,17 @@ class RetrofitApplication : Application() {
     }
 
     private fun getAPIService() = with(RetrofitInstance){
-        setToken(getTokent())
+        setToken(getToken())
+        setRoles(getRoles())
+        setUsername(getUsername())
         getLoginService()
     }
 
-    fun getTokent(): String = prefs.getString(USER_TOKEN, "")!!
+    fun getToken(): String = prefs.getString(USER_TOKEN, "")!!
+
+    fun getRoles(): List<String> = prefs.getStringSet(USER_ROLES, emptySet())?.toList() ?: emptyList()
+
+    fun getUsername(): String = prefs.getString(USERNAME, "")!!
 
     val credentialsRepository: CredentialsRepository by lazy {
         CredentialsRepository(getAPIService())
@@ -29,7 +35,21 @@ class RetrofitApplication : Application() {
         editor.apply()
     }
 
+    fun saveRoles(roles: List<String>) {
+        val editor = prefs.edit()
+        editor.putStringSet(USER_ROLES, roles.toSet())
+        editor.apply()
+    }
+
+    fun saveUsername(username: String) {
+        val editor = prefs.edit()
+        editor.putString(USERNAME, username)
+        editor.apply()
+    }
+
     companion object {
         const val USER_TOKEN = "user_token"
+        const val USER_ROLES = "user_roles"
+        const val USERNAME = "username"
     }
 }

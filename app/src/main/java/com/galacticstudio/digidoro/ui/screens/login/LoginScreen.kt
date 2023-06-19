@@ -1,8 +1,7 @@
-package com.galacticstudio.digidoro.screens.login
+package com.galacticstudio.digidoro.ui.screens.login
 
 import android.content.res.Configuration
 import android.widget.Toast
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -21,7 +20,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,17 +29,16 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.galacticstudio.digidoro.R
 import com.galacticstudio.digidoro.RetrofitApplication
+import com.galacticstudio.digidoro.navigation.HOME_GRAPH_ROUTE
 import com.galacticstudio.digidoro.navigation.Screen
-import com.galacticstudio.digidoro.ui.screens.login.LoginFormEvent
-import com.galacticstudio.digidoro.ui.screens.login.LoginResponseState
 import com.galacticstudio.digidoro.ui.screens.login.viewmodel.LoginViewModel
 import com.galacticstudio.digidoro.ui.shared.button.CustomButton
+import com.galacticstudio.digidoro.ui.shared.textfield.ErrorMessage
 import com.galacticstudio.digidoro.ui.shared.textfield.TextFieldForm
 import com.galacticstudio.digidoro.ui.shared.textfield.TextFieldType
 import com.galacticstudio.digidoro.ui.shared.titles.CustomMessageData
@@ -76,7 +73,7 @@ fun LoginPreview() {
 @Composable
 fun LoginScreen(
     navController: NavController,
-    loginViewModel: LoginViewModel = viewModel<LoginViewModel>(factory = LoginViewModel.Factory),
+    loginViewModel: LoginViewModel = viewModel(factory = LoginViewModel.Factory),
 ) {
     // Retrieve the application instance from the current context
     val app: RetrofitApplication = LocalContext.current.applicationContext as RetrofitApplication
@@ -107,12 +104,19 @@ fun LoginScreen(
                 }
 
                 is LoginResponseState.Success -> {
+                    app.saveAuthToken(event.token)
+                    app.saveRoles(event.roles)
+                    app.saveUsername(event.username)
+
+                    val tokenValue = app.getToken()
+
                     Toast.makeText(
                         context,
-                        "Login Successful ${event.token}",
+                        "Login Successful ${tokenValue}",
                         Toast.LENGTH_LONG
                     ).show()
-                    app.saveAuthToken(event.token)
+
+                    navController.navigate(HOME_GRAPH_ROUTE)
                 }
 
                 else -> {}
@@ -129,8 +133,10 @@ fun LoginScreen(
     ) {
         Logo()
         Spacer(modifier = Modifier.height(gap))
+
         Header()
         Spacer(modifier = Modifier.height(largegap))
+
         TextFieldForm(
             label = "Your username",
             placeholder = "digidoro4U@hotmail.com",
@@ -141,18 +147,10 @@ fun LoginScreen(
         ) {
             loginViewModel.onEvent(LoginFormEvent.EmailChanged(it))
         }
-        AnimatedVisibility (
-            visible = state.emailError != null,
-        ) {
-            Text(
-                text = state.emailError ?: "",
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.padding(top = 8.dp).fillMaxWidth().align(Alignment.CenterHorizontally)
-            )
-        }
 
+        ErrorMessage(state.emailError)
         Spacer(modifier = Modifier.height(gap))
+
         TextFieldForm(
             value = state.password,
             label = "Your password",
@@ -164,25 +162,20 @@ fun LoginScreen(
         ){
             loginViewModel.onEvent(LoginFormEvent.PasswordChanged(it))
         }
-        AnimatedVisibility (state.passwordError != null) {
-            Text(
-                text = state.passwordError ?: "",
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.padding(top = 8.dp).fillMaxWidth().align(Alignment.End)
-            )
-        }
+
+        ErrorMessage(state.passwordError)
         Spacer(modifier = Modifier.height(smallgap))
+
         ForgotPassword(
             text = "forgot your password?",
             onClick = { navController.navigate(route = Screen.ForgotPassword.route) }
         )
         Spacer(modifier = Modifier.height(gap))
+
         CustomButton(
             text = "Log in",
             onClick = {
                 loginViewModel.onEvent(LoginFormEvent.Submit)
-//                navController.navigate(HOME_GRAPH_ROUTE)
             }
         )
         Spacer(modifier = Modifier.height(gap))

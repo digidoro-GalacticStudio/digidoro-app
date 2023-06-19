@@ -1,12 +1,33 @@
 package com.galacticstudio.digidoro.util
 
+import android.annotation.SuppressLint
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
 class DateUtils {
     companion object {
+
+        fun formatLongDateToString(dateMillis: Long): String {
+            val dateFormat = SimpleDateFormat("MM-dd-yyyy", Locale.getDefault())
+            val calendar = Calendar.getInstance().apply {
+                timeInMillis = dateMillis
+                add(Calendar.DAY_OF_MONTH, 1)
+            }
+            return dateFormat.format(calendar.time)
+        }
+
+        @SuppressLint("NewApi")
+        fun convertToISO8601(dateString: String): String {
+            val inputFormatter = DateTimeFormatter.ofPattern("MM-dd-yyyy")
+            val localDate = LocalDate.parse(dateString, inputFormatter)
+            val outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+            return localDate.format(outputFormatter)
+        }
+
         fun formatDateWithTime(date: Date?): Pair<String, String> {
             if (date == null) {
                 return "Invalid Date" to ""

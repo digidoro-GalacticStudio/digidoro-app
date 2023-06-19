@@ -26,10 +26,13 @@ fun TextFieldForm(
     value: String,
     label: String,
     placeholder: String,
+    modifier: Modifier = Modifier,
     type: TextFieldType = TextFieldType.TEXT,
     leadingIcon: Painter? = null,
+    trailingIcon: @Composable (() -> Unit)? = null,
     isPassword: Boolean = false,
     isError: Boolean = false,
+    enabled: Boolean = true,
     onTextFieldChanged: (String) -> Unit,
 ) {
     Column {
@@ -42,6 +45,7 @@ fun TextFieldForm(
         Spacer(modifier = Modifier.height(6.dp))
         if (isPassword) {
             PasswordTextField(
+                modifier = modifier,
                 placeholder = placeholder,
                 leadingIcon = leadingIcon,
                 value = value,
@@ -50,11 +54,14 @@ fun TextFieldForm(
             )
         } else {
             TextFieldItem(
+                modifier = modifier,
                 placeholder = placeholder,
                 type = type,
                 leadingIcon = leadingIcon,
+                trailingIcon = trailingIcon,
                 value = value,
                 isError = isError,
+                enabled = enabled,
                 onTextFieldChanged = onTextFieldChanged
             )
         }

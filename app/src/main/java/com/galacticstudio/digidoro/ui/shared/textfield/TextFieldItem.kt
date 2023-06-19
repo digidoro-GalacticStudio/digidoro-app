@@ -47,10 +47,11 @@ fun TextFieldItem(
     modifier: Modifier = Modifier,
     type: TextFieldType = TextFieldType.TEXT,
     leadingIcon: Painter? = null,
+    trailingIcon: @Composable (() -> Unit)? = null,
     isError: Boolean,
+    enabled: Boolean = true,
     onTextFieldChanged: (String) -> Unit
 ) {
-
     val borderWidth = LocalDensity.current.run { 2.toDp() }
     val borderRadius = LocalDensity.current.run { 18.toDp() }
 
@@ -87,13 +88,16 @@ fun TextFieldItem(
                 focusedTextColor = Gray60,
                 unfocusedTextColor = Gray60,
                 errorTextColor = Gray60,
+                disabledTextColor = Gray60.copy(0.8f),
                 cursorColor = Gray60,
                 focusedContainerColor = Color.White,
                 unfocusedContainerColor= Color.White,
                 errorContainerColor = Color.White,
+                disabledContainerColor = Color.White,
                 focusedPlaceholderColor = Gray60,
                 unfocusedPlaceholderColor = Gray60,
                 errorPlaceholderColor = MaterialTheme.colorScheme.error.copy(0.7f),
+                disabledPlaceholderColor = Gray60.copy(0.8f),
                 focusedLeadingIconColor = Gray60,
                 unfocusedLeadingIconColor = Gray60,
                 errorLeadingIconColor = MaterialTheme.colorScheme.error.copy(0.7f),
@@ -106,6 +110,10 @@ fun TextFieldItem(
                     )
                 }
             },
+            trailingIcon = trailingIcon?.let {
+                trailingIcon
+            },
+            enabled = enabled,
             maxLines = 1,
             textStyle = MaterialTheme.typography.titleMedium,
             isError = isError,

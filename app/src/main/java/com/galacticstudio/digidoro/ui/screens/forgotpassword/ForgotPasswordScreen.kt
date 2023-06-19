@@ -21,8 +21,8 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.galacticstudio.digidoro.R
 import com.galacticstudio.digidoro.navigation.Screen
-import com.galacticstudio.digidoro.screens.login.Logo
-import com.galacticstudio.digidoro.screens.login.RegisterButton
+import com.galacticstudio.digidoro.ui.screens.login.Logo
+import com.galacticstudio.digidoro.ui.screens.login.RegisterButton
 import com.galacticstudio.digidoro.ui.shared.button.CustomButton
 import com.galacticstudio.digidoro.ui.shared.textfield.TextFieldForm
 import com.galacticstudio.digidoro.ui.shared.textfield.TextFieldType

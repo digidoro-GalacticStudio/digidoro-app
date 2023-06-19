@@ -21,15 +21,6 @@ import com.galacticstudio.digidoro.navigation.AppScaffold
 import com.galacticstudio.digidoro.ui.theme.Nunito
 
 @Composable
-fun SignUpScreen(
-    navController: NavController
-) {
-    Sample("This is the sign up",
-        onClick = { navController.navigate(AUTH_GRAPH_ROUTE) }
-    )
-}
-
-@Composable
 fun NoteScreen(
     navController: NavHostController
 ) {
