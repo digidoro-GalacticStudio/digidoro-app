@@ -60,7 +60,7 @@ fun SearchBarItem(
                     Color.Gray,
                     shape = RoundedCornerShape(4.dp)
                 )
-                .background(Color.White),
+                .background(MaterialTheme.colorScheme.primaryContainer),
             textStyle = MaterialTheme.typography.bodySmall,
             decorationBox = { innerTextField ->
                 Row(

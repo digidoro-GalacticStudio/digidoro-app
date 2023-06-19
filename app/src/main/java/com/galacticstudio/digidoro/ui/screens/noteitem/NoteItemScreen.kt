@@ -1,5 +1,15 @@
 package com.galacticstudio.digidoro.ui.screens.noteitem
 
+import android.content.res.Configuration
+import android.util.Log
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.core.keyframes
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.with
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -27,6 +37,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -40,10 +51,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
@@ -56,16 +69,26 @@ import com.galacticstudio.digidoro.ui.screens.noteitem.components.TransparentTex
 import com.galacticstudio.digidoro.ui.shared.floatingCards.BottomSheetLayout
 import com.galacticstudio.digidoro.ui.shared.floatingCards.floatingElementCard.ColorBox
 import com.galacticstudio.digidoro.ui.shared.textfield.SearchBarItem
+import com.galacticstudio.digidoro.ui.theme.DigidoroTheme
+import com.galacticstudio.digidoro.util.ColorCustomUtils
 import kotlinx.coroutines.CoroutineScope
 
 /**
  * A composable function used for previewing a note item.
  */
-@Preview(showSystemUi = true)
+@Preview(name = "Full Preview", showSystemUi = true)
+@Preview(name = "Dark Mode", showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun NoteItemScreenPreview() {
     val navController = rememberNavController()
-    NoteItemScreen(navController = navController, noteColor = Color.White)
+    DigidoroTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            NoteItemScreen(navController = navController, noteColor = Color.White)
+        }
+    }
 }
 
 /**
@@ -79,10 +102,13 @@ fun NoteItemScreen(
     navController: NavController,
     noteColor: Color,
 ) {
+    val newNoteColor = noteColor.takeUnless { it == Color.White } ?: MaterialTheme.colorScheme.background
+
     TopBarNote(
         navController = navController,
+        noteColor = newNoteColor,
         content = {
-            NoteItemContent(noteColor = noteColor)
+            NoteItemContent(noteColor = newNoteColor)
         },
     )
 }
@@ -97,19 +123,22 @@ fun NoteItemScreen(
 fun NoteItemContent(
     noteColor: Color,
 ) {
+    val colorFilter = ColorCustomUtils.addColorTone(MaterialTheme.colorScheme.tertiaryContainer, noteColor)
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFD9D9D9))
+            .background(colorFilter)
             .wrapContentSize(Alignment.Center)
     ) {
         var text by remember { mutableStateOf("") }
+        val color = ColorCustomUtils.returnLuminanceColor(noteColor)
 
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight(0.9f)
-                .background(noteColor),
+                .background(noteColor.copy(0.8f)),
         ) {
             TransparentTextField(
                 text = text,
@@ -120,7 +149,7 @@ fun NoteItemContent(
                 onFocusChange = { },
                 textStyle = MaterialTheme.typography.bodyLarge,
                 hintStyle = MaterialTheme.typography.bodyLarge,
-                hintColor = Color.Black.copy(alpha = 0.45f),
+                hintColor = color.copy(0.45f),
             )
         }
     }
@@ -137,10 +166,12 @@ fun NoteItemContent(
 fun TopBarNote(
     navController: NavController,
     content: @Composable () -> Unit = {},
+    noteColor: Color,
 ) {
     var title by remember { mutableStateOf("") }
 
     var showMenu by remember { mutableStateOf(false) }
+    val color = ColorCustomUtils.returnLuminanceColor(noteColor)
 
     Scaffold(
         topBar = {
@@ -156,7 +187,7 @@ fun TopBarNote(
                         singleLine = true,
                         textStyle = MaterialTheme.typography.titleLarge,
                         hintStyle = MaterialTheme.typography.titleLarge,
-                        hintColor = Color.Black.copy(alpha = 0.45f),
+                        hintColor = color.copy(alpha = 0.45f),
                         fontWeight = FontWeight.W700,
                     )
                 },
@@ -166,15 +197,20 @@ fun TopBarNote(
                             painter = painterResource(R.drawable.arrow_back),
                             contentDescription = null,
                             modifier = Modifier.size(25.dp),
+                            tint = color
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.White
+                    containerColor = noteColor
                 ),
                 actions = {
                     IconButton(onClick = { showMenu = true }) {
-                        Icon(imageVector = Icons.Default.Menu, contentDescription = null)
+                        Icon(
+                            imageVector = Icons.Default.Menu,
+                            contentDescription = null,
+                            tint = color
+                        )
                     }
                     DropDownNoteMenu(
                         expanded = showMenu,

@@ -14,8 +14,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.core.graphics.ColorUtils
+import com.galacticstudio.digidoro.util.ColorCustomUtils
 
 /**
  * Composable function for displaying short note items.
@@ -31,6 +34,8 @@ fun NoteItem(
     color: Color,
     onClick: () -> Unit,
 ) {
+    val textColor = ColorCustomUtils.returnLuminanceColor(color)
+
     Card(
         onClick = onClick,
         modifier = Modifier
@@ -58,7 +63,7 @@ fun NoteItem(
                 text = text,
                 overflow = TextOverflow.Ellipsis,
                 style = MaterialTheme.typography.bodySmall,
-                color = Color.Black,
+                color = textColor,
             )
         }
     }

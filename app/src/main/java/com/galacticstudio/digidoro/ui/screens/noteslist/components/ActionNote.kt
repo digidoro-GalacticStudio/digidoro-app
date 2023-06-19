@@ -44,10 +44,10 @@ fun ActionNote(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 4.dp
         ),
-        border = BorderStroke(1.dp, Color.Black),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.onPrimary),
         shape = MaterialTheme.shapes.small,
         colors = CardDefaults.cardColors(
-            containerColor = Color.White,
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
         ),
     ) {
         Row(
@@ -81,7 +81,6 @@ fun ActionNote(
                     .padding(start = 6.dp)
                     .weight(1f),
                 style = MaterialTheme.typography.bodySmall,
-                color = Color.Black,
             )
         }
     }

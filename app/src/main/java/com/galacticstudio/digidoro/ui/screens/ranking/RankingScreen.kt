@@ -64,14 +64,6 @@ fun RankingScreen(
 ) {
     val borderRadius = 28.dp
 
-    IconButton(onClick = { navController.popBackStack() }) {
-        Icon(
-            painter = painterResource(R.drawable.arrow_back),
-            contentDescription = null,
-            modifier = Modifier.size(25.dp),
-        )
-    }
-
     LazyColumn(
         contentPadding = PaddingValues(35.dp),
     ) {
@@ -151,5 +143,13 @@ fun RankingScreen(
                 }
             }
         }
+    }
+
+    IconButton(onClick = { navController.popBackStack() }) {
+        Icon(
+            painter = painterResource(R.drawable.arrow_back),
+            contentDescription = null,
+            modifier = Modifier.size(25.dp),
+        )
     }
 }
