@@ -31,6 +31,8 @@ private val DarkColorScheme = darkColorScheme(
     primaryContainer = LightGray_accent,
     secondaryContainer = Mint_accent,
     tertiaryContainer = BabyAzure_accent,
+
+    //TODO: Arreglar color, en light mode es color gris claro usado para menu hover, pero en darkmode es amarillo ?
     onPrimaryContainer = HoneyYellow_accent,
     onTertiaryContainer = Lavender_accent,
     // for pomo bar
