@@ -36,6 +36,18 @@ fun NoteScreen(
     AppScaffold(
         navController = navController,
         content = {
+            Sample("This is the POMODORO screen",
+                onClick = { navController.navigate(AUTH_GRAPH_ROUTE) }
+            )
+        }
+    )
+    Sample("Login",
+        onClick = { navController.navigate(AUTH_GRAPH_ROUTE) }
+    )
+    AppScaffold(
+        navController = navController,
+
+        content = {
             Column {
                 Text(text = "Hello - dL", style = MaterialTheme.typography.displayLarge)
                 Text(text = "Hello - dMedium", style = MaterialTheme.typography.displayMedium)
@@ -75,30 +87,6 @@ fun NoteScreen(
                 )
             }
         }
-    )
-}
-
-@Composable
-fun PomodoroScreen(
-    navController: NavHostController
-) {
-    AppScaffold(
-        navController = navController,
-        content = {
-            Sample("This is the POMODORO screen",
-                onClick = { navController.navigate(AUTH_GRAPH_ROUTE) }
-            )
-        }
-    )
-
-}
-
-@Composable
-fun AccountScreen(
-    navController: NavController
-) {
-    Sample("Login",
-        onClick = { navController.navigate(AUTH_GRAPH_ROUTE) }
     )
 }
 
