@@ -63,7 +63,7 @@ private val LightColorScheme = lightColorScheme(
     secondaryContainer = Mint_accent,
     tertiaryContainer = BabyAzure_accent,
     surfaceVariant = HoneyYellow_accent,
-    onSurfaceVariant = Lavender_accent,
+    onSurfaceVariant = Gray60,
     // for pomo bar
     error = Cherry_accent,
     onError = GreenPepper_accent,

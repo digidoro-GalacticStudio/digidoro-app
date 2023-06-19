@@ -21,8 +21,8 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.galacticstudio.digidoro.R
 import com.galacticstudio.digidoro.navigation.Screen
-import com.galacticstudio.digidoro.screens.login.Logo
-import com.galacticstudio.digidoro.screens.login.RegisterButton
+import com.galacticstudio.digidoro.ui.screens.login.Logo
+import com.galacticstudio.digidoro.ui.screens.login.RegisterButton
 import com.galacticstudio.digidoro.ui.shared.button.CustomButton
 import com.galacticstudio.digidoro.ui.shared.textfield.TextFieldForm
 import com.galacticstudio.digidoro.ui.shared.textfield.TextFieldType
@@ -57,10 +57,12 @@ fun ForgotPasswordScreen(
         Header()
         Spacer(modifier = Modifier.height(largegap))
         TextFieldForm(
+            value = "",
             label = "Your username",
             placeholder = "digidoro4U",
             type = TextFieldType.TEXT,
             leadingIcon = painterResource(R.drawable.email_icon),
+            onTextFieldChanged = { /* TODO */}
         )
         Spacer(modifier = Modifier.height(largegap))
         VerificationInstructions()

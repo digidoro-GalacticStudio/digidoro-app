@@ -1,5 +1,7 @@
 package com.galacticstudio.digidoro.ui.screens.home
 
+import android.content.res.Configuration
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -16,12 +18,14 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -30,24 +34,38 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.galacticstudio.digidoro.R
+import com.galacticstudio.digidoro.RetrofitApplication
 import com.galacticstudio.digidoro.data.pomodoroList
 import com.galacticstudio.digidoro.data.todoList
 import com.galacticstudio.digidoro.navigation.AppScaffold
+import com.galacticstudio.digidoro.ui.screens.home.viewmodel.HomeViewModel
+import com.galacticstudio.digidoro.ui.screens.login.LoginFormEvent
 import com.galacticstudio.digidoro.ui.shared.cards.pomodorocard.PomodoroCard
 import com.galacticstudio.digidoro.ui.shared.cards.todocard.TodoCard
 import com.galacticstudio.digidoro.ui.shared.titles.CustomMessageData
 import com.galacticstudio.digidoro.ui.shared.titles.Title
+import com.galacticstudio.digidoro.ui.theme.DigidoroTheme
 import com.galacticstudio.digidoro.ui.theme.Nunito
 import com.galacticstudio.digidoro.util.DateUtils
 
-@Preview(showSystemUi = true)
+@Preview(name = "Full Preview", showSystemUi = true)
+@Preview(name = "Dark Mode", showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun HomeScreenPreview() {
     val navController = rememberNavController()
-    HomeScreen(navController = navController)
+
+    DigidoroTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            HomeScreen(navController = navController)
+        }
+    }
 }
 
 /**
@@ -57,12 +75,13 @@ fun HomeScreenPreview() {
  */
 @Composable
 fun HomeScreen(
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
+    homeViewModel: HomeViewModel = viewModel<HomeViewModel>(),
 ) {
     AppScaffold(
         navController = navController,
         content = {
-            HomeContent()
+            HomeContent(homeViewModel = homeViewModel)
         }
     )
 }
@@ -71,7 +90,21 @@ fun HomeScreen(
  * A composable function representing the content of the home screen.
  */
 @Composable
-fun HomeContent() {
+fun HomeContent(
+    homeViewModel: HomeViewModel,
+) {
+    val app: RetrofitApplication = LocalContext.current.applicationContext as RetrofitApplication
+    val state = homeViewModel.state // Retrieves the current state from the HomeViewModel.
+
+    val tokenValue = app.getToken()
+    val rolesValue = app.getRoles()
+    val usernameValue = app.getUsername()
+
+    Log.d("MyTest", "tokenValue: ${tokenValue}")
+    Log.d("MyTest", "rolesValue: ${rolesValue}")
+    Log.d("MyTest", "usernameValue: ${usernameValue}")
+    homeViewModel.onEvent(HomeUIEvent.UsernameChanged(usernameValue))
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize(),
@@ -79,7 +112,7 @@ fun HomeContent() {
         state = rememberLazyListState()
     ) {
         item {
-            WelcomeUser()
+            WelcomeUser(state)
         }
 
         // Ranking
@@ -157,7 +190,9 @@ fun HomeContent() {
  * A composable function representing the welcome message and user information.
  */
 @Composable
-fun WelcomeUser() {
+fun WelcomeUser(
+    state: HomeUIState
+) {
     Text(
         text = "Hello again,",
         style = MaterialTheme.typography.headlineLarge,
@@ -169,9 +204,8 @@ fun WelcomeUser() {
     Row(
         verticalAlignment = Alignment.CenterVertically
     ) {
-        //TODO Get the USER NAME from API
         Text(
-            text = "Jenny",
+            text = state.username,
             style = MaterialTheme.typography.headlineLarge,
             fontFamily = Nunito,
             fontWeight = FontWeight.W800,
