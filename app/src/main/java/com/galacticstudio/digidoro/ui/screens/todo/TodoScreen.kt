@@ -109,13 +109,15 @@ fun TodoContent(modifier: Modifier = Modifier){
                 onClick = { FloatingTodoVisibleHandler() },
                 containerColor = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier
+                    .padding(bottom = 80.dp)
                     .clip(CircleShape)
                     .width(68.dp)
                     .height(68.dp)
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.add_icon),
-                    contentDescription = "Create new todo"
+                    contentDescription = "Create new todo",
+                    tint = MaterialTheme.colorScheme.primary
                 )
             }
         },
