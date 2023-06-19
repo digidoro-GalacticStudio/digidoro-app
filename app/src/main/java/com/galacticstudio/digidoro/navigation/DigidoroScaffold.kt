@@ -1,24 +1,53 @@
 package com.galacticstudio.digidoro.navigation
 
+import android.annotation.SuppressLint
+import android.content.res.Configuration
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.galacticstudio.digidoro.R
+import com.galacticstudio.digidoro.navigation.navgraph.SetupNavGraph
+import com.galacticstudio.digidoro.ui.theme.DigidoroTheme
+import com.galacticstudio.digidoro.ui.theme.Gray30
+import com.galacticstudio.digidoro.util.dropShadow
+
+@Preview(name = "Full Preview", showSystemUi = true)
+@Preview(name = "Dark Mode", showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun ScaffoldPreview() {
+    DigidoroTheme { AppScaffold(rememberNavController()) }
+}
 
 /**
  * Sealed class representing items in the menu.
@@ -69,27 +98,30 @@ sealed class ItemsMenu(
  * @param navController The NavHostController used for navigation.
  * @param content The content of the app scaffold.
  */
-@OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun AppScaffold(
-    navController: NavHostController,
-    content: @Composable () -> Unit = {},
-) {
+fun AppScaffold(navController: NavHostController) {
+
+    // State of bottomBar
+    val bottomBarState = rememberSaveable { (mutableStateOf(false)) }
+
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+
+    // Determine whether to show the bottom bar based on the current destination route.
+    bottomBarState.value = when (navBackStackEntry?.destination?.route) {
+        in listOf("home_screen", "todo_screen", "pomodoro_screen", "note_screen") -> true
+        else -> false
+    }
+
     Scaffold(
         bottomBar = {
-            Surface(shadowElevation = 23.dp) {
-                BottomBarNavigation(navController = navController)
-            }
+            BottomBarNavigation(
+                navController = navController,
+                bottomBarState = bottomBarState,
+            )
         },
-        modifier = Modifier.shadow(45.dp)
-    ) { padding ->
-        Column(
-            modifier = Modifier
-                .padding(padding)
-        ) {
-            content()
-        }
-
+    ) {
+        SetupNavGraph(navController = navController)
     }
 }
 
@@ -99,7 +131,10 @@ fun AppScaffold(
  * @param navController The NavHostController used for navigation.
  */
 @Composable
-fun BottomBarNavigation(navController: NavHostController) {
+fun BottomBarNavigation(
+    navController: NavHostController,
+    bottomBarState: MutableState<Boolean>
+) {
     val navigationItems = listOf(
         ItemsMenu.HomeItem,
         ItemsMenu.TodoItem,
@@ -108,28 +143,47 @@ fun BottomBarNavigation(navController: NavHostController) {
         ItemsMenu.AccountItem
     )
 
-    val navBackStackEntry = navController.currentBackStackEntryAsState()
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
 
-    NavigationBar(
-        containerColor = Color.White
-    ) {
-        navigationItems.forEach { item ->
-            val seletedRoute = item.route == navBackStackEntry.value?.destination?.route
-            NavigationBarItem(
-                selected = seletedRoute,
-                onClick = {
-                    navController.navigate(item.route)
-                },
-                icon = {
-                    Icon(
-                        painter = painterResource(id = item.icon),
-                        contentDescription = null,
-                        modifier = Modifier.size(23.dp)
-                    )
-                },
-                label = { Text(item.title) },
-                alwaysShowLabel = false
-            )
+    AnimatedVisibility(
+        visible = bottomBarState.value,
+        enter = slideInVertically(initialOffsetY = { it }),
+        exit = slideOutVertically(targetOffsetY = { it }),
+        content = {
+            Surface(
+                modifier = Modifier.dropShadow(
+                    color = MaterialTheme.colorScheme.onPrimary.copy(0.25f),
+                    blurRadius = 4.dp
+                )
+            ) {
+                NavigationBar(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                ) {
+                    navigationItems.forEach { item ->
+                        val selectedRoute = item.route == navBackStackEntry?.destination?.route
+                        NavigationBarItem(
+                            selected = selectedRoute,
+                            onClick = {
+                                navController.navigate(item.route)
+                            },
+                            icon = {
+                                Icon(
+                                    painter = painterResource(id = item.icon),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(23.dp)
+                                )
+                            },
+                            label = { Text(item.title) },
+                            alwaysShowLabel = false,
+                            colors = NavigationBarItemDefaults.colors(
+                                selectedIconColor = Gray30,
+                                selectedTextColor = MaterialTheme.colorScheme.onPrimary,
+                                unselectedIconColor = MaterialTheme.colorScheme.onPrimary,
+                            )
+                        )
+                    }
+                }
+            }
         }
-    }
+    )
 }

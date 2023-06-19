@@ -11,9 +11,6 @@ val OnAzureBlue = Color(0xB74880FF)
 val Gray60 = Color(0xFF202124)
 val BabyGray30 = Color(0xFFE8EAED)
 
-//txt color
-
-
 //accent color
 val Cherry_accent = Color(0xFFE15A51)
 val GreenPepper_accent = Color(0xFF38A852)

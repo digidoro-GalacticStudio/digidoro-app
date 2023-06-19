@@ -1,4 +1,4 @@
-package com.galacticstudio.digidoro.ui.shared.cards.pomodorocard
+package com.galacticstudio.digidoro.ui.shared.cards.pomodoroCard
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -55,15 +56,15 @@ fun PomodoroCard(
             .width(140.dp)
             .shadowWithBorder(
                 borderWidth = 4.dp,
-                borderColor = Color(0xFF202124),
+                borderColor = MaterialTheme.colorScheme.onPrimary,
                 cornerRadius = borderRadius,
                 shadowColor = colorTheme,
                 shadowOffset = Offset(15f, 15f)
             )
-            .border(borderWidth, Color.Black, shape = RoundedCornerShape(borderRadius))
+            .border(borderWidth, MaterialTheme.colorScheme.onPrimary, shape = RoundedCornerShape(borderRadius))
             .then(modifier),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White,
+            containerColor = MaterialTheme.colorScheme.primaryContainer
         ),
     ) {
         Column(
@@ -76,7 +77,6 @@ fun PomodoroCard(
         ) {
             Text(
                 text = message,
-                color = Color.Black,
                 fontFamily = Nunito,
                 style = TextStyle(
                     fontSize = 16.sp
@@ -94,7 +94,6 @@ fun PomodoroCard(
             ) {
                 Text(
                     text = sectionText,
-                    color = Color.Black,
                     fontSize = 11.5.sp
                 )
             }

@@ -8,7 +8,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
-import com.galacticstudio.digidoro.navigation.navgraph.SetupNavGraph
+import com.galacticstudio.digidoro.navigation.AppScaffold
 import com.galacticstudio.digidoro.ui.theme.DigidoroTheme
 
 class MainActivity : ComponentActivity() {
@@ -20,7 +20,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    SetupNavGraph(navController = rememberNavController())
+                    AppScaffold(navController = rememberNavController())
                 }
             }
         }

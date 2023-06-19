@@ -1,7 +1,6 @@
 package com.galacticstudio.digidoro.ui.screens.home
 
 import android.content.res.Configuration
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -41,10 +40,8 @@ import com.galacticstudio.digidoro.R
 import com.galacticstudio.digidoro.RetrofitApplication
 import com.galacticstudio.digidoro.data.pomodoroList
 import com.galacticstudio.digidoro.data.todoList
-import com.galacticstudio.digidoro.navigation.AppScaffold
 import com.galacticstudio.digidoro.ui.screens.home.viewmodel.HomeViewModel
-import com.galacticstudio.digidoro.ui.screens.login.LoginFormEvent
-import com.galacticstudio.digidoro.ui.shared.cards.pomodorocard.PomodoroCard
+import com.galacticstudio.digidoro.ui.shared.cards.pomodoroCard.PomodoroCard
 import com.galacticstudio.digidoro.ui.shared.cards.todocard.TodoCard
 import com.galacticstudio.digidoro.ui.shared.titles.CustomMessageData
 import com.galacticstudio.digidoro.ui.shared.titles.Title
@@ -76,39 +73,19 @@ fun HomeScreenPreview() {
 @Composable
 fun HomeScreen(
     navController: NavHostController = rememberNavController(),
-    homeViewModel: HomeViewModel = viewModel<HomeViewModel>(),
-) {
-    AppScaffold(
-        navController = navController,
-        content = {
-            HomeContent(homeViewModel = homeViewModel)
-        }
-    )
-}
-
-/**
- * A composable function representing the content of the home screen.
- */
-@Composable
-fun HomeContent(
-    homeViewModel: HomeViewModel,
+    homeViewModel: HomeViewModel = viewModel(),
 ) {
     val app: RetrofitApplication = LocalContext.current.applicationContext as RetrofitApplication
     val state = homeViewModel.state // Retrieves the current state from the HomeViewModel.
 
-    val tokenValue = app.getToken()
-    val rolesValue = app.getRoles()
-    val usernameValue = app.getUsername()
+    homeViewModel.onEvent(HomeUIEvent.UsernameChanged(app.getUsername()))
 
-    Log.d("MyTest", "tokenValue: ${tokenValue}")
-    Log.d("MyTest", "rolesValue: ${rolesValue}")
-    Log.d("MyTest", "usernameValue: ${usernameValue}")
-    homeViewModel.onEvent(HomeUIEvent.UsernameChanged(usernameValue))
+    val contentPadding = PaddingValues(start = 24.dp, top = 24.dp, end = 24.dp, bottom = 75.dp)
 
     LazyColumn(
         modifier = Modifier
             .fillMaxSize(),
-        contentPadding = PaddingValues(35.dp),
+        contentPadding = contentPadding,
         state = rememberLazyListState()
     ) {
         item {
@@ -122,7 +99,7 @@ fun HomeContent(
 
         //Pomodoro title
         item {
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
             Text(
                 text = "What did we leave off on?",
@@ -138,7 +115,7 @@ fun HomeContent(
                 ),
                 titleStyle = MaterialTheme.typography.headlineMedium
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(24.dp))
         }
 
         //Pomodoro List
@@ -160,7 +137,7 @@ fun HomeContent(
 
         //Activities title
         item {
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(32.dp))
             Title(
                 message = CustomMessageData(
                     title = "Your Activities",
@@ -168,7 +145,7 @@ fun HomeContent(
                 ),
                 titleStyle = MaterialTheme.typography.headlineMedium
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(24.dp))
         }
 
         //Activities list
@@ -199,7 +176,6 @@ fun WelcomeUser(
         textAlign = TextAlign.Center,
         fontFamily = Nunito,
         fontWeight = FontWeight.W800,
-        color = Color(0xFF202124)
     )
     Row(
         verticalAlignment = Alignment.CenterVertically
@@ -251,7 +227,6 @@ fun RankingHome() {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 text = levelName,
-                style = TextStyle(color = Color.Black),
                 fontSize = 14.sp,
                 fontFamily = Nunito,
             )
