@@ -105,7 +105,7 @@ fun TodoInformation(
                 .fillMaxWidth()
                 .border(
                     1.dp,
-                    colorResource(id = R.color.secondary_color),
+                    MaterialTheme.colorScheme.secondary,
                     RoundedCornerShape(cornerRadius)
                 )
                 .background(
@@ -131,8 +131,7 @@ fun TodoInformation(
                     })
                 Text(
                     text = message.mainMessage,
-                    color = if(done == true) MaterialTheme.colorScheme.secondary else colorResource(
-                        R.color.black_text_color),
+                    color = if(done == false) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.labelLarge,
                     fontWeight = FontWeight.SemiBold
                 )
