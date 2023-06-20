@@ -1,5 +1,6 @@
 package com.galacticstudio.digidoro.ui.screens.noteslist
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,11 +18,16 @@ import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -29,7 +35,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.galacticstudio.digidoro.R
 import com.galacticstudio.digidoro.data.itemNotesList
-import com.galacticstudio.digidoro.navigation.AppScaffold
 import com.galacticstudio.digidoro.navigation.Screen
 import com.galacticstudio.digidoro.ui.screens.noteslist.components.ActionNote
 import com.galacticstudio.digidoro.ui.screens.noteslist.components.NoteItem
@@ -65,21 +70,6 @@ data class ActionNoteData(
 fun NotesListScreen(
     navController: NavHostController
 ) {
-    AppScaffold(
-        navController = navController,
-        content = {
-            NoteListContent(navController = navController)
-        }
-    )
-}
-
-/**
- * Composable function for displaying the content of the note list screen.
- *
- * @param navController The navigation controller used for navigating to other screens.
- */
-@Composable
-fun NoteListContent(navController: NavHostController) {
     val actionNotesList = listOf(
         ActionNoteData(
             text = "All notes",
@@ -107,13 +97,15 @@ fun NoteListContent(navController: NavHostController) {
         )
     )
 
+    val contentPadding = PaddingValues(start = 24.dp, top = 24.dp, end = 24.dp, bottom = 75.dp)
+    val cols = 2
+
     var search by remember { mutableStateOf("") }
 
-    val cols = 2
     LazyVerticalGrid(
         columns = GridCells.Fixed(cols),
         modifier = Modifier.fillMaxWidth(),
-        contentPadding = PaddingValues(35.dp),
+        contentPadding = contentPadding,
     ) {
         item(span = { GridItemSpan(cols) }) {
             HeaderNoteList()
@@ -153,17 +145,18 @@ fun NoteListContent(navController: NavHostController) {
         }
 
         itemsIndexed(itemNotesList) { _, dataNote ->
-            val colorNote = Color(android.graphics.Color.parseColor(dataNote.theme))
+            var noteColor = Color(android.graphics.Color.parseColor(dataNote.theme))
+            val resNoteColor = noteColor.takeUnless { it == Color.White } ?: MaterialTheme.colorScheme.primaryContainer
 
             NoteItemContainer(
-               message = dataNote.message,
+                message = dataNote.message,
                 title = dataNote.title,
                 updatedAt = dataNote.updatedAt,
-                theme = colorNote,
+                theme = resNoteColor,
             ) {
                 navController.navigate(
                     Screen.Note.route +
-                            "?noteId=${dataNote.user_id}&noteColor=${colorNote}"
+                            "?noteId=${dataNote.user_id}&noteColor=${noteColor.toArgb()}"
                 )
             }
         }
@@ -272,7 +265,7 @@ fun ShortNoteItems(
                     .clickable { onClick() }
                     .padding(end = 8.dp),
                 style = MaterialTheme.typography.bodySmall,
-                color = Color(0xFF7A7A7A)
+                color = MaterialTheme.colorScheme.onPrimary.copy(0.4f)
             )
             Icon(
                 painter = icon,

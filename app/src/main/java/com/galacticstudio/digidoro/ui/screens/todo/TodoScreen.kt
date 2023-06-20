@@ -10,6 +10,7 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -44,7 +45,6 @@ import androidx.navigation.compose.rememberNavController
 import com.galacticstudio.digidoro.R
 import com.galacticstudio.digidoro.data.TodoModel
 import com.galacticstudio.digidoro.data.todoList
-import com.galacticstudio.digidoro.navigation.AppScaffold
 import com.galacticstudio.digidoro.ui.screens.todo.components.DisplayTodo
 import com.galacticstudio.digidoro.ui.shared.floatingCards.todo.TodoFloatingBox
 import com.galacticstudio.digidoro.ui.shared.titles.CustomMessageData
@@ -73,23 +73,9 @@ fun TodoScreenPreview(){
 */
 @Composable
 fun TodoScreen(
-    navController: NavHostController = rememberNavController()
+    modifier: Modifier = Modifier,
+    navController: NavHostController = rememberNavController(),
 ){
-    AppScaffold(
-        navController = navController,
-        content = {
-            TodoContent()
-        }
-    )
-}
-
-/**
- * A composable function representing Todo Screen content.
- *
- * @param modifier styles will be applied.
- */
-@Composable
-fun TodoContent(modifier: Modifier = Modifier){
 
 //    variables and functions to use
     var isFloatingTodoVisible by remember {
@@ -169,7 +155,7 @@ fun TodoStaticBody(modifier: Modifier = Modifier){
         modifier
             .verticalScroll(rememberScrollState())
             .fillMaxSize()
-            .padding(24.dp)
+            .padding(start = 24.dp, top = 24.dp, end = 24.dp, bottom = 75.dp)
     ) {
 
         //static elements

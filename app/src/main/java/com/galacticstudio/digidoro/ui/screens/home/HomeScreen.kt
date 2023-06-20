@@ -1,5 +1,6 @@
 package com.galacticstudio.digidoro.ui.screens.home
 
+import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -16,12 +17,14 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -30,24 +33,36 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.galacticstudio.digidoro.R
+import com.galacticstudio.digidoro.RetrofitApplication
 import com.galacticstudio.digidoro.data.pomodoroList
 import com.galacticstudio.digidoro.data.todoList
-import com.galacticstudio.digidoro.navigation.AppScaffold
-import com.galacticstudio.digidoro.ui.shared.cards.pomodorocard.PomodoroCard
+import com.galacticstudio.digidoro.ui.screens.home.viewmodel.HomeViewModel
+import com.galacticstudio.digidoro.ui.shared.cards.pomodoroCard.PomodoroCard
 import com.galacticstudio.digidoro.ui.shared.cards.todocard.TodoCard
 import com.galacticstudio.digidoro.ui.shared.titles.CustomMessageData
 import com.galacticstudio.digidoro.ui.shared.titles.Title
+import com.galacticstudio.digidoro.ui.theme.DigidoroTheme
 import com.galacticstudio.digidoro.ui.theme.Nunito
 import com.galacticstudio.digidoro.util.DateUtils
 
-@Preview(showSystemUi = true)
+@Preview(name = "Full Preview", showSystemUi = true)
+@Preview(name = "Dark Mode", showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun HomeScreenPreview() {
     val navController = rememberNavController()
-    HomeScreen(navController = navController)
+
+    DigidoroTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            HomeScreen(navController = navController)
+        }
+    }
 }
 
 /**
@@ -57,29 +72,24 @@ fun HomeScreenPreview() {
  */
 @Composable
 fun HomeScreen(
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
+    homeViewModel: HomeViewModel = viewModel(),
 ) {
-    AppScaffold(
-        navController = navController,
-        content = {
-            HomeContent()
-        }
-    )
-}
+    val app: RetrofitApplication = LocalContext.current.applicationContext as RetrofitApplication
+    val state = homeViewModel.state // Retrieves the current state from the HomeViewModel.
 
-/**
- * A composable function representing the content of the home screen.
- */
-@Composable
-fun HomeContent() {
+    homeViewModel.onEvent(HomeUIEvent.UsernameChanged(app.getUsername()))
+
+    val contentPadding = PaddingValues(start = 24.dp, top = 24.dp, end = 24.dp, bottom = 75.dp)
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize(),
-        contentPadding = PaddingValues(35.dp),
+        contentPadding = contentPadding,
         state = rememberLazyListState()
     ) {
         item {
-            WelcomeUser()
+            WelcomeUser(state)
         }
 
         // Ranking
@@ -89,7 +99,7 @@ fun HomeContent() {
 
         //Pomodoro title
         item {
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
             Text(
                 text = "What did we leave off on?",
@@ -105,7 +115,7 @@ fun HomeContent() {
                 ),
                 titleStyle = MaterialTheme.typography.headlineMedium
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(24.dp))
         }
 
         //Pomodoro List
@@ -127,7 +137,7 @@ fun HomeContent() {
 
         //Activities title
         item {
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(32.dp))
             Title(
                 message = CustomMessageData(
                     title = "Your Activities",
@@ -135,7 +145,7 @@ fun HomeContent() {
                 ),
                 titleStyle = MaterialTheme.typography.headlineMedium
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(24.dp))
         }
 
         //Activities list
@@ -157,21 +167,21 @@ fun HomeContent() {
  * A composable function representing the welcome message and user information.
  */
 @Composable
-fun WelcomeUser() {
+fun WelcomeUser(
+    state: HomeUIState
+) {
     Text(
         text = "Hello again,",
         style = MaterialTheme.typography.headlineLarge,
         textAlign = TextAlign.Center,
         fontFamily = Nunito,
         fontWeight = FontWeight.W800,
-        color = Color(0xFF202124)
     )
     Row(
         verticalAlignment = Alignment.CenterVertically
     ) {
-        //TODO Get the USER NAME from API
         Text(
-            text = "Jenny",
+            text = state.username,
             style = MaterialTheme.typography.headlineLarge,
             fontFamily = Nunito,
             fontWeight = FontWeight.W800,
@@ -217,7 +227,6 @@ fun RankingHome() {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 text = levelName,
-                style = TextStyle(color = Color.Black),
                 fontSize = 14.sp,
                 fontFamily = Nunito,
             )

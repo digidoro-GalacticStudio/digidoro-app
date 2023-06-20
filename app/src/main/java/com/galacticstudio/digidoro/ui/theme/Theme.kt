@@ -26,14 +26,11 @@ private val DarkColorScheme = darkColorScheme(
     surfaceVariant = OnGray_accent, //menu's color hover
     onSurfaceVariant = DarkNotes_accent, //notes background
 
-    //accents, ni modo, no hay otras variables
     //Gray from the note taking squares
-    primaryContainer = LightGray_accent,
-    secondaryContainer = Mint_accent,
-    tertiaryContainer = BabyAzure_accent,
-
-    //TODO: Arreglar color, en light mode es color gris claro usado para menu hover, pero en darkmode es amarillo ?
-    onPrimaryContainer = HoneyYellow_accent,
+    primaryContainer = DarkNotes_accent,
+    secondaryContainer = OnGray_accent,
+    tertiaryContainer = DarkNotes_accent,
+    onPrimaryContainer = White60,
     onTertiaryContainer = Lavender_accent,
     // for pomo bar
     error = Cherry_accent,
@@ -61,11 +58,11 @@ private val LightColorScheme = lightColorScheme(
 
     //accents, ni modo, no hay otras variables
     //Gray from the note taking squares
-    primaryContainer = LightGray_accent,
-    secondaryContainer = Mint_accent,
-    tertiaryContainer = BabyAzure_accent,
+    primaryContainer = White60,
+    secondaryContainer = OnGray_accent,
+    tertiaryContainer = LightGray_accent,
     surfaceVariant = HoneyYellow_accent,
-    onSurfaceVariant = Lavender_accent,
+    onSurfaceVariant = Gray60,
     // for pomo bar
     error = Cherry_accent,
     onError = GreenPepper_accent,

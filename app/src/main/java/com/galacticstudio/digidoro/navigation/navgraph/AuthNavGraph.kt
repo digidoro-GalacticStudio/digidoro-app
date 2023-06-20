@@ -6,10 +6,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.galacticstudio.digidoro.navigation.AUTH_GRAPH_ROUTE
 import com.galacticstudio.digidoro.navigation.Screen
-import com.galacticstudio.digidoro.screens.login.LoginScreen
-import com.galacticstudio.digidoro.ui.SignUpScreen
+import com.galacticstudio.digidoro.ui.screens.login.LoginScreen
 import com.galacticstudio.digidoro.ui.forgotpassword.ForgotPasswordScreen
-import com.galacticstudio.digidoro.ui.forgotpassword.VerifyAccountScreen
+import com.galacticstudio.digidoro.ui.screens.verifyaccount.VerifyAccountScreen
+import com.galacticstudio.digidoro.ui.screens.register.RegisterScreen
 
 fun NavGraphBuilder.authNavGraph(
     navController: NavHostController
@@ -36,7 +36,7 @@ fun NavGraphBuilder.authNavGraph(
         composable(
             route = Screen.SignUp.route
         ) {
-            SignUpScreen(navController = navController)
+            RegisterScreen(navController = navController)
         }
     }
 }

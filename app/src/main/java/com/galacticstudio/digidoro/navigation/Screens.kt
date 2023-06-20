@@ -16,6 +16,7 @@ sealed class Screen(val route: String) {
     object Note: Screen(route = "note_screen")
     object Pomodoro: Screen(route = "pomodoro_screen")
     object Account: Screen(route = "account_screen")
+    object Ranking: Screen(route = "ranking_screen")
     object ForgotPassword: Screen(route = "forgot_password_screen")
     object VerifyAccount: Screen(route = "verify_account_screen")
 }

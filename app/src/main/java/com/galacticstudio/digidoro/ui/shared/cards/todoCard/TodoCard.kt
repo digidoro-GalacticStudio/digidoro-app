@@ -60,12 +60,12 @@ fun TodoCard(
         onClick = { onClick() },
         modifier = Modifier
             .fillMaxWidth()
-            .border(borderWidth, Color.Black, shape = RoundedCornerShape(borderRadius))
+            .border(borderWidth, MaterialTheme.colorScheme.onPrimary, shape = RoundedCornerShape(borderRadius))
             .height(IntrinsicSize.Min)
             .clip(RoundedCornerShape(borderRadius))
             .then(modifier),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White,
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
         ),
     ) {
         Row {
@@ -81,8 +81,8 @@ fun TodoCard(
             Divider(
                 modifier = Modifier
                     .fillMaxHeight()
-                    .width(borderWidth),
-                color = Color.Black
+                    .width(1.75.dp),
+                color = MaterialTheme.colorScheme.onPrimary
             )
             Box(
                 Modifier
@@ -97,7 +97,6 @@ fun TodoCard(
             ) {
                 Text(
                     text = message,
-                    color = Color.Black,
                     style = TextStyle(
                         fontSize = 15.5.sp
                     ),
@@ -116,13 +115,11 @@ fun TodoCard(
                     Row {
                         Text(
                             text = boldSubtitle,
-                            color = Color.Black,
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.W800,
                         )
                         Text(
                             text = normalSubtitle,
-                            color = Color.Black,
                             style = MaterialTheme.typography.labelSmall,
                         )
                     }
