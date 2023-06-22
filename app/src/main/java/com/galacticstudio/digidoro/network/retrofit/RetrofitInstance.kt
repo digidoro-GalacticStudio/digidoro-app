@@ -1,7 +1,9 @@
 package com.galacticstudio.digidoro.network.retrofit
 
 import com.galacticstudio.digidoro.network.service.AuthService
+import com.galacticstudio.digidoro.network.service.NoteService
 import com.galacticstudio.digidoro.util.NetworkService.BASE_URL
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -10,8 +12,15 @@ object RetrofitInstance {
     private var username = ""
     private var roles: List<String> = emptyList()
 
+    private val interceptor = AuthInterceptor(token)
+
+    private val client = OkHttpClient.Builder()
+        .addInterceptor(interceptor)
+        .build()
+
     fun setToken(token: String) {
         this.token = token
+        interceptor.updateToken(token)
     }
 
     fun setUsername(username: String) {
@@ -23,6 +32,7 @@ object RetrofitInstance {
     }
 
     private val retrofit = Retrofit.Builder()
+        .client(client)
         .baseUrl(BASE_URL)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
@@ -30,4 +40,9 @@ object RetrofitInstance {
     fun getLoginService(): AuthService {
         return retrofit.create(AuthService::class.java)
     }
+
+    fun getNoteService(): NoteService {
+        return retrofit.create(NoteService::class.java)
+    }
 }
+

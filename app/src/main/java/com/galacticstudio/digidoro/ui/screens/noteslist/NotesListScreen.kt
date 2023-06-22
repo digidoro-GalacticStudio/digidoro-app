@@ -1,12 +1,14 @@
 package com.galacticstudio.digidoro.ui.screens.noteslist
 
-import android.util.Log
+import android.content.res.Configuration
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -15,43 +17,63 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.galacticstudio.digidoro.R
-import com.galacticstudio.digidoro.data.itemNotesList
+import com.galacticstudio.digidoro.domain.util.NoteOrder
+import com.galacticstudio.digidoro.domain.util.OrderType
 import com.galacticstudio.digidoro.navigation.Screen
 import com.galacticstudio.digidoro.ui.screens.noteslist.components.ActionNote
 import com.galacticstudio.digidoro.ui.screens.noteslist.components.NoteItem
+import com.galacticstudio.digidoro.ui.screens.noteslist.viewmodel.NotesViewModel
 import com.galacticstudio.digidoro.ui.shared.textfield.SearchBarItem
 import com.galacticstudio.digidoro.ui.shared.titles.CustomMessageData
 import com.galacticstudio.digidoro.ui.shared.titles.Title
+import com.galacticstudio.digidoro.ui.theme.DigidoroTheme
 import com.galacticstudio.digidoro.util.DateUtils
 import java.util.Date
 
 /**
  * Preview function for the notes list screen..
  */
-@Preview(showSystemUi = true)
+@Preview(name = "Full Preview", showSystemUi = true)
+@Preview(name = "Dark Mode", showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun NotesListSPreview() {
     val navController = rememberNavController()
-    NotesListScreen(navController = navController)
+
+    DigidoroTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            NotesListScreen(navController = navController)
+        }
+    }
 }
 
 data class ActionNoteData(
@@ -68,8 +90,80 @@ data class ActionNoteData(
  */
 @Composable
 fun NotesListScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    notesViewModel: NotesViewModel = viewModel(factory = NotesViewModel.Factory),
 ) {
+
+    Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {
+                    navController.navigate(Screen.Note.route + "?noteId=&noteColor=")
+                },
+                containerColor = MaterialTheme.colorScheme.tertiary,
+                modifier = Modifier
+                    .padding(bottom = 80.dp)
+                    .clip(CircleShape)
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ad_note_icon),
+                    contentDescription = "Add note",
+                    tint = Color.White,
+                    modifier = Modifier.size(30.dp),
+                )
+            }
+        },
+    ) { padding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+        ) {
+            NotesListContent(
+                navController = navController,
+                notesViewModel = notesViewModel
+            )
+        }
+    }
+}
+
+@Composable
+fun NotesListContent(
+    navController: NavHostController,
+    notesViewModel: NotesViewModel = viewModel(factory = NotesViewModel.Factory),
+) {
+    val state = notesViewModel.state.value
+    val context = LocalContext.current
+
+    LaunchedEffect(key1 = context) {
+        // Collect the response events from the loginViewModel
+        notesViewModel.responseEvents.collect { event ->
+            when (event) {
+                is NotesResponseState.Error -> {
+                    Toast.makeText(
+                        context,
+                        "An error has occurred ${event.exception}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                is NotesResponseState.ErrorWithMessage -> {
+                    Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+                }
+
+                is NotesResponseState.Success -> {
+                    Toast.makeText(
+                        context,
+                        "Todas las notas correctas",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+
+                else -> {}
+            }
+        }
+    }
+
     val actionNotesList = listOf(
         ActionNoteData(
             text = "All notes",
@@ -112,7 +206,7 @@ fun NotesListScreen(
         }
 
         item(span = { GridItemSpan(cols) }) {
-            Box(modifier =Modifier.padding(bottom = 32.dp)) {
+            Box(modifier = Modifier.padding(bottom = 32.dp)) {
                 SearchBarItem(
                     search = search,
                     hintText = "Seach",
@@ -137,16 +231,17 @@ fun NotesListScreen(
 
         item(span = { GridItemSpan(cols) }) {
             ShortNoteItems(
-                text = "Last Modification",
-                icon = painterResource(R.drawable.last_modification_icon)
+                icon = painterResource(R.drawable.last_modification_icon),
+                noteOrder = state.noteOrder
             ) {
-                //TODO Implement this action
+                notesViewModel.onEvent(NotesEvent.Order(it))
             }
         }
 
-        itemsIndexed(itemNotesList) { _, dataNote ->
-            var noteColor = Color(android.graphics.Color.parseColor(dataNote.theme))
-            val resNoteColor = noteColor.takeUnless { it == Color.White } ?: MaterialTheme.colorScheme.primaryContainer
+        itemsIndexed(notesViewModel.state.value.notes) { _, dataNote ->
+            val noteColor = Color(android.graphics.Color.parseColor(dataNote.theme))
+            val resNoteColor = noteColor.takeUnless { it == Color.White }
+                ?: MaterialTheme.colorScheme.primaryContainer
 
             NoteItemContainer(
                 message = dataNote.message,
@@ -246,23 +341,36 @@ fun NoteItemContainer(
 
 @Composable
 fun ShortNoteItems(
-    text: String,
     icon: Painter,
-    onClick: () -> Unit
+    noteOrder: NoteOrder = NoteOrder.Date(OrderType.Descending),
+    onOrderChange: (NoteOrder) -> Unit,
 ) {
+    val text: String = if (noteOrder.orderType is OrderType.Ascending) {
+        "First Creation"
+    } else {
+        "Last Modification"
+    }
+
     Box(
         contentAlignment = Alignment.CenterEnd
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.clickable {
-                onClick()
+                onOrderChange(
+                    noteOrder.copy(
+                        if (noteOrder.orderType is OrderType.Ascending) {
+                            OrderType.Descending
+                        } else {
+                            OrderType.Ascending
+                        }
+                    )
+                )
             },
         ) {
             Text(
                 text = text,
                 modifier = Modifier
-                    .clickable { onClick() }
                     .padding(end = 8.dp),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onPrimary.copy(0.4f)

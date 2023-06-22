@@ -1,6 +1,7 @@
 package com.galacticstudio.digidoro.ui.screens.home
 
 import android.content.res.Configuration
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -20,6 +21,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -40,6 +44,7 @@ import com.galacticstudio.digidoro.R
 import com.galacticstudio.digidoro.RetrofitApplication
 import com.galacticstudio.digidoro.data.pomodoroList
 import com.galacticstudio.digidoro.data.todoList
+import com.galacticstudio.digidoro.network.retrofit.RetrofitInstance
 import com.galacticstudio.digidoro.ui.screens.home.viewmodel.HomeViewModel
 import com.galacticstudio.digidoro.ui.shared.cards.pomodoroCard.PomodoroCard
 import com.galacticstudio.digidoro.ui.shared.cards.todocard.TodoCard
@@ -78,7 +83,11 @@ fun HomeScreen(
     val app: RetrofitApplication = LocalContext.current.applicationContext as RetrofitApplication
     val state = homeViewModel.state // Retrieves the current state from the HomeViewModel.
 
-    homeViewModel.onEvent(HomeUIEvent.UsernameChanged(app.getUsername()))
+    val username = remember { mutableStateOf(app.getUsername()) }
+    SideEffect {
+        username.value = app.getUsername()
+        RetrofitInstance.setToken(app.getToken())
+    }
 
     val contentPadding = PaddingValues(start = 24.dp, top = 24.dp, end = 24.dp, bottom = 75.dp)
 
@@ -89,7 +98,7 @@ fun HomeScreen(
         state = rememberLazyListState()
     ) {
         item {
-            WelcomeUser(state)
+            WelcomeUser(username.value)
         }
 
         // Ranking
@@ -168,7 +177,7 @@ fun HomeScreen(
  */
 @Composable
 fun WelcomeUser(
-    state: HomeUIState
+    username: String
 ) {
     Text(
         text = "Hello again,",
@@ -181,7 +190,8 @@ fun WelcomeUser(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = state.username,
+            text = username,
+//            text = state.username,
             style = MaterialTheme.typography.headlineLarge,
             fontFamily = Nunito,
             fontWeight = FontWeight.W800,

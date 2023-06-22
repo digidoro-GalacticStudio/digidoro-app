@@ -28,6 +28,11 @@ class DateUtils {
             return localDate.format(outputFormatter)
         }
 
+        fun convertISO8601ToDate(dateString: String): Date {
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+            return dateFormat.parse(dateString)
+        }
+
         fun formatDateWithTime(date: Date?): Pair<String, String> {
             if (date == null) {
                 return "Invalid Date" to ""

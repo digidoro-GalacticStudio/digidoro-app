@@ -1,4 +1,6 @@
-package com.galacticstudio.digidoro.domain.usecase
+package com.galacticstudio.digidoro.domain.usecase.fields
+
+import com.galacticstudio.digidoro.domain.usecase.ValidationResult
 
 /**
  * Use case responsible for validating a password.

@@ -11,7 +11,7 @@ data class RegisterResponse(
 )
 
 data class UserData(
-    @SerializedName("name") val name: String,
+    @SerializedName("firstname") val name: String,
     @SerializedName("lastname") val lastname: String,
     @SerializedName("email") val email: String,
     @SerializedName("phone_number") val phoneNumber: String,

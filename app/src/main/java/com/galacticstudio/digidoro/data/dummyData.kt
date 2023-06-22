@@ -74,7 +74,7 @@ val todoList = mutableListOf<TodoModel>().apply {
 
 val itemNotesList = listOf(
     NoteModel(
-        user_id = 1,
+        user_id = "1",
         title = "Abstract Libro 1",
         message = "Simplicity boils down to two steps: Identify the essential. Eliminate the rest.",
         tags = emptyList(),
@@ -84,7 +84,7 @@ val itemNotesList = listOf(
         updatedAt = Calendar.getInstance().time
     ),
     NoteModel(
-        user_id = 2,
+        user_id = "2",
         title = "Abstract Libro 2",
         message = "Simplicity boils down to two steps: Identify the essential. Eliminate the rest.",
         tags = emptyList(),
@@ -94,7 +94,7 @@ val itemNotesList = listOf(
         updatedAt = Calendar.getInstance().time
     ),
     NoteModel(
-        user_id = 3,
+        user_id = "3",
         title = "Abstract Libro 3",
         message = "Simplicity boils down to two steps: Identify the essential. Eliminate the rest.",
         tags = emptyList(),
@@ -104,7 +104,7 @@ val itemNotesList = listOf(
         updatedAt = Calendar.getInstance().time
     ),
     NoteModel(
-        user_id = 4,
+        user_id = "4",
         title = "Abstract Libro 4",
         message = "Simplicity boils down to two steps: Identify the essential. Eliminate the rest.",
         tags = emptyList(),
@@ -114,7 +114,7 @@ val itemNotesList = listOf(
         updatedAt = Calendar.getInstance().time
     ),
     NoteModel(
-        user_id = 5,
+        user_id = "5",
         title = "Abstract Libro 5",
         message = "Simplicity boils down to two steps: Identify the essential. Eliminate the rest.",
         tags = emptyList(),

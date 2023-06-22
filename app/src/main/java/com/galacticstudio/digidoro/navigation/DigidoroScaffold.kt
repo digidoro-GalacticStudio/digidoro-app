@@ -88,7 +88,8 @@ sealed class ItemsMenu(
     object AccountItem : ItemsMenu(
         R.drawable.manage_account_icon,
         "account",
-        "account_screen"
+//        "account_screen"
+        "login_screen"
     )
 }
 

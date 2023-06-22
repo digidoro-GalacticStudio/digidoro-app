@@ -4,7 +4,7 @@ import java.util.Date
 
 //TODO Verify the attributes (user_id)
 data class NoteModel(
-    val user_id: Int,
+    val user_id: String,
     val title: String,
     val message: String,
     val tags: List<String>,

@@ -1,7 +1,8 @@
-package com.galacticstudio.digidoro.domain.usecase
+package com.galacticstudio.digidoro.domain.usecase.fields
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import com.galacticstudio.digidoro.domain.usecase.ValidationResult
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
