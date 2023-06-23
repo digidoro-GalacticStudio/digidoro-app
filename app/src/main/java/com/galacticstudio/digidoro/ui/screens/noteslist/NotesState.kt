@@ -7,5 +7,6 @@ import com.galacticstudio.digidoro.domain.util.OrderType
 data class NotesState (
     val notes: List<NoteModel> = emptyList(),
     val noteOrder: NoteOrder = NoteOrder.Date(OrderType.Descending),
-    val isOrderSectionVisible: Boolean = false
+    val isOrderSectionVisible: Boolean = false,
+    val isLoading: Boolean = false,
 )

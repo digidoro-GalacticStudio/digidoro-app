@@ -43,10 +43,6 @@ class NotesViewModel(
     private val responseEventChannel = Channel<NotesResponseState>()
     val responseEvents: Flow<NotesResponseState> = responseEventChannel.receiveAsFlow()
 
-//    init {
-//        getNotes(_state.value.noteOrder)
-//    }
-
     fun onEvent(event: NotesEvent) {
         when (event) {
             is NotesEvent.Order -> {
@@ -84,6 +80,8 @@ class NotesViewModel(
 
     private fun getNotes(noteOrder: NoteOrder) {
         viewModelScope.launch {
+            _state.value = _state.value.copy(isLoading = true)
+
             val sortBy = when (noteOrder) {
                 is NoteOrder.Date -> "createdAt"
             }
@@ -105,7 +103,8 @@ class NotesViewModel(
                 is ApiResponse.Success -> {
                     _state.value = _state.value.copy(
                         notes = mapToNoteModels(response.data),
-                                noteOrder = noteOrder
+                        noteOrder = noteOrder,
+                        isLoading = false,
                     )
                     sendResponseEvent(NotesResponseState.Success)
                 }

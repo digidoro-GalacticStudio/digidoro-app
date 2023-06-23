@@ -8,7 +8,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import com.galacticstudio.digidoro.ui.theme.Nunito
@@ -33,17 +32,18 @@ fun Title(
     Column(
         horizontalAlignment = alignment,
         modifier = Modifier
-            .fillMaxWidth()
-            .then(modifier),
+            .fillMaxWidth(),
     ) {
         TextElement(
             text = message.title,
             textStyle = titleStyle,
             fontWeight = FontWeight.W800,
+            modifier = modifier
         )
         TextElement(
             text = message.subTitle,
-            textStyle = subtitleStyle
+            textStyle = subtitleStyle,
+            modifier = modifier
         )
     }
 }
@@ -57,12 +57,16 @@ fun Title(
  */
 @Composable
 fun TextElement(
-    text: String, textStyle: TextStyle, fontWeight: FontWeight = FontWeight.W500
+    text: String,
+    textStyle: TextStyle,
+    fontWeight: FontWeight = FontWeight.W500,
+    modifier: Modifier = Modifier
 ) {
     Text(
         text = text,
         style = textStyle,
         fontFamily = Nunito,
         fontWeight = fontWeight,
+        modifier = modifier,
     )
 }

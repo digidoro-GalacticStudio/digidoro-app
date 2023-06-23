@@ -1,7 +1,6 @@
 package com.galacticstudio.digidoro.ui.screens.noteslist
 
 import android.content.res.Configuration
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -27,7 +26,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,6 +38,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -49,7 +48,6 @@ import com.galacticstudio.digidoro.R
 import com.galacticstudio.digidoro.domain.util.NoteOrder
 import com.galacticstudio.digidoro.domain.util.OrderType
 import com.galacticstudio.digidoro.navigation.Screen
-import com.galacticstudio.digidoro.network.retrofit.RetrofitInstance
 import com.galacticstudio.digidoro.ui.screens.noteslist.components.ActionNote
 import com.galacticstudio.digidoro.ui.screens.noteslist.components.NoteItem
 import com.galacticstudio.digidoro.ui.screens.noteslist.viewmodel.NotesViewModel
@@ -58,6 +56,7 @@ import com.galacticstudio.digidoro.ui.shared.titles.CustomMessageData
 import com.galacticstudio.digidoro.ui.shared.titles.Title
 import com.galacticstudio.digidoro.ui.theme.DigidoroTheme
 import com.galacticstudio.digidoro.util.DateUtils
+import com.galacticstudio.digidoro.util.shimmerEffect
 import java.util.Date
 
 /**
@@ -246,21 +245,41 @@ fun NotesListContent(
             }
         }
 
-        itemsIndexed(notesViewModel.state.value.notes) { _, dataNote ->
-            val noteColor = Color(android.graphics.Color.parseColor(dataNote.theme))
-            val resNoteColor = noteColor.takeUnless { it == Color.White }
-                ?: MaterialTheme.colorScheme.primaryContainer
+        val isLoading = notesViewModel.state.value.isLoading
 
-            NoteItemContainer(
-                message = dataNote.message,
-                title = dataNote.title,
-                updatedAt = dataNote.updatedAt,
-                theme = resNoteColor,
-            ) {
-                navController.navigate(
-                    Screen.Note.route +
-                            "?noteId=${dataNote.id}&noteColor=${noteColor.toArgb()}"
+        if (isLoading) {
+            val array = arrayOf(1, 2, 3, 4)
+
+            itemsIndexed(array) { _, value ->
+                NoteItemContainer(
+                    message = "",
+                    title = "Lorem Ipsum",
+                    updatedAt = Date(),
+                    theme = Color.Transparent,
+                    onNoteClick = {},
+                    modifier = Modifier
+                        .shimmerEffect(),
+                    isLoading = true,
                 )
+            }
+        } else {
+            itemsIndexed(notesViewModel.state.value.notes) { _, dataNote ->
+                val noteColor = Color(android.graphics.Color.parseColor(dataNote.theme))
+                val resNoteColor = noteColor.takeUnless { it == Color.White }
+                    ?: MaterialTheme.colorScheme.primaryContainer
+
+                NoteItemContainer(
+                    message = dataNote.message,
+                    title = dataNote.title,
+                    updatedAt = dataNote.updatedAt,
+                    theme = resNoteColor,
+                    isLoading = false,
+                ) {
+                    navController.navigate(
+                        Screen.Note.route +
+                                "?noteId=${dataNote.id}&noteColor=${noteColor.toArgb()}"
+                    )
+                }
             }
         }
     }
@@ -325,6 +344,8 @@ fun NoteItemContainer(
     message: String,
     title: String,
     updatedAt: Date,
+    modifier: Modifier = Modifier,
+    isLoading: Boolean,
     theme: Color = Color.White,
     onNoteClick: () -> Unit,
 ) {
@@ -333,6 +354,8 @@ fun NoteItemContainer(
             text = message,
             color = theme,
             onClick = onNoteClick,
+            modifier = if (isLoading) Modifier.shimmerEffect(12.dp) else modifier,
+            isLoading = isLoading,
         )
         Title(
             message = CustomMessageData(
@@ -340,8 +363,16 @@ fun NoteItemContainer(
                 subTitle = DateUtils.formatDateToString(updatedAt)
             ),
             alignment = Alignment.CenterHorizontally,
-            titleStyle = MaterialTheme.typography.bodyMedium,
-            subtitleStyle = MaterialTheme.typography.bodySmall
+            titleStyle = TextStyle(
+                color = if (isLoading) Color.Transparent else MaterialTheme.colorScheme.onPrimary,
+                fontStyle = MaterialTheme.typography.bodyMedium.fontStyle,
+            ),
+            subtitleStyle =
+            TextStyle(
+                color = if (isLoading) Color.Transparent else MaterialTheme.colorScheme.onPrimary,
+                fontStyle = MaterialTheme.typography.bodySmall.fontStyle,
+            ),
+            modifier = modifier,
         )
         Spacer(modifier = Modifier.height(24.dp))
     }
