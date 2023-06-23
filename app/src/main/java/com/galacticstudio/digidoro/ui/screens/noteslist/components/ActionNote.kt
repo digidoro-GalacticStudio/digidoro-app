@@ -36,6 +36,7 @@ fun ActionNote(
     leadingIcon: Painter? = null,
     colorIcon: Color = Color.Magenta,
     onClick: () -> Unit,
+    isSelected: Boolean,
 ) {
     Card(
         onClick = onClick,
@@ -47,7 +48,8 @@ fun ActionNote(
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.onPrimary),
         shape = MaterialTheme.shapes.small,
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            containerColor = if (isSelected) MaterialTheme.colorScheme.onPrimary.copy(0.5f)
+                else MaterialTheme.colorScheme.primaryContainer,
         ),
     ) {
         Row(

@@ -19,7 +19,9 @@ import com.galacticstudio.digidoro.domain.util.NoteOrder
 import com.galacticstudio.digidoro.domain.util.OrderType
 import com.galacticstudio.digidoro.network.ApiResponse
 import com.galacticstudio.digidoro.network.dto.note.NoteData
+import com.galacticstudio.digidoro.repository.FavoriteNoteRepository
 import com.galacticstudio.digidoro.repository.NoteRepository
+import com.galacticstudio.digidoro.ui.screens.noteslist.NoteResultsMode
 import com.galacticstudio.digidoro.ui.screens.noteslist.NotesEvent
 import com.galacticstudio.digidoro.ui.screens.noteslist.NotesResponseState
 import com.galacticstudio.digidoro.ui.screens.noteslist.NotesState
@@ -31,13 +33,17 @@ import kotlinx.coroutines.launch
 
 class NotesViewModel(
     private val noteUseCases: NoteUseCases,
-    private val repository: NoteRepository,
+    private val noteRepository: NoteRepository,
+    private val favoriteNoteRepository: FavoriteNoteRepository,
 ) : ViewModel() {
     private val _state = mutableStateOf(NotesState())
     val state: State<NotesState> = _state
 
     // The current state of the notes response from the API (nullable)
     private var apiState by mutableStateOf<NotesResponseState?>(NotesResponseState.Resume)
+
+    private val _resultsMode = mutableStateOf<NoteResultsMode>(NoteResultsMode.AllNotes)
+    val resultsMode: State<NoteResultsMode> = _resultsMode
 
     // Channel for emitting notes response states.
     private val responseEventChannel = Channel<NotesResponseState>()
@@ -63,6 +69,11 @@ class NotesViewModel(
                 _state.value = state.value.copy(
                     isOrderSectionVisible = !state.value.isOrderSectionVisible
                 )
+            }
+
+            is NotesEvent.ResultsChanged -> {
+                _resultsMode.value = event.resultsMode
+                getNotes(state.value.noteOrder)
             }
         }
     }
@@ -91,7 +102,31 @@ class NotesViewModel(
                 is OrderType.Descending -> "desc"
             }
 
-            when (val response = repository.getAllNotes(sortBy, order)) {
+            val response = when (_resultsMode.value) {
+                is NoteResultsMode.AllNotes -> noteRepository.getAllNotes(
+                    sortBy,
+                    order,
+                    isTrashed = false
+                )
+
+                is NoteResultsMode.FavoriteNotes -> favoriteNoteRepository.getAllFavoriteNotes(
+                    populateFields = "notes_id"
+                )
+
+                is NoteResultsMode.TrashNotes -> noteRepository.getAllNotes(
+                    sortBy,
+                    order,
+                    isTrashed = false
+                )
+
+                is NoteResultsMode.FolderNotes -> noteRepository.getAllNotes(
+                    sortBy,
+                    order,
+                    isTrashed = true
+                ) //noteRepository.getFolderNotes(sortBy, order)
+            }
+
+            when (response) {
                 is ApiResponse.Error -> {
                     sendResponseEvent(NotesResponseState.Error(response.exception))
                 }
@@ -140,7 +175,8 @@ class NotesViewModel(
                         deleteNote = DeleteNote(app.notesRepository),
                         addNote = AddNote()
                     ),
-                    repository = app.notesRepository
+                    noteRepository = app.notesRepository,
+                    favoriteNoteRepository = app.favoriteNotesRepository,
                 )
             }
         }

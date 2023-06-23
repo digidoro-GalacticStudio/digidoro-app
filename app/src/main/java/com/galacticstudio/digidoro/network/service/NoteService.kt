@@ -21,6 +21,7 @@ interface NoteService {
         @Query("page") page: Int? = null,
         @Query("limit") limit: Int? = null,
         @Query("populateFields") populateFields: String? = null,
+        @Query("is_trashed") isTrashed: Boolean? = null,
     ): NoteListResponse
 
     @GET("api/note/own/{id}")

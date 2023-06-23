@@ -11,4 +11,5 @@ sealed class NoteItemEvent {
     object UpdateNote: NoteItemEvent()
     object DeleteNote: NoteItemEvent()
     object ToggleFavorite: NoteItemEvent()
+    object ToggleTrash: NoteItemEvent()
 }

@@ -1,6 +1,7 @@
 package com.galacticstudio.digidoro.network.retrofit
 
 import com.galacticstudio.digidoro.network.service.AuthService
+import com.galacticstudio.digidoro.network.service.FavoriteNoteService
 import com.galacticstudio.digidoro.network.service.NoteService
 import com.galacticstudio.digidoro.util.NetworkService.BASE_URL
 import okhttp3.OkHttpClient
@@ -43,6 +44,10 @@ object RetrofitInstance {
 
     fun getNoteService(): NoteService {
         return retrofit.create(NoteService::class.java)
+    }
+
+    fun getFavoriteNoteService(): FavoriteNoteService {
+        return retrofit.create(FavoriteNoteService::class.java)
     }
 }
 

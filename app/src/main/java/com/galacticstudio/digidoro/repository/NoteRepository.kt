@@ -14,10 +14,11 @@ class NoteRepository(private val noteService: NoteService) {
         order: String? = null,
         page: Int? = null,
         limit: Int? = null,
-        populateFields: String? = null
+        populateFields: String? = null,
+        isTrashed: Boolean? = null,
     ): ApiResponse<List<NoteData>> {
         return handleApiCall {
-            noteService.getAllNotes(sortBy, order, page, limit, populateFields).data
+            noteService.getAllNotes(sortBy, order, page, limit, populateFields, isTrashed).data
         }
     }
 

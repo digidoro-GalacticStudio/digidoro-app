@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.galacticstudio.digidoro.network.retrofit.RetrofitInstance
 import com.galacticstudio.digidoro.repository.CredentialsRepository
+import com.galacticstudio.digidoro.repository.FavoriteNoteRepository
 import com.galacticstudio.digidoro.repository.NoteRepository
 
 class RetrofitApplication : Application() {
@@ -24,6 +25,10 @@ class RetrofitApplication : Application() {
         getNoteService()
     }
 
+    private fun getFavoriteNoteAPIService() = with(RetrofitInstance){
+        getFavoriteNoteService()
+    }
+
     fun getToken(): String = prefs.getString(USER_TOKEN, "")!!
 
     fun getRoles(): List<String> = prefs.getStringSet(USER_ROLES, emptySet())?.toList() ?: emptyList()
@@ -36,6 +41,10 @@ class RetrofitApplication : Application() {
 
     val notesRepository: NoteRepository by lazy {
         NoteRepository(getNoteAPIService())
+    }
+
+    val favoriteNotesRepository: FavoriteNoteRepository by lazy {
+        FavoriteNoteRepository(getFavoriteNoteAPIService())
     }
 
     fun saveAuthToken(token: String){

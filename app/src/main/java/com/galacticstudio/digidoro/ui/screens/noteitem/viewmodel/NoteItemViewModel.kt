@@ -61,7 +61,7 @@ class NoteItemViewModel(
             }
 
             is NoteItemEvent.ColorChanged -> {
-                _noteColor.value = "${event.color}"
+                _noteColor.value = event.color
             }
 
             is NoteItemEvent.TagsChanged -> {
@@ -86,6 +86,10 @@ class NoteItemViewModel(
 
             is NoteItemEvent.ToggleFavorite -> {
 
+            }
+
+            is NoteItemEvent.ToggleTrash -> {
+                toggleTrashNote(_state.value.noteId)
             }
         }
     }
@@ -225,6 +229,26 @@ class NoteItemViewModel(
     private fun deleteNote(noteId: String) {
         viewModelScope.launch {
             when (val response = repository.deleteNoteById(noteId)) {
+                is ApiResponse.Error -> {
+                    sendResponseEvent(NoteItemResponseState.Error(response.exception))
+                }
+
+                is ApiResponse.ErrorWithMessage -> {
+                    sendResponseEvent(NoteItemResponseState.ErrorWithMessage(response.message))
+                }
+
+                is ApiResponse.Success -> {
+                    sendResponseEvent(
+                        NoteItemResponseState.Success(_actionTypeEvents.value)
+                    )
+                }
+            }
+        }
+    }
+
+    private fun toggleTrashNote(noteId: String) {
+        viewModelScope.launch {
+            when (val response = repository.toggleTrashNoteById(noteId)) {
                 is ApiResponse.Error -> {
                     sendResponseEvent(NoteItemResponseState.Error(response.exception))
                 }

@@ -82,7 +82,8 @@ data class ActionNoteData(
     val text: String,
     val leadingIcon: Painter,
     val colorIcon: Color,
-    val onClick: () -> Unit
+    val onClick: () -> Unit,
+    val resultMode: NoteResultsMode,
 )
 
 /**
@@ -176,25 +177,37 @@ fun NotesListContent(
             text = "All notes",
             leadingIcon = painterResource(R.drawable.email_icon),
             colorIcon = Color(0xFF4880FF),
-            onClick = {}
+            resultMode = NoteResultsMode.AllNotes,
+            onClick = {
+                notesViewModel.onEvent(NotesEvent.ResultsChanged(NoteResultsMode.AllNotes))
+            }
         ),
         ActionNoteData(
             text = "Your folders",
             leadingIcon = painterResource(R.drawable.email_icon),
             colorIcon = Color(0xFF202124),
-            onClick = {}
+            resultMode = NoteResultsMode.FolderNotes,
+            onClick = {
+                notesViewModel.onEvent(NotesEvent.ResultsChanged(NoteResultsMode.FolderNotes))
+            },
         ),
         ActionNoteData(
             text = "Your favorites",
             leadingIcon = painterResource(R.drawable.email_icon),
             colorIcon = Color(0xFFFFC700),
-            onClick = {}
+            resultMode = NoteResultsMode.FavoriteNotes,
+            onClick = {
+                notesViewModel.onEvent(NotesEvent.ResultsChanged(NoteResultsMode.FavoriteNotes))
+            },
         ),
         ActionNoteData(
             text = "Your trash bin",
             leadingIcon = painterResource(R.drawable.email_icon),
             colorIcon = Color(0xFFE15A51),
-            onClick = {}
+            resultMode = NoteResultsMode.TrashNotes,
+            onClick = {
+                notesViewModel.onEvent(NotesEvent.ResultsChanged(NoteResultsMode.TrashNotes))
+            },
         )
     )
 
@@ -228,7 +241,8 @@ fun NotesListContent(
                 text = dataAction.text,
                 leadingIcon = dataAction.leadingIcon,
                 colorIcon = dataAction.colorIcon,
-                onClick = dataAction.onClick
+                onClick = dataAction.onClick,
+                isSelected = notesViewModel.resultsMode.value == dataAction.resultMode
             )
         }
 
