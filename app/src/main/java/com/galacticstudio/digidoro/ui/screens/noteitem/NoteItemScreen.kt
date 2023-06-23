@@ -1,6 +1,7 @@
 package com.galacticstudio.digidoro.ui.screens.noteitem
 
 import android.content.res.Configuration
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -125,13 +126,13 @@ fun NoteItemScreen(
 
     /*
      * Executes a side effect using LaunchedEffect when the context value changes.
-     * This effect collects response events from the loginViewModel and performs different actions based on the event type.
+     * This effect collects response events from the noteItemViewModel and performs different actions based on the event type.
      * -> If the event is of type Error or ErrorWithMessage, displays a toast with the exception message.
-     * -> If the event is of type Success, displays a toast with the login success message and saves the auth token.
+     * -> If the event is of type Success, displays a toast with the notes success message and saves the auth token.
      * This effect relies on the provided context to access resources like Toast and the RetrofitApplication instance.
      */
     LaunchedEffect(key1 = context) {
-        // Collect the response events from the loginViewModel
+        // Collect the response events from the noteItemViewModel
         noteItemViewModel.responseEvents.collect { event ->
             when (event) {
                 is NoteItemResponseState.Error -> {
@@ -153,6 +154,7 @@ fun NoteItemScreen(
                         is ActionType.DeleteNote -> "Note deleted"
                         is ActionType.UpdateNote -> "Note updated"
                     }
+
                     Toast.makeText(
                         context,
                         actionMessage,
@@ -165,12 +167,12 @@ fun NoteItemScreen(
         }
     }
 
-
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
     val newNoteColor =
         Color(android.graphics.Color.parseColor("#${noteItemViewModel.noteColor.value}")).takeUnless { it == Color.White } ?: MaterialTheme.colorScheme.background
+
     TopBarNote(
         snackbarHostState = snackbarHostState,
         noteColor = newNoteColor,
@@ -349,7 +351,8 @@ fun TopBarNote(
                         expanded = showMenu,
                         onDismissRequest = { showMenu = false },
                         noteItemViewModel = noteItemViewModel,
-                        onDeleteNote = { openDeleteDialog.value = true }
+                        onDeleteNote = { openDeleteDialog.value = true },
+                        onToggleFavoriteNote = { noteItemViewModel.onEvent(NoteItemEvent.ToggleFavorite) }
                     )
                 }
             )
@@ -376,6 +379,7 @@ fun DropDownNoteMenu(
     expanded: Boolean,
     onDismissRequest: () -> Unit,
     onDeleteNote: () -> Unit,
+    onToggleFavoriteNote: () -> Unit,
     noteItemViewModel: NoteItemViewModel,
 ) {
     var openTagBottomSheet by rememberSaveable { mutableStateOf(false) }
@@ -429,16 +433,19 @@ fun DropDownNoteMenu(
         ) {
             DropdownMenuItem(
                 modifier = Modifier.width(50.dp),
+                enabled = isUpdated,
                 text = {
-                    //TODO Implement the favorite action
+                    val isFavorite = !noteItemViewModel.state.value.isFavorite
                     Icon(
-                        painter = painterResource(R.drawable.star_outline_icon),
+                        painter = if (isFavorite) painterResource(R.drawable.heart_border_icon) else
+                            painterResource(R.drawable.heart_fill_icon),
                         contentDescription = "Favorite Note",
                         modifier = Modifier.size(25.dp),
-                        tint = MaterialTheme.colorScheme.onPrimary,
+                        tint = if (isFavorite) MaterialTheme.colorScheme.onPrimary else
+                            Color.Red,
                     )
                 },
-                onClick = { /*TODO*/ }
+                onClick = { onToggleFavoriteNote() }
             )
             Spacer(modifier = Modifier.width(75.dp))
             DropdownMenuItem(
@@ -449,7 +456,8 @@ fun DropDownNoteMenu(
                         painter = painterResource(R.drawable.delete_icon),
                         contentDescription = "Delete Note",
                         modifier = Modifier.size(25.dp),
-                        tint = MaterialTheme.colorScheme.onPrimary,
+                        tint = if (isUpdated) MaterialTheme.colorScheme.onPrimary else
+                            MaterialTheme.colorScheme.onPrimary.copy(0.7f),
                     )
                 },
                 onClick = { onDeleteNote() }

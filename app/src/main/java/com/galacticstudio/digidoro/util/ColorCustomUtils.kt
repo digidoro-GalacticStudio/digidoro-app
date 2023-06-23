@@ -25,7 +25,7 @@ class ColorCustomUtils {
             return String.format("%02X%02X%02X", red, green, blue)
         }
 
-        fun returnLuminanceColor(color: Color) : Color {
+        fun returnLuminanceColor(color: Color): Color {
             return if (isColorDark(color)) Color.White else Gray60
         }
 
@@ -33,5 +33,34 @@ class ColorCustomUtils {
             val luminance = ColorUtils.calculateLuminance(color.toArgb())
             return luminance < 0.5
         }
+
+        fun adjustColorBrightness(color: Color, isDarken: Boolean, factor: Float): Color {
+            val argb = color.toArgb()
+
+            val red = android.graphics.Color.red(argb)
+            val green = android.graphics.Color.green(argb)
+            val blue = android.graphics.Color.blue(argb)
+            val alpha = android.graphics.Color.alpha(argb)
+
+            val hsv = FloatArray(3)
+            android.graphics.Color.RGBToHSV(red, green, blue, hsv)
+
+            if (isDarken) {
+                hsv[2] *= (1 - factor)
+            } else {
+                hsv[2] += (1 - hsv[2]) * factor
+            }
+
+            val adjustedArgb = android.graphics.Color.HSVToColor(hsv)
+            return Color(
+                android.graphics.Color.argb(
+                    alpha,
+                    android.graphics.Color.red(adjustedArgb),
+                    android.graphics.Color.green(adjustedArgb),
+                    android.graphics.Color.blue(adjustedArgb)
+                )
+            )
+        }
+
     }
 }

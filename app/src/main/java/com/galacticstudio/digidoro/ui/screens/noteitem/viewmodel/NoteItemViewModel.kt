@@ -15,6 +15,7 @@ import com.galacticstudio.digidoro.data.NoteModel
 import com.galacticstudio.digidoro.domain.usecase.note.AddNote
 import com.galacticstudio.digidoro.network.ApiResponse
 import com.galacticstudio.digidoro.network.dto.note.NoteData
+import com.galacticstudio.digidoro.repository.FavoriteNoteRepository
 import com.galacticstudio.digidoro.repository.NoteRepository
 import com.galacticstudio.digidoro.ui.screens.noteitem.ActionType
 import com.galacticstudio.digidoro.ui.screens.noteitem.NoteItemEvent
@@ -28,7 +29,8 @@ import kotlinx.coroutines.launch
 
 class NoteItemViewModel(
     private val addNote: AddNote = AddNote(),
-    private val repository: NoteRepository,
+    private val noteRepository: NoteRepository,
+    private val favoriteRepository: FavoriteNoteRepository,
 ) : ViewModel() {
     private val _state = mutableStateOf(NoteItemState())
     val state: State<NoteItemState> = _state
@@ -50,6 +52,7 @@ class NoteItemViewModel(
         when (event) {
             is NoteItemEvent.NoteIdChanged -> {
                 getNoteById(event.noteId)
+                isFavorite()
             }
 
             is NoteItemEvent.TitleChanged -> {
@@ -85,7 +88,7 @@ class NoteItemViewModel(
             }
 
             is NoteItemEvent.ToggleFavorite -> {
-
+                toggleFavoriteNote(_state.value.noteId)
             }
 
             is NoteItemEvent.ToggleTrash -> {
@@ -100,7 +103,12 @@ class NoteItemViewModel(
             return
         }
 
-        addNewNote(_state.value.title, _state.value.message, _state.value.tags, "#${_noteColor.value}")
+        addNewNote(
+            _state.value.title,
+            _state.value.message,
+            _state.value.tags,
+            "#${_noteColor.value}"
+        )
     }
 
     private fun updateData() {
@@ -149,24 +157,12 @@ class NoteItemViewModel(
     }
 
     private fun addNewNote(title: String, message: String, tags: List<String>, color: String) {
-        viewModelScope.launch {
-            when (val response = repository.createNote(title, message, tags, color)) {
-                is ApiResponse.Error -> {
-                    sendResponseEvent(NoteItemResponseState.Error(response.exception))
-                }
-
-                is ApiResponse.ErrorWithMessage -> {
-                    sendResponseEvent(NoteItemResponseState.ErrorWithMessage(response.message))
-                }
-
-                is ApiResponse.Success -> {
-                    _actionTypeEvents.value = ActionType.CreateNote
-                    sendResponseEvent(
-                        NoteItemResponseState.Success(_actionTypeEvents.value)
-                    )
-                }
+        executeOperation(
+            operation = { noteRepository.createNote(title, message, tags, color) },
+            onSuccess = {
+                _actionTypeEvents.value = ActionType.CreateNote
             }
-        }
+        )
     }
 
     private fun updateNote(
@@ -176,79 +172,84 @@ class NoteItemViewModel(
         tags: List<String>,
         toString: String
     ) {
-        viewModelScope.launch {
-            when (val response =
-                repository.updateNoteById(noteId, title, message, tags, toString)) {
-                is ApiResponse.Error -> {
-                    sendResponseEvent(NoteItemResponseState.Error(response.exception))
-                }
-
-                is ApiResponse.ErrorWithMessage -> {
-                    sendResponseEvent(NoteItemResponseState.ErrorWithMessage(response.message))
-                }
-
-                is ApiResponse.Success -> {
-                    _actionTypeEvents.value = ActionType.UpdateNote
-                    sendResponseEvent(
-                        NoteItemResponseState.Success(ActionType.CreateNote)
-                    )
-                }
+        executeOperation(
+            operation = { noteRepository.updateNoteById(noteId, title, message, tags, toString) },
+            onSuccess = {
+                _actionTypeEvents.value = ActionType.UpdateNote
             }
-        }
+        )
     }
 
     private fun getNoteById(noteId: String) {
-        viewModelScope.launch {
-            when (val response = repository.getNoteById(noteId)) {
-                is ApiResponse.Error -> {
-                    sendResponseEvent(NoteItemResponseState.Error(response.exception))
-                }
-
-                is ApiResponse.ErrorWithMessage -> {
-                    sendResponseEvent(NoteItemResponseState.ErrorWithMessage(response.message))
-                }
-
-                is ApiResponse.Success -> {
-                    val note = mapToNoteModel(response.data)
-                    _state.value = _state.value.copy(
-                        noteId = note.id,
-                        title = note.title,
-                        message = note.message,
-                        tags = note.tags,
-                    )
-
-                    _actionTypeEvents.value = ActionType.UpdateNote
-                    sendResponseEvent(
-                        NoteItemResponseState.Success(_actionTypeEvents.value)
-                    )
-                }
+        executeOperation(
+            operation = { noteRepository.getNoteById(noteId) },
+            onSuccess = { response ->
+                val note = mapToNoteModel(response.data)
+                _state.value = _state.value.copy(
+                    noteId = note.id,
+                    title = note.title,
+                    message = note.message,
+                    tags = note.tags
+                )
+                _actionTypeEvents.value = ActionType.UpdateNote
             }
-        }
+        )
     }
 
     private fun deleteNote(noteId: String) {
-        viewModelScope.launch {
-            when (val response = repository.deleteNoteById(noteId)) {
-                is ApiResponse.Error -> {
-                    sendResponseEvent(NoteItemResponseState.Error(response.exception))
-                }
-
-                is ApiResponse.ErrorWithMessage -> {
-                    sendResponseEvent(NoteItemResponseState.ErrorWithMessage(response.message))
-                }
-
-                is ApiResponse.Success -> {
-                    sendResponseEvent(
-                        NoteItemResponseState.Success(_actionTypeEvents.value)
-                    )
-                }
-            }
-        }
+        executeOperation(
+            operation = { noteRepository.deleteNoteById(noteId) }
+        )
     }
 
     private fun toggleTrashNote(noteId: String) {
+        executeOperation(
+            operation = { noteRepository.toggleTrashNoteById(noteId) }
+        )
+    }
+
+    private fun toggleFavoriteNote(noteId: String) {
+        executeOperation(
+            operation = {
+                favoriteRepository.toggleFavoriteNote(
+                    _state.value.favoriteContainerId,
+                    noteId
+                )
+            },
+            onSuccess = {
+                _state.value = _state.value.copy(isFavorite = !_state.value.isFavorite)
+            }
+        )
+    }
+
+    private fun isFavorite() {
+        executeOperation(
+            operation = { favoriteRepository.getFavoriteNote() },
+            onSuccess = { response ->
+                var foundNote: String? = null
+
+                _state.value = _state.value.copy(favoriteContainerId = response.data.id)
+
+                response.data.notesId.forEach { note ->
+                    if (note == _state.value.noteId) {
+                        foundNote = note
+                        return@forEach
+                    }
+                }
+
+                if (foundNote != null) {
+                    _state.value = _state.value.copy(isFavorite = true)
+                }
+            }
+        )
+    }
+
+    private fun <T> executeOperation(
+        operation: suspend () -> ApiResponse<T>,
+        onSuccess: ((ApiResponse.Success<T>) -> Unit)? = null
+    ) {
         viewModelScope.launch {
-            when (val response = repository.toggleTrashNoteById(noteId)) {
+            when (val response = operation()) {
                 is ApiResponse.Error -> {
                     sendResponseEvent(NoteItemResponseState.Error(response.exception))
                 }
@@ -258,9 +259,8 @@ class NoteItemViewModel(
                 }
 
                 is ApiResponse.Success -> {
-                    sendResponseEvent(
-                        NoteItemResponseState.Success(_actionTypeEvents.value)
-                    )
+                    onSuccess?.invoke(response)
+                    sendResponseEvent(NoteItemResponseState.Success(_actionTypeEvents.value))
                 }
             }
         }
@@ -289,7 +289,8 @@ class NoteItemViewModel(
                 // Create a new instance of LoginViewModel with dependencies.
                 NoteItemViewModel(
                     addNote = AddNote(),
-                    repository = app.notesRepository
+                    noteRepository = app.notesRepository,
+                    favoriteRepository = app.favoriteNotesRepository,
                 )
             }
         }

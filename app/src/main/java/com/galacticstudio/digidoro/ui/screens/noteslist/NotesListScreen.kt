@@ -144,7 +144,7 @@ fun NotesListContent(
     }
 
     LaunchedEffect(key1 = context) {
-        // Collect the response events from the loginViewModel
+        // Collect the response events from the notesViewModel
         notesViewModel.responseEvents.collect { event ->
             when (event) {
                 is NotesResponseState.Error -> {
@@ -157,14 +157,6 @@ fun NotesListContent(
 
                 is NotesResponseState.ErrorWithMessage -> {
                     Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
-                }
-
-                is NotesResponseState.Success -> {
-                    Toast.makeText(
-                        context,
-                        "Todas las notas correctas",
-                        Toast.LENGTH_LONG
-                    ).show()
                 }
 
                 else -> {}

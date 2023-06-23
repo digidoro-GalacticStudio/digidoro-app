@@ -24,6 +24,13 @@ data class ToggleFavoriteNoteResponse(
     @SerializedName("data") val data: List<ToggleFavoriteNote>,
 )
 
+data class SingleFavoriteNoteResponse(
+    @SerializedName("status") val status: String,
+    @SerializedName("code") val code: Int,
+    @SerializedName("message") val message: Any,
+    @SerializedName("data") val data: ToggleFavoriteNote,
+)
+
 data class ToggleFavoriteNote(
     @SerializedName("_id") val id: String,
     @SerializedName("user_id") val userId: String,
