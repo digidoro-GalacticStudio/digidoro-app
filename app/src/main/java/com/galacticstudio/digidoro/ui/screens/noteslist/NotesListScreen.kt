@@ -1,6 +1,7 @@
 package com.galacticstudio.digidoro.ui.screens.noteslist
 
 import android.content.res.Configuration
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -26,6 +27,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,6 +49,7 @@ import com.galacticstudio.digidoro.R
 import com.galacticstudio.digidoro.domain.util.NoteOrder
 import com.galacticstudio.digidoro.domain.util.OrderType
 import com.galacticstudio.digidoro.navigation.Screen
+import com.galacticstudio.digidoro.network.retrofit.RetrofitInstance
 import com.galacticstudio.digidoro.ui.screens.noteslist.components.ActionNote
 import com.galacticstudio.digidoro.ui.screens.noteslist.components.NoteItem
 import com.galacticstudio.digidoro.ui.screens.noteslist.viewmodel.NotesViewModel
@@ -136,6 +139,10 @@ fun NotesListContent(
     val state = notesViewModel.state.value
     val context = LocalContext.current
 
+    LaunchedEffect(Unit) {
+        notesViewModel.onEvent(NotesEvent.Rebuild)
+    }
+
     LaunchedEffect(key1 = context) {
         // Collect the response events from the loginViewModel
         notesViewModel.responseEvents.collect { event ->
@@ -153,11 +160,11 @@ fun NotesListContent(
                 }
 
                 is NotesResponseState.Success -> {
-//                    Toast.makeText(
-//                        context,
-//                        "Todas las notas correctas",
-//                        Toast.LENGTH_LONG
-//                    ).show()
+                    Toast.makeText(
+                        context,
+                        "Todas las notas correctas",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
 
                 else -> {}

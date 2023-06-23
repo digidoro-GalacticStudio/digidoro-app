@@ -116,11 +116,11 @@ fun NoteItemScreen(
     val openDeleteDialog = remember { mutableStateOf(false) }
 
     LaunchedEffect(noteId) {
-        noteItemViewModel.onEvent(NoteItemEvent.ColorChanged(convertColorToString(noteColor)))
-
         if (!noteId.isNullOrEmpty()) {
             noteItemViewModel.onEvent(NoteItemEvent.NoteIdChanged(noteId))
         }
+
+        noteItemViewModel.onEvent(NoteItemEvent.ColorChanged(convertColorToString(noteColor)))
     }
 
     /*

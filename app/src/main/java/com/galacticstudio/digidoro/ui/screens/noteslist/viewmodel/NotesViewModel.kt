@@ -43,9 +43,9 @@ class NotesViewModel(
     private val responseEventChannel = Channel<NotesResponseState>()
     val responseEvents: Flow<NotesResponseState> = responseEventChannel.receiveAsFlow()
 
-    init {
-        getNotes(_state.value.noteOrder)
-    }
+//    init {
+//        getNotes(_state.value.noteOrder)
+//    }
 
     fun onEvent(event: NotesEvent) {
         when (event) {
@@ -57,6 +57,10 @@ class NotesViewModel(
                 }
 
                 getNotes(event.noteOrder)
+            }
+
+            is NotesEvent.Rebuild -> {
+                getNotes(state.value.noteOrder)
             }
 
             is NotesEvent.ToggleOrderSection -> {
