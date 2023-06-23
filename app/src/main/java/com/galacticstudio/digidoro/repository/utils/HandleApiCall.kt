@@ -15,13 +15,15 @@ suspend fun <T> handleApiCall(call: suspend () -> T): ApiResponse<T> {
         ApiResponse.Success(response)
     } catch (e: HttpException) {
         val errorBody = e.response()?.errorBody()?.string()
+        Log.d("MyErrors", "-::[ERROR]::- errorBody: ${errorBody}")
         val response = Gson().fromJson(errorBody, ErrorResponse::class.java)
+        Log.d("MyErrors", "-::[ERROR]::- response: ${response}")
 
         val code = response?.code ?: -1
         val message = response?.message
 
-        Log.d("MyErrors", "-::[ERROR]::- response: ${response}")
-        Log.d("MyErrors", "-::[ERROR]::- errorBody: ${errorBody}")
+
+
 
         when (code) {
             409 -> {

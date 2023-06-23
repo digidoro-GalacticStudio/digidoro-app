@@ -98,7 +98,8 @@ fun NotesListScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    navController.navigate(Screen.Note.route + "?noteId=&noteColor=")
+                    val color = Color.White.toArgb()
+                    navController.navigate(Screen.Note.route + "?noteId=&noteColor=${color}")
                 },
                 containerColor = MaterialTheme.colorScheme.tertiary,
                 modifier = Modifier
@@ -152,11 +153,11 @@ fun NotesListContent(
                 }
 
                 is NotesResponseState.Success -> {
-                    Toast.makeText(
-                        context,
-                        "Todas las notas correctas",
-                        Toast.LENGTH_LONG
-                    ).show()
+//                    Toast.makeText(
+//                        context,
+//                        "Todas las notas correctas",
+//                        Toast.LENGTH_LONG
+//                    ).show()
                 }
 
                 else -> {}
@@ -251,7 +252,7 @@ fun NotesListContent(
             ) {
                 navController.navigate(
                     Screen.Note.route +
-                            "?noteId=${dataNote.user_id}&noteColor=${noteColor.toArgb()}"
+                            "?noteId=${dataNote.id}&noteColor=${noteColor.toArgb()}"
                 )
             }
         }
@@ -373,7 +374,7 @@ fun ShortNoteItems(
                 modifier = Modifier
                     .padding(end = 8.dp),
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onPrimary.copy(0.4f)
+                color = MaterialTheme.colorScheme.onPrimary.copy(0.8f)
             )
             Icon(
                 painter = icon,

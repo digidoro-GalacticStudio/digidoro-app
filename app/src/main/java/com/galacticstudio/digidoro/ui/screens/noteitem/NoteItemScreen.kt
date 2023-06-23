@@ -1,15 +1,7 @@
 package com.galacticstudio.digidoro.ui.screens.noteitem
 
 import android.content.res.Configuration
-import android.util.Log
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.SizeTransform
-import androidx.compose.animation.core.keyframes
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.with
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -37,41 +29,51 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.galacticstudio.digidoro.R
 import com.galacticstudio.digidoro.data.tagList
+import com.galacticstudio.digidoro.navigation.Screen
 import com.galacticstudio.digidoro.ui.screens.noteitem.components.DottedDivider
 import com.galacticstudio.digidoro.ui.screens.noteitem.components.TagItem
 import com.galacticstudio.digidoro.ui.screens.noteitem.components.TransparentTextField
+import com.galacticstudio.digidoro.ui.screens.noteitem.viewmodel.NoteItemViewModel
+import com.galacticstudio.digidoro.ui.shared.dialogs.ExitConfirmationDialog
 import com.galacticstudio.digidoro.ui.shared.floatingCards.BottomSheetLayout
 import com.galacticstudio.digidoro.ui.shared.floatingCards.floatingElementCard.ColorBox
 import com.galacticstudio.digidoro.ui.shared.textfield.SearchBarItem
 import com.galacticstudio.digidoro.ui.theme.DigidoroTheme
 import com.galacticstudio.digidoro.util.ColorCustomUtils
-import kotlinx.coroutines.CoroutineScope
+import com.galacticstudio.digidoro.util.ColorCustomUtils.Companion.convertColorToString
+import com.galacticstudio.digidoro.util.dropShadow
+import kotlinx.coroutines.launch
 
 /**
  * A composable function used for previewing a note item.
@@ -86,7 +88,7 @@ fun NoteItemScreenPreview() {
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
         ) {
-            NoteItemScreen(navController = navController, noteColor = Color.White)
+            NoteItemScreen(navController = navController, noteColor = Color.White, noteId = null)
         }
     }
 }
@@ -101,15 +103,137 @@ fun NoteItemScreenPreview() {
 fun NoteItemScreen(
     navController: NavController,
     noteColor: Color,
+    noteId: String?,
+    noteItemViewModel: NoteItemViewModel = viewModel(factory = NoteItemViewModel.Factory),
 ) {
-    val newNoteColor = noteColor.takeUnless { it == Color.White } ?: MaterialTheme.colorScheme.background
+    val state = noteItemViewModel.state // Retrieves the current state from the noteItemViewModel.
+    val actionType =
+        noteItemViewModel.actionTypeEvents // Retrieves the current type of actions from the noteItemViewModel.
+    val context = LocalContext.current // Retrieves the current context from the LocalContext.
 
+    //Dialogs
+    val openExitDialog = remember { mutableStateOf(false) }
+    val openDeleteDialog = remember { mutableStateOf(false) }
+
+    LaunchedEffect(noteId) {
+        noteItemViewModel.onEvent(NoteItemEvent.ColorChanged(convertColorToString(noteColor)))
+
+        if (!noteId.isNullOrEmpty()) {
+            noteItemViewModel.onEvent(NoteItemEvent.NoteIdChanged(noteId))
+        }
+    }
+
+    /*
+     * Executes a side effect using LaunchedEffect when the context value changes.
+     * This effect collects response events from the loginViewModel and performs different actions based on the event type.
+     * -> If the event is of type Error or ErrorWithMessage, displays a toast with the exception message.
+     * -> If the event is of type Success, displays a toast with the login success message and saves the auth token.
+     * This effect relies on the provided context to access resources like Toast and the RetrofitApplication instance.
+     */
+    LaunchedEffect(key1 = context) {
+        // Collect the response events from the loginViewModel
+        noteItemViewModel.responseEvents.collect { event ->
+            when (event) {
+                is NoteItemResponseState.Error -> {
+                    Toast.makeText(
+                        context,
+                        "An error has occurred ${event.exception}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                is NoteItemResponseState.ErrorWithMessage -> {
+                    Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+                }
+
+                is NoteItemResponseState.Success -> {
+                    val actionMessage = when (event.actionType) {
+                        is ActionType.CreateNote -> "Note added"
+                        is ActionType.ReadNote -> "Get Note successfully"
+                        is ActionType.DeleteNote -> "Note deleted"
+                        is ActionType.UpdateNote -> "Note updated"
+                    }
+                    Toast.makeText(
+                        context,
+                        actionMessage,
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+
+                else -> {}
+            }
+        }
+    }
+
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+
+    val newNoteColor =
+        Color(android.graphics.Color.parseColor("#${noteItemViewModel.noteColor.value}")).takeUnless { it == Color.White } ?: MaterialTheme.colorScheme.background
     TopBarNote(
-        navController = navController,
+        snackbarHostState = snackbarHostState,
         noteColor = newNoteColor,
+        openExitDialog = openExitDialog,
+        openDeleteDialog = openDeleteDialog,
+        noteItemViewModel = noteItemViewModel,
         content = {
-            NoteItemContent(noteColor = newNoteColor)
+            NoteItemContent(
+                noteColor = newNoteColor,
+                noteItemViewModel = noteItemViewModel
+            )
         },
+    )
+
+    ExitConfirmationDialog(
+        title = "Exit Confirmation",
+        text = "Do you want to save the changes?",
+        openDialog = openExitDialog,
+        onConfirmClick = {
+            when (actionType.value) {
+                is ActionType.CreateNote -> {
+                    noteItemViewModel.onEvent(NoteItemEvent.SaveNote)
+                }
+
+                is ActionType.UpdateNote -> {
+                    noteItemViewModel.onEvent(NoteItemEvent.UpdateNote)
+                }
+
+                else -> {}
+            }
+
+            if (noteItemViewModel.state.value.noteError == null) {
+                navController.navigate(Screen.Note.route)
+            } else {
+                scope.launch {
+                    snackbarHostState.showSnackbar(
+                        "Error: ${noteItemViewModel.state.value.noteError}"
+                    )
+                }
+            }
+            openExitDialog.value = false
+        },
+        onDismissClick = {
+            openExitDialog.value = false
+            navController.popBackStack()
+        },
+        onDismissRequest = { openExitDialog.value = false }
+    )
+
+    ExitConfirmationDialog(
+        title = "Exit Confirmation",
+        text = "Do you want to delete this note?",
+        openDialog = openDeleteDialog,
+        onConfirmClick = {
+            noteItemViewModel.onEvent(NoteItemEvent.DeleteNote)
+            openDeleteDialog.value = false
+            navController.popBackStack()
+        },
+        onDismissClick = {
+            openDeleteDialog.value = false
+            navController.popBackStack()
+        },
+        onDismissRequest = { openDeleteDialog.value = false }
     )
 }
 
@@ -122,8 +246,15 @@ fun NoteItemScreen(
 @Composable
 fun NoteItemContent(
     noteColor: Color,
+    noteItemViewModel: NoteItemViewModel,
 ) {
-    val colorFilter = ColorCustomUtils.addColorTone(MaterialTheme.colorScheme.tertiaryContainer, noteColor)
+    val state = noteItemViewModel.state
+
+    val colorFilter = if (noteColor != Color.White) {
+        ColorCustomUtils.addColorTone(MaterialTheme.colorScheme.tertiaryContainer, noteColor)
+    } else {
+        MaterialTheme.colorScheme.tertiaryContainer
+    }
 
     Column(
         modifier = Modifier
@@ -131,26 +262,26 @@ fun NoteItemContent(
             .background(colorFilter)
             .wrapContentSize(Alignment.Center)
     ) {
-        var text by remember { mutableStateOf("") }
         val color = ColorCustomUtils.returnLuminanceColor(noteColor)
 
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight(0.9f)
-                .background(noteColor.copy(0.8f)),
+                .background(noteColor),
         ) {
             TransparentTextField(
-                text = text,
+                text = state.value.message,
                 hint = "Hint",
                 modifier = Modifier.padding(36.dp),
                 applyFillMaxHeight = true,
-                onValueChange = { text = it },
-                onFocusChange = { },
-                textStyle = MaterialTheme.typography.bodyLarge,
+                textStyle = TextStyle(
+                    fontSize = MaterialTheme.typography.bodyLarge.fontSize,
+                    color = color
+                ),
                 hintStyle = MaterialTheme.typography.bodyLarge,
                 hintColor = color.copy(0.45f),
-            )
+            ) { noteItemViewModel.onEvent(NoteItemEvent.ContentChanged(it)) }
         }
     }
 }
@@ -158,18 +289,19 @@ fun NoteItemContent(
 /**
  * A composable function representing the top bar of a note.
  *
- * @param navController The NavController used for navigation.
  * @param content The content of the note item.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBarNote(
-    navController: NavController,
     content: @Composable () -> Unit = {},
     noteColor: Color,
+    snackbarHostState: SnackbarHostState,
+    openExitDialog: MutableState<Boolean>,
+    openDeleteDialog: MutableState<Boolean>,
+    noteItemViewModel: NoteItemViewModel,
 ) {
-    var title by remember { mutableStateOf("") }
-
+    val state = noteItemViewModel.state
     var showMenu by remember { mutableStateOf(false) }
     val color = ColorCustomUtils.returnLuminanceColor(noteColor)
 
@@ -178,21 +310,22 @@ fun TopBarNote(
             TopAppBar(
                 title = {
                     TransparentTextField(
-                        text = title,
+                        text = state.value.title,
                         hint = "Change Title",
-                        onValueChange = { title = it },
-                        onFocusChange = {
-                            /* TODO */
-                        },
                         singleLine = true,
-                        textStyle = MaterialTheme.typography.titleLarge,
+                        textStyle = TextStyle(
+                            fontSize = MaterialTheme.typography.titleLarge.fontSize,
+                            color = color
+                        ),
                         hintStyle = MaterialTheme.typography.titleLarge,
                         hintColor = color.copy(alpha = 0.45f),
                         fontWeight = FontWeight.W700,
-                    )
+                    ) { noteItemViewModel.onEvent(NoteItemEvent.TitleChanged(it)) }
                 },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                    IconButton(onClick = {
+                        openExitDialog.value = true
+                    }) {
                         Icon(
                             painter = painterResource(R.drawable.arrow_back),
                             contentDescription = null,
@@ -214,11 +347,14 @@ fun TopBarNote(
                     }
                     DropDownNoteMenu(
                         expanded = showMenu,
-                        onDismissRequest = { showMenu = false }
+                        onDismissRequest = { showMenu = false },
+                        noteItemViewModel = noteItemViewModel,
+                        onDeleteNote = { openDeleteDialog.value = true }
                     )
                 }
             )
-        }
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { padding ->
         Box(
             modifier = Modifier
@@ -239,40 +375,54 @@ fun TopBarNote(
 fun DropDownNoteMenu(
     expanded: Boolean,
     onDismissRequest: () -> Unit,
+    onDeleteNote: () -> Unit,
+    noteItemViewModel: NoteItemViewModel,
 ) {
     var openTagBottomSheet by rememberSaveable { mutableStateOf(false) }
     var openFolderBottomSheet by rememberSaveable { mutableStateOf(false) }
     var openColorBottomSheet by rememberSaveable { mutableStateOf(false) }
 
+    val isUpdated = when (noteItemViewModel.actionTypeEvents.value) {
+        is ActionType.UpdateNote -> true
+        else -> false
+    }
+
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = { onDismissRequest() },
         modifier = Modifier
-            .background(Color.White)
-            .padding(10.dp),
+            .dropShadow(
+                color = MaterialTheme.colorScheme.onPrimary.copy(0.25f),
+                blurRadius = 5.dp,
+            )
+            .padding(2.dp)
+            .background(MaterialTheme.colorScheme.background)
+            .padding(10.dp)
     ) {
+
         Text(
             text = "Configuration",
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
                 .padding(top = 8.dp, bottom = 16.dp),
             style = MaterialTheme.typography.labelLarge,
-            fontWeight = FontWeight.W800
+            fontWeight = FontWeight.W800,
+            color = MaterialTheme.colorScheme.onPrimary,
         )
-        DottedDivider(color = Color(0xFF313131))
+        DottedDivider(color = MaterialTheme.colorScheme.onPrimary.copy(0.8f))
         DropdownMenuItem(
-            text = { Text("Folders") },
+            text = { Text("Folders", color = MaterialTheme.colorScheme.onPrimary) },
             onClick = { openFolderBottomSheet = true }
         )
         DropdownMenuItem(
-            text = { Text("Tags") },
+            text = { Text("Tags", color = MaterialTheme.colorScheme.onPrimary) },
             onClick = { openTagBottomSheet = true }
         )
         DropdownMenuItem(
-            text = { Text("Colors") },
+            text = { Text("Colors", color = MaterialTheme.colorScheme.onPrimary) },
             onClick = { openColorBottomSheet = true }
         )
-        DottedDivider(color = Color(0xFF313131))
+        DottedDivider(color = MaterialTheme.colorScheme.onPrimary.copy(0.8f))
         Row(
             Modifier.padding(horizontal = 16.dp),
             horizontalArrangement = Arrangement.SpaceBetween
@@ -284,7 +434,8 @@ fun DropDownNoteMenu(
                     Icon(
                         painter = painterResource(R.drawable.star_outline_icon),
                         contentDescription = "Favorite Note",
-                        modifier = Modifier.size(25.dp)
+                        modifier = Modifier.size(25.dp),
+                        tint = MaterialTheme.colorScheme.onPrimary,
                     )
                 },
                 onClick = { /*TODO*/ }
@@ -292,45 +443,43 @@ fun DropDownNoteMenu(
             Spacer(modifier = Modifier.width(75.dp))
             DropdownMenuItem(
                 modifier = Modifier.width(50.dp),
+                enabled = isUpdated,
                 text = {
-                    //TODO Implement the favorite action
                     Icon(
                         painter = painterResource(R.drawable.delete_icon),
                         contentDescription = "Delete Note",
                         modifier = Modifier.size(25.dp),
+                        tint = MaterialTheme.colorScheme.onPrimary,
                     )
                 },
-                onClick = { /*TODO*/ }
+                onClick = { onDeleteNote() }
             )
         }
     }
     BottomSheetLayout(
         openBottomSheet = openTagBottomSheet,
         onDismissRequest = { openTagBottomSheet = false },
-        content = { scope: CoroutineScope -> TagBottomSheetContent(scope) }
+        content = { TagBottomSheetContent() },
     )
     BottomSheetLayout(
         openBottomSheet = openFolderBottomSheet,
         onDismissRequest = { openFolderBottomSheet = false },
-        content = { scope: CoroutineScope -> FolderBottomSheetContent(scope) }
+        content = { FolderBottomSheetContent() },
     )
     BottomSheetLayout(
         openBottomSheet = openColorBottomSheet,
         onDismissRequest = { openColorBottomSheet = false },
-        content = { scope: CoroutineScope -> ColorBottomSheetContent(scope) }
+        content = { ColorBottomSheetContent(noteItemViewModel) }
     )
 }
 
 /**
  * A composable function representing the content of the tag bottom sheet.
  *
- * @param scope The coroutine scope.
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun TagBottomSheetContent(
-    scope: CoroutineScope
-) {
+fun TagBottomSheetContent() {
     Column(
         modifier = Modifier
             .padding(16.dp)
@@ -380,12 +529,9 @@ fun TagBottomSheetContent(
 /**
  * A composable function representing the content of the folder bottom sheet.
  *
- * @param scope The coroutine scope.
  */
 @Composable
-fun FolderBottomSheetContent(
-    scope: CoroutineScope
-) {
+fun FolderBottomSheetContent() {
     var text by remember { mutableStateOf("") }
     Column(
         modifier = Modifier
@@ -409,7 +555,6 @@ fun FolderBottomSheetContent(
             placeholder = { Text("Placeholder") },
             shape = RectangleShape,
             singleLine = true,
-
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -441,12 +586,9 @@ fun FolderBottomSheetContent(
 /**
  * A composable function representing the content of the color bottom sheet.
  *
- * @param scope The coroutine scope.
  */
 @Composable
-fun ColorBottomSheetContent(
-    scope: CoroutineScope
-) {
+fun ColorBottomSheetContent(noteItemViewModel: NoteItemViewModel) {
     Column(
         modifier = Modifier
             .padding(16.dp)
@@ -456,7 +598,12 @@ fun ColorBottomSheetContent(
             style = MaterialTheme.typography.titleMedium,
         )
         Spacer(modifier = Modifier.height(16.dp))
-        ColorBox()
+        ColorBox(
+            selectedColor = Color(android.graphics.Color.parseColor("#${noteItemViewModel.noteColor.value}")),
+            onColorChange = {noteItemViewModel.onEvent(NoteItemEvent.ColorChanged(
+                convertColorToString(it)
+            ))}
+        )
         Spacer(modifier = Modifier.height(16.dp))
         Row(
             modifier = Modifier

@@ -7,6 +7,7 @@ import com.galacticstudio.digidoro.network.dto.note.NoteThemeRequest
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
@@ -22,22 +23,22 @@ interface NoteService {
         @Query("populateFields") populateFields: String? = null,
     ): NoteListResponse
 
-    @GET("api/notes/own/{id}")
+    @GET("api/note/own/{id}")
     suspend fun getNoteById(@Path("id") noteId: String): NoteResponse
 
     @POST("api/note/own")
     suspend fun createNote(@Body note: NoteRequest): NoteResponse
 
-    @PUT("api/notes/own/{id}")
+    @PATCH("api/note/own/{id}")
     suspend fun updateNoteById(@Path("id") noteId: String, @Body note: NoteRequest): NoteResponse
 
-    @DELETE("api/notes/own/{id}")
+    @DELETE("api/note/own/{id}")
     suspend fun deleteNoteById(@Path("id") noteId: String): NoteResponse
 
     //TODO :: Experimental
-    @PUT("api/notes/own/theme/{id}")
+    @PATCH("api/note/own/theme/{id}")
     suspend fun updateThemeOfNoteById(@Path("id") noteId: String, @Body theme: NoteThemeRequest): NoteResponse
 
-    @PUT("api/notes/own/theme/{id}")
+    @PATCH("api/note/own/theme/{id}")
     suspend fun toggleTrashNoteById(@Path("id") noteId: String): NoteResponse
 }

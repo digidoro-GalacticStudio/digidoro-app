@@ -18,6 +18,13 @@ class ColorCustomUtils {
             }
         }
 
+        fun convertColorToString(color: Color): String {
+            val red = (color.red * 255).toInt()
+            val green = (color.green * 255).toInt()
+            val blue = (color.blue * 255).toInt()
+            return String.format("%02X%02X%02X", red, green, blue)
+        }
+
         fun returnLuminanceColor(color: Color) : Color {
             return if (isColorDark(color)) Color.White else Gray60
         }

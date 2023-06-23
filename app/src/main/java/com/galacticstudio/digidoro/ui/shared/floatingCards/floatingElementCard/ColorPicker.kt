@@ -1,19 +1,15 @@
 package com.galacticstudio.digidoro.ui.shared.floatingCards.floatingElementCard
 
-import android.content.res.Configuration
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
@@ -23,22 +19,17 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.rememberNavController
 import com.galacticstudio.digidoro.R
-import com.galacticstudio.digidoro.ui.screens.home.HomeScreen
 import com.galacticstudio.digidoro.ui.theme.DigidoroTheme
+import com.galacticstudio.digidoro.util.ColorCustomUtils.Companion.convertColorToString
 
 val buttonSize = 32.dp
 
@@ -52,7 +43,7 @@ fun ColorBoxPreview() {
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
         ) {
-            ColorBox()
+            ColorBox(Color.White, {})
         }
     }
 }
@@ -60,8 +51,11 @@ fun ColorBoxPreview() {
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ColorBox(
-    isUserPremium: Boolean = false
+    selectedColor: Color,
+    onColorChange: (Color) -> Unit,
+    isUserPremium: Boolean = false,
 ) {
+
     val colors = listOf(
         ColorItem(colorResource(id = R.color.secondary_color), isPremium = false),
         ColorItem(colorResource(id = R.color.mint_accent), isPremium = false),
@@ -71,8 +65,6 @@ fun ColorBox(
         ColorItem(colorResource(id = R.color.lavender_accent), isPremium = true),
         ColorItem(colorResource(id = R.color.gray_text_color), isPremium = true)
     )
-
-    var selectedColor by remember { mutableStateOf(colors[0].color) }
 
     FlowRow(
         horizontalArrangement = Arrangement.spacedBy(5.dp),
@@ -87,12 +79,17 @@ fun ColorBox(
                 if (!isUserPremium && colors.any { it.color == color && it.isPremium }) {
                     //If the user is NO premium, keep the previous value
                 } else {
-                    selectedColor = color
+                    Log.d("MyErrors", ".color ${color}")
+                    Log.d("MyErrors", ".toArgb() ${color.toArgb()}")
+                    Log.d("MyErrors", ".convertColorToString() ${convertColorToString(color)}")
+                    onColorChange(color)
                 }
             }
         }
     }
 }
+
+
 
 
 @Composable

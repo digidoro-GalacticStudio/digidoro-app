@@ -31,8 +31,8 @@ fun NavGraphBuilder.noteNavGraph(
                 navArgument(
                     name = "noteId"
                 ) {
-                    type = NavType.IntType
-                    defaultValue = -1
+                    type = NavType.StringType
+                    defaultValue = ""
                 },
                 navArgument(
                     name = "noteColor"
@@ -43,9 +43,12 @@ fun NavGraphBuilder.noteNavGraph(
             )
         ) {
             val color = Color(it.arguments?.getInt("noteColor") ?: 0)
+            val noteId = it.arguments?.getString("noteId")
+
             NoteItemScreen(
                 navController = navController,
-                noteColor = color
+                noteColor = color,
+                noteId = noteId
             )
         }
     }

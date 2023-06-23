@@ -112,6 +112,7 @@ class NotesViewModel(
     private fun mapToNoteModels(noteDataList: List<NoteData>): List<NoteModel> {
         return noteDataList.map { noteData ->
             NoteModel(
+                id = noteData.id,
                 user_id = noteData.userId,
                 title = noteData.title,
                 message = noteData.message,

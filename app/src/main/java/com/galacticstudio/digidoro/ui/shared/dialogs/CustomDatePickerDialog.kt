@@ -5,6 +5,7 @@ import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -49,7 +50,7 @@ fun CustomDatePickerDialog(
                     },
                     enabled = confirmEnabled.value
                 ) {
-                    Text("OK")
+                    Text("OK", color = MaterialTheme.colorScheme.onPrimary)
                 }
             },
             dismissButton = {
@@ -58,7 +59,7 @@ fun CustomDatePickerDialog(
                         openDialog.value = false
                     }
                 ) {
-                    Text("Cancel")
+                    Text("Cancel", color = MaterialTheme.colorScheme.onPrimary)
                 }
             },
             colors = DatePickerDefaults.colors(

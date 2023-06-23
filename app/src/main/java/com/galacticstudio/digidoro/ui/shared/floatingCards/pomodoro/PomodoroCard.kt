@@ -77,7 +77,8 @@ fun PomodoroFloatingBox(){
                             style = MaterialTheme.typography.titleLarge,
                             modifier = Modifier.padding(vertical = 4.dp)
                         )
-                        ColorBox()
+                        //TODO Update
+                        ColorBox(Color.White, {})
                     }
                     Spacer(modifier = Modifier.height(14.dp))
                     PomodoroControler()

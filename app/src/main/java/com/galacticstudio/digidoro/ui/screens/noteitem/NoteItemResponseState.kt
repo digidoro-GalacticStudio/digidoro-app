@@ -7,5 +7,12 @@ sealed class NoteItemResponseState {
     object Resume : NoteItemResponseState()
     class Error(val exception: Exception) : NoteItemResponseState()
     data class ErrorWithMessage(val message: String) : NoteItemResponseState()
-    object Success : NoteItemResponseState()
+    data class Success(val actionType: ActionType) : NoteItemResponseState()
+}
+
+sealed class ActionType {
+    object CreateNote : ActionType()
+    object ReadNote : ActionType()
+    object DeleteNote : ActionType()
+    object UpdateNote : ActionType()
 }

@@ -35,13 +35,13 @@ fun TransparentTextField(
     hint: String,
     modifier: Modifier = Modifier,
     applyFillMaxHeight: Boolean = false,
-    onValueChange: (String) -> Unit,
     textStyle: TextStyle = MaterialTheme.typography.bodyMedium,
     hintStyle: TextStyle = MaterialTheme.typography.bodyMedium,
     hintColor: Color = Color.Black,
     fontWeight: FontWeight = FontWeight.W500,
     singleLine: Boolean = false,
-    onFocusChange: (FocusState) -> Unit
+    onFocusChange: ((FocusState) -> Unit)? = null,
+    onValueChange: (String) -> Unit,
 ) {
     Box(
         modifier = modifier
@@ -61,7 +61,9 @@ fun TransparentTextField(
                     }
                 }
                 .onFocusChanged {
-                    onFocusChange(it)
+                    if (onFocusChange != null) {
+                        onFocusChange(it)
+                    }
                 },
             decorationBox = { innerTextField ->
                 if (text.isEmpty()) {

@@ -1,5 +1,6 @@
 package com.galacticstudio.digidoro.repository
 
+import android.util.Log
 import com.galacticstudio.digidoro.network.ApiResponse
 import com.galacticstudio.digidoro.network.dto.note.NoteData
 import com.galacticstudio.digidoro.network.dto.note.NoteRequest

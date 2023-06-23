@@ -221,6 +221,7 @@ fun RankingHome() {
             painter = painterResource(R.drawable.ranking_icon),
             contentDescription = null,
             modifier = Modifier.size(35.dp),
+            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
         )
         Text(
             text = "ranking",
