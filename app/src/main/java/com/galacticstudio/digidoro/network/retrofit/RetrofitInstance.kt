@@ -4,6 +4,7 @@ import com.galacticstudio.digidoro.network.service.AuthService
 import com.galacticstudio.digidoro.network.service.FavoriteNoteService
 import com.galacticstudio.digidoro.network.service.FolderService
 import com.galacticstudio.digidoro.network.service.NoteService
+import com.galacticstudio.digidoro.network.service.TodoService
 import com.galacticstudio.digidoro.util.NetworkService.BASE_URL
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -20,11 +21,11 @@ object RetrofitInstance {
         .addInterceptor(interceptor)
         .build()
 
+
     fun setToken(token: String) {
         this.token = token
         interceptor.updateToken(token)
     }
-
     fun setUsername(username: String) {
         this.username = username
     }
@@ -53,6 +54,10 @@ object RetrofitInstance {
 
     fun getFolderService(): FolderService {
         return retrofit.create(FolderService::class.java)
+    }
+
+    fun getTodoService(): TodoService{
+        return retrofit.create(TodoService::class.java)
     }
 }
 

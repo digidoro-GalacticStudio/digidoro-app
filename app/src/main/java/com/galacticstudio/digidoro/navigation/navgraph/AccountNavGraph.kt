@@ -6,8 +6,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.galacticstudio.digidoro.navigation.ACCOUNT_GRAPH_ROUTE
 import com.galacticstudio.digidoro.navigation.Screen
-import com.galacticstudio.digidoro.ui.AccountScreen
 import com.galacticstudio.digidoro.ui.NoteScreen
+import com.galacticstudio.digidoro.ui.screens.account.AccountScreen
+import com.galacticstudio.digidoro.ui.screens.login.LoginScreen
+import com.galacticstudio.digidoro.ui.screens.todo.TodoScreen
 
 fun NavGraphBuilder.accountNavGraph(
     navController: NavHostController
@@ -19,7 +21,7 @@ fun NavGraphBuilder.accountNavGraph(
         composable(
             route = Screen.Account.route
         ) {
-            NoteScreen(navController = navController)
+            AccountScreen(navController = navController)
         }
     }
 }

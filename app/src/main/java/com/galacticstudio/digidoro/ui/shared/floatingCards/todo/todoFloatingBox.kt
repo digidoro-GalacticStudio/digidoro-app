@@ -1,5 +1,7 @@
 package com.galacticstudio.digidoro.ui.shared.floatingCards.todo
 
+import android.content.res.Configuration
+import android.content.res.Configuration.UI_MODE_NIGHT_MASK
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -38,8 +40,10 @@ import java.util.Locale
 
 @Preview()
 @Composable
-fun todoFloatingBox(){
-    TodoFloatingBox(FloatingTodoHideHandler = fun(){})
+fun todoFloatingBox() {
+    DigidoroTheme() {
+        TodoFloatingBox(FloatingTodoHideHandler = fun() {})
+    }
 }
 
 val cornerRadius = 5.dp
@@ -57,53 +61,50 @@ fun TodoFloatingBox(
 ){
 
     val day = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault()).format(Calendar.getInstance().time)
-    DigidoroTheme {
+    Box(
+        modifier = modifier
+            .wrapContentWidth()
+            .fillMaxHeight()
+    ){
         Box(
-            modifier = modifier
+            modifier = Modifier
+                .padding(4.dp)
+                .shadowWithCorner(
+                    cornerRadius = 5.dp,
+                    shadowOffset = Offset(16.0f, 16.0f),
+                    shadowColor = MaterialTheme.colorScheme.secondary
+                )
+                .border(
+                    width = (1).dp,
+                    color = MaterialTheme.colorScheme.secondary,
+                    shape = RoundedCornerShape(cornerRadius)
+                )
+                .background(MaterialTheme.colorScheme.primary)
+                .padding(10.dp)
                 .wrapContentWidth()
-                .fillMaxHeight()
         ){
-            Box(
-                modifier = Modifier
-                    .padding(4.dp)
-                    .shadowWithCorner(
-                        cornerRadius = 5.dp,
-                        shadowOffset = Offset(16.0f, 16.0f),
-                        shadowColor = MaterialTheme.colorScheme.secondary
+            Column(Modifier.wrapContentWidth()) {
+                TitleCard(placeHolder = "Nombra tu task")
+                GrayInput(
+                    label = "Fecha",
+                    placeHolder = day,
+                    fieldWidth = 100.dp,
+                    type = TextFieldType.DATE,
+                    modifier = Modifier.selectable(true, false, null, fun(){})
+                )
+                Column () {
+                    Text(
+                        text = "Color",
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier.padding(vertical = 4.dp)
                     )
-                    .border(
-                        width = (1).dp,
-                        color = MaterialTheme.colorScheme.secondary,
-                        shape = RoundedCornerShape(cornerRadius)
-                    )
-                    .background(colorResource(id = R.color.dominant_color_light))
-                    .padding(10.dp)
-                    .wrapContentWidth()
-
-            ){
-                Column(Modifier.wrapContentWidth()) {
-                    TitleCard(placeHolder = "Nombra tu task")
-                    GrayInput(
-                        label = "Fecha",
-                        placeHolder = day,
-                        fieldWidth = 100.dp,
-                        type = TextFieldType.DATE,
-                        modifier = Modifier.selectable(true, false, null, fun(){})
-                    )
-                    Column () {
-                        Text(
-                            text = "Color",
-                            style = MaterialTheme.typography.titleLarge,
-                            modifier = Modifier.padding(vertical = 4.dp)
-                        )
-                        //TODO Update
-                        ColorBox(Color.White, {})
-                    }
-                    Spacer(modifier = Modifier.height(14.dp))
-                    PomodoroControler(
-                        FloatingTodoHideHandler
-                    )
+                    //TODO Update
+                    ColorBox(Color.White, {})
                 }
+                Spacer(modifier = Modifier.height(14.dp))
+                PomodoroControler(
+                    FloatingTodoHideHandler
+                )
             }
         }
     }
@@ -130,9 +131,9 @@ fun PomodoroControler(
         Spacer(modifier = Modifier.width(110.dp))
         ButtonControl(
             text = "Guardar",
-            contentColor = colorResource(id = R.color.black_text_color),
+            contentColor = MaterialTheme.colorScheme.secondary,
             backgroundColor =  colorResource(id = R.color.gray_text_color),
-            borderColor = colorResource(id = R.color.black_text_color),
+            borderColor = MaterialTheme.colorScheme.secondary,
             onClick = { /*todo*/ }
         )
     }

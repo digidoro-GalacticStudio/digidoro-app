@@ -25,7 +25,7 @@ import java.util.Locale
  * @param todoList its a casted list of todos data
  */
 @Composable
-fun DisplayTodo(todoList: MutableList<TodoModel>){
+fun DisplayTodo(todoList: List<TodoModel>){
     LazyColumn(
         modifier = Modifier.heightIn(100.dp, 270.dp),
         contentPadding = PaddingValues(16.dp),
