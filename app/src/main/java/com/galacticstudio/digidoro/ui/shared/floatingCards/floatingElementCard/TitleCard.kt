@@ -43,12 +43,13 @@ fun TitleCard(
                 colors = TextFieldDefaults.colors(
                     unfocusedIndicatorColor = Color.Transparent ,
                     focusedIndicatorColor = MaterialTheme.colorScheme.secondary,
-                    unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurface,
-                    focusedPlaceholderColor = MaterialTheme.colorScheme.onSurface,
+                    unfocusedPlaceholderColor = Color(color = 0xFF3C3D41),
+                    focusedPlaceholderColor = Color(color = 0xFF3C3D41),
                     focusedTextColor = MaterialTheme.colorScheme.secondary,
                     unfocusedTextColor = MaterialTheme.colorScheme.secondary,
                     unfocusedContainerColor = Color.Transparent,
-                    focusedContainerColor = Color.Transparent
+                    focusedContainerColor = Color.Transparent,
+
                 ),
             )
 
