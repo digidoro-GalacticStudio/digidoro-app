@@ -1,30 +1,25 @@
 package com.galacticstudio.digidoro.ui.screens.account
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.galacticstudio.digidoro.R
-import com.galacticstudio.digidoro.data.userList
-import com.galacticstudio.digidoro.navigation.AppScaffold
 import com.galacticstudio.digidoro.ui.screens.account.components.options.OptionComposable
 import com.galacticstudio.digidoro.ui.screens.account.components.options.OptionsComposable
 import com.galacticstudio.digidoro.ui.screens.account.components.userInformation.UserInformation
+import com.galacticstudio.digidoro.ui.shared.button.VerticalDivider
 import com.galacticstudio.digidoro.ui.theme.DigidoroTheme
 
 
@@ -41,11 +36,7 @@ fun AccountPreview(){
 fun AccountScreen(
     navController: NavHostController = rememberNavController()
 ){
-    AppScaffold(
-        navController = navController
-    ){
-        AccountContent()
-    }
+    AccountContent()
 }
 
 @Composable
@@ -53,16 +44,16 @@ fun AccountContent(){
 
     Column(
         modifier = Modifier
-            .fillMaxHeight(),
+            .fillMaxHeight()
+            .padding(bottom = 80.dp),
         verticalArrangement = Arrangement.Bottom
     ) {
 
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
-                .padding(8.dp)
+                .padding(horizontal = 8.dp)
                 .fillMaxWidth()
-                .fillMaxHeight(0.9f)
         ) {
             UserInformation(
                 userName = "Jenny",
@@ -72,7 +63,7 @@ fun AccountContent(){
                 nextLevelScore = 250
             )
 
-            Spacer(modifier = Modifier.height(40.dp))
+            Spacer(modifier = Modifier.height(30.dp))
             OptionsComposable()
 
         }

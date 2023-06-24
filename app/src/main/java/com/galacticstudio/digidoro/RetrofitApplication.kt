@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.galacticstudio.digidoro.network.retrofit.RetrofitInstance
 import com.galacticstudio.digidoro.repository.CredentialsRepository
+import com.galacticstudio.digidoro.repository.TodoRepository
 
 class RetrofitApplication : Application() {
 
@@ -25,10 +26,16 @@ class RetrofitApplication : Application() {
 
     fun getUsername(): String = prefs.getString(USERNAME, "")!!
 
+    //initialize repositories
     val credentialsRepository: CredentialsRepository by lazy {
         CredentialsRepository(getAPIService())
     }
 
+    val todoRepository: TodoRepository by lazy{
+        TodoRepository(
+            todoService = RetrofitInstance.getTodoService()
+        )
+    }
     fun saveAuthToken(token: String){
         val editor = prefs.edit()
         editor.putString(USER_TOKEN, token)

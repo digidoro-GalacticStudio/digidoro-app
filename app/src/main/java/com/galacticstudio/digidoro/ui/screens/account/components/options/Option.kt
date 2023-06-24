@@ -45,7 +45,7 @@ fun OptionComposable(
                 onOptionClick
             }
             .background(backgroundColor)
-            .padding(12.dp)
+            .padding(horizontal = 12.dp, vertical = 13.dp)
     ){
         Row() {
             Image(

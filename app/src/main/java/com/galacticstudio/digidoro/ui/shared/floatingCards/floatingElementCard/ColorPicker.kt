@@ -61,7 +61,7 @@ fun ColorButton(color: Color, onClick: () -> Unit) {
         modifier = Modifier
             .padding(3.dp)
             .padding(end = 5.dp)
-            .border((0.5).dp, colorResource(id = R.color.secondary_color), CircleShape)
+            .border(1.dp, MaterialTheme.colorScheme.secondary, CircleShape)
             .size(buttonSize)
 
     ) {

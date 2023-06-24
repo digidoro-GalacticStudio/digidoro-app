@@ -109,7 +109,7 @@ fun AppScaffold(navController: NavHostController) {
 
     // Determine whether to show the bottom bar based on the current destination route.
     bottomBarState.value = when (navBackStackEntry?.destination?.route) {
-        in listOf("home_screen", "todo_screen", "pomodoro_screen", "note_screen") -> true
+        in listOf("home_screen", "todo_screen", "pomodoro_screen", "note_screen", "account_screen") -> true
         else -> false
     }
 

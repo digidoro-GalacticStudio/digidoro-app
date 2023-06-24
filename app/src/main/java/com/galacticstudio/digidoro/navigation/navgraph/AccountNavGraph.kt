@@ -8,6 +8,8 @@ import com.galacticstudio.digidoro.navigation.ACCOUNT_GRAPH_ROUTE
 import com.galacticstudio.digidoro.navigation.Screen
 import com.galacticstudio.digidoro.ui.NoteScreen
 import com.galacticstudio.digidoro.ui.screens.account.AccountScreen
+import com.galacticstudio.digidoro.ui.screens.login.LoginScreen
+import com.galacticstudio.digidoro.ui.screens.todo.TodoScreen
 
 fun NavGraphBuilder.accountNavGraph(
     navController: NavHostController
