@@ -2,6 +2,7 @@ package com.galacticstudio.digidoro.ui.screens.noteslist.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -20,6 +21,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.dp
+import com.galacticstudio.digidoro.util.ColorCustomUtils.Companion.addColorTone
+import com.galacticstudio.digidoro.util.ColorCustomUtils.Companion.adjustColorBrightness
+import com.galacticstudio.digidoro.util.ColorCustomUtils.Companion.isColorDark
 
 /**
  * Composable function for displaying action notes.
@@ -36,7 +40,14 @@ fun ActionNote(
     leadingIcon: Painter? = null,
     colorIcon: Color = Color.Magenta,
     onClick: () -> Unit,
+    isSelected: Boolean,
 ) {
+    val selectedColor = adjustColorBrightness(
+        MaterialTheme.colorScheme.primaryContainer,
+        !isSystemInDarkTheme(),
+        if (isSystemInDarkTheme()) 0.55f else 0.16f
+    )
+
     Card(
         onClick = onClick,
         modifier = Modifier
@@ -47,7 +58,8 @@ fun ActionNote(
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.onPrimary),
         shape = MaterialTheme.shapes.small,
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            containerColor = if (isSelected) selectedColor
+            else MaterialTheme.colorScheme.primaryContainer,
         ),
     ) {
         Row(

@@ -1,7 +1,7 @@
 package com.galacticstudio.digidoro.network.dto.register
 
 data class RegisterRequest(
-    val name: String,
+    val firstname: String,
     val lastname: String,
     val email: String,
     val username: String,

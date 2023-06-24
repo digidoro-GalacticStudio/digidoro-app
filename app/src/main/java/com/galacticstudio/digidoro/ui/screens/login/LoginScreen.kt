@@ -36,6 +36,7 @@ import com.galacticstudio.digidoro.R
 import com.galacticstudio.digidoro.RetrofitApplication
 import com.galacticstudio.digidoro.navigation.HOME_GRAPH_ROUTE
 import com.galacticstudio.digidoro.navigation.Screen
+import com.galacticstudio.digidoro.network.retrofit.RetrofitInstance
 import com.galacticstudio.digidoro.ui.screens.login.viewmodel.LoginViewModel
 import com.galacticstudio.digidoro.ui.shared.button.CustomButton
 import com.galacticstudio.digidoro.ui.shared.textfield.ErrorMessage
@@ -77,6 +78,7 @@ fun LoginScreen(
 ) {
     // Retrieve the application instance from the current context
     val app: RetrofitApplication = LocalContext.current.applicationContext as RetrofitApplication
+
     val state = loginViewModel.state // Retrieves the current state from the loginViewModel.
     val context = LocalContext.current // Retrieves the current context from the LocalContext.
 
@@ -107,7 +109,6 @@ fun LoginScreen(
                     app.saveAuthToken(event.token)
                     app.saveRoles(event.roles)
                     app.saveUsername(event.username)
-
                     val tokenValue = app.getToken()
 
                     Toast.makeText(

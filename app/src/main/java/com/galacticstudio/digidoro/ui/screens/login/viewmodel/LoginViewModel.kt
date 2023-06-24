@@ -9,8 +9,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.galacticstudio.digidoro.RetrofitApplication
-import com.galacticstudio.digidoro.domain.usecase.ValidateEmail
-import com.galacticstudio.digidoro.domain.usecase.ValidatePassword
+import com.galacticstudio.digidoro.domain.usecase.fields.ValidateEmail
+import com.galacticstudio.digidoro.domain.usecase.fields.ValidatePassword
 import com.galacticstudio.digidoro.network.ApiResponse
 import com.galacticstudio.digidoro.repository.CredentialsRepository
 import com.galacticstudio.digidoro.ui.screens.login.LoginFormEvent
@@ -72,8 +72,12 @@ class LoginViewModel(
      * Submits the form data for login.
      */
     private fun submitData() {
-        if (!validateData()) return
-        onLogin()
+        if (!validateData()) {
+            apiState = LoginResponseState.ErrorWithMessage("Wrong information")
+            return
+        }
+
+        login(email = state.email, password = state.password)
     }
 
     /**
@@ -138,19 +142,6 @@ class LoginViewModel(
                 }
             }
         }
-    }
-
-    /**
-     * Handles the login process triggered by the submit event.
-     * Validates the form data and initiates the login operation if the data is valid.
-     */
-    private fun onLogin() {
-        if (!validateData()) {
-            apiState = LoginResponseState.ErrorWithMessage("Wrong information")
-            return
-        }
-
-        login(email = state.email, password = state.password)
     }
 
     companion object {

@@ -14,10 +14,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.core.graphics.ColorUtils
 import com.galacticstudio.digidoro.util.ColorCustomUtils
 
 /**
@@ -33,24 +31,33 @@ fun NoteItem(
     text: String,
     color: Color,
     onClick: () -> Unit,
+    modifier: Modifier,
+    isLoading: Boolean,
 ) {
     val textColor = ColorCustomUtils.returnLuminanceColor(color)
 
-    Card(
-        onClick = onClick,
-        modifier = Modifier
-            .height(200.dp)
-            .padding(horizontal = 8.dp, vertical = 8.dp),
-        elevation = CardDefaults.cardElevation(
+    val elevation = if (isLoading) {
+        CardDefaults.cardElevation()
+    } else {
+        CardDefaults.cardElevation(
             defaultElevation = 6.5.dp,
             pressedElevation = 6.5.dp,
             focusedElevation = 6.5.dp,
             hoveredElevation = 6.5.dp,
-        ),
-        shape = MaterialTheme.shapes.medium,
+        )
+    }
+
+    Card(
+        onClick = onClick,
+        elevation = elevation,
         colors = CardDefaults.cardColors(
             containerColor = color,
         ),
+        modifier = Modifier
+            .height(200.dp)
+            .padding(horizontal = 8.dp, vertical = 8.dp)
+            .then(modifier),
+        shape = MaterialTheme.shapes.medium,
     ) {
         Row(
             modifier = Modifier

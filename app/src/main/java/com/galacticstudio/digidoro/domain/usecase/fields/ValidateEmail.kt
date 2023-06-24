@@ -1,6 +1,7 @@
-package com.galacticstudio.digidoro.domain.usecase
+package com.galacticstudio.digidoro.domain.usecase.fields
 
 import android.util.Patterns
+import com.galacticstudio.digidoro.domain.usecase.ValidationResult
 
 /**
  * Use case responsible for validating an email address.

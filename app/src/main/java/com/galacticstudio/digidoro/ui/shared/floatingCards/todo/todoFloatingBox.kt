@@ -82,12 +82,8 @@ fun TodoFloatingBox(
                 .background(MaterialTheme.colorScheme.primary)
                 .padding(10.dp)
                 .wrapContentWidth()
-
         ){
-            Column(
-                Modifier
-                    .wrapContentWidth()
-            ) {
+            Column(Modifier.wrapContentWidth()) {
                 TitleCard(placeHolder = "Nombra tu task")
                 GrayInput(
                     label = "Fecha",
@@ -102,7 +98,8 @@ fun TodoFloatingBox(
                         style = MaterialTheme.typography.titleLarge,
                         modifier = Modifier.padding(vertical = 4.dp)
                     )
-                    ColorBox()
+                    //TODO Update
+                    ColorBox(Color.White, {})
                 }
                 Spacer(modifier = Modifier.height(14.dp))
                 PomodoroControler(
