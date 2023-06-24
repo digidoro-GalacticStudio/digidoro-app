@@ -13,10 +13,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -45,10 +47,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.galacticstudio.digidoro.R
+import com.galacticstudio.digidoro.RetrofitApplication
 import com.galacticstudio.digidoro.domain.util.NoteOrder
 import com.galacticstudio.digidoro.domain.util.OrderType
 import com.galacticstudio.digidoro.navigation.Screen
 import com.galacticstudio.digidoro.ui.screens.noteslist.components.ActionNote
+import com.galacticstudio.digidoro.ui.screens.noteslist.components.FolderItem
 import com.galacticstudio.digidoro.ui.screens.noteslist.components.NoteItem
 import com.galacticstudio.digidoro.ui.screens.noteslist.viewmodel.NotesViewModel
 import com.galacticstudio.digidoro.ui.shared.textfield.SearchBarItem
@@ -136,11 +140,13 @@ fun NotesListContent(
     navController: NavHostController,
     notesViewModel: NotesViewModel = viewModel(factory = NotesViewModel.Factory),
 ) {
+    val app: RetrofitApplication = LocalContext.current.applicationContext as RetrofitApplication
     val state = notesViewModel.state.value
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         notesViewModel.onEvent(NotesEvent.Rebuild)
+        notesViewModel.onEvent(NotesEvent.RolesChanged(app.getRoles()))
     }
 
     LaunchedEffect(key1 = context) {
@@ -241,6 +247,22 @@ fun NotesListContent(
         item(span = { GridItemSpan(cols) }) {
             TitleNoteList()
         }
+
+        //TODO :: Experimental
+//        if (app.getRoles().contains("premiun")) {
+//            item(span = { GridItemSpan(cols) }) {
+//                LazyRow(
+//
+//                ) {
+//                    item { Text("The folders") }
+//
+//                    items(notesViewModel.state.value.folders) {folder ->
+//                        FolderItem()
+//                    }
+//                }
+//            }
+//        }
+
 
         item(span = { GridItemSpan(cols) }) {
             ShortNoteItems(

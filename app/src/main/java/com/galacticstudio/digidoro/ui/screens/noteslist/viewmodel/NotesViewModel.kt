@@ -1,5 +1,6 @@
 package com.galacticstudio.digidoro.ui.screens.noteslist.viewmodel
 
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -10,6 +11,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.galacticstudio.digidoro.RetrofitApplication
+import com.galacticstudio.digidoro.data.FolderModel
 import com.galacticstudio.digidoro.data.NoteModel
 import com.galacticstudio.digidoro.domain.usecase.note.AddNote
 import com.galacticstudio.digidoro.domain.usecase.note.DeleteNote
@@ -18,9 +20,12 @@ import com.galacticstudio.digidoro.domain.usecase.note.NoteUseCases
 import com.galacticstudio.digidoro.domain.util.NoteOrder
 import com.galacticstudio.digidoro.domain.util.OrderType
 import com.galacticstudio.digidoro.network.ApiResponse
+import com.galacticstudio.digidoro.network.dto.folder.FolderData
 import com.galacticstudio.digidoro.network.dto.note.NoteData
 import com.galacticstudio.digidoro.repository.FavoriteNoteRepository
+import com.galacticstudio.digidoro.repository.FolderRepository
 import com.galacticstudio.digidoro.repository.NoteRepository
+import com.galacticstudio.digidoro.ui.screens.login.LoginResponseState
 import com.galacticstudio.digidoro.ui.screens.noteslist.NoteResultsMode
 import com.galacticstudio.digidoro.ui.screens.noteslist.NotesEvent
 import com.galacticstudio.digidoro.ui.screens.noteslist.NotesResponseState
@@ -35,6 +40,7 @@ class NotesViewModel(
     private val noteUseCases: NoteUseCases,
     private val noteRepository: NoteRepository,
     private val favoriteNoteRepository: FavoriteNoteRepository,
+    private val folderRepository: FolderRepository,
 ) : ViewModel() {
     private val _state = mutableStateOf(NotesState())
     val state: State<NotesState> = _state
@@ -48,6 +54,9 @@ class NotesViewModel(
     // Channel for emitting notes response states.
     private val responseEventChannel = Channel<NotesResponseState>()
     val responseEvents: Flow<NotesResponseState> = responseEventChannel.receiveAsFlow()
+
+    private val _roles = mutableStateOf<List<String>>(emptyList())
+    val roles: State<List<String>> = _roles
 
     fun onEvent(event: NotesEvent) {
         when (event) {
@@ -63,6 +72,7 @@ class NotesViewModel(
 
             is NotesEvent.Rebuild -> {
                 getNotes(state.value.noteOrder)
+                getFolders()
             }
 
             is NotesEvent.ToggleOrderSection -> {
@@ -72,8 +82,21 @@ class NotesViewModel(
             }
 
             is NotesEvent.ResultsChanged -> {
-                _resultsMode.value = event.resultsMode
-                getNotes(state.value.noteOrder)
+                if (event.resultsMode == NoteResultsMode.FolderNotes) {
+                    if (_roles.value.contains("premiun")) {
+                        _resultsMode.value = event.resultsMode
+                        getNotes(state.value.noteOrder)
+                    } else {
+                        apiState = NotesResponseState.ErrorWithMessage("The user is not premium")
+                    }
+                } else {
+                    _resultsMode.value = event.resultsMode
+                    getNotes(state.value.noteOrder)
+                }
+            }
+
+            is NotesEvent.RolesChanged -> {
+                _roles.value = event.roles
             }
         }
     }
@@ -147,6 +170,30 @@ class NotesViewModel(
         }
     }
 
+    private fun getFolders() {
+        viewModelScope.launch {
+//            _state.value = _state.value.copy(isLoading = true)
+
+            when (val response = folderRepository.getAllFolders()) {
+                is ApiResponse.Error -> {
+                    sendResponseEvent(NotesResponseState.Error(response.exception))
+                }
+
+                is ApiResponse.ErrorWithMessage -> {
+                    sendResponseEvent(NotesResponseState.ErrorWithMessage(response.message))
+                }
+
+                is ApiResponse.Success -> {
+                    _state.value = _state.value.copy(
+                        folders = mapToFolderModels(response.data),
+//                        isLoading = false,
+                    )
+                    sendResponseEvent(NotesResponseState.Success)
+                }
+            }
+        }
+    }
+
     private fun mapToNoteModels(noteDataList: List<NoteData>): List<NoteModel> {
         return noteDataList.map { noteData ->
             NoteModel(
@@ -159,6 +206,20 @@ class NotesViewModel(
                 is_trashed = noteData.isTrashed,
                 createdAt = convertISO8601ToDate(noteData.createdAt),
                 updatedAt = convertISO8601ToDate(noteData.updatedAt)
+            )
+        }
+    }
+
+    private fun mapToFolderModels(folderDataList: List<FolderData>): List<FolderModel> {
+        return folderDataList.map { folderData ->
+            FolderModel(
+                id = folderData.id,
+                userId = folderData.userId,
+                name = folderData.name,
+                theme = folderData.theme,
+                notesId = folderData.notesId,
+                createdAt = folderData.createdAt,
+                updatedAt = folderData.updatedAt
             )
         }
     }
@@ -177,6 +238,7 @@ class NotesViewModel(
                     ),
                     noteRepository = app.notesRepository,
                     favoriteNoteRepository = app.favoriteNotesRepository,
+                    folderRepository = app.folderRepository,
                 )
             }
         }

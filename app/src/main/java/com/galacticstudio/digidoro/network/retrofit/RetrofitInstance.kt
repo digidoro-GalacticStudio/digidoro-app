@@ -2,6 +2,7 @@ package com.galacticstudio.digidoro.network.retrofit
 
 import com.galacticstudio.digidoro.network.service.AuthService
 import com.galacticstudio.digidoro.network.service.FavoriteNoteService
+import com.galacticstudio.digidoro.network.service.FolderService
 import com.galacticstudio.digidoro.network.service.NoteService
 import com.galacticstudio.digidoro.util.NetworkService.BASE_URL
 import okhttp3.OkHttpClient
@@ -48,6 +49,10 @@ object RetrofitInstance {
 
     fun getFavoriteNoteService(): FavoriteNoteService {
         return retrofit.create(FavoriteNoteService::class.java)
+    }
+
+    fun getFolderService(): FolderService {
+        return retrofit.create(FolderService::class.java)
     }
 }
 

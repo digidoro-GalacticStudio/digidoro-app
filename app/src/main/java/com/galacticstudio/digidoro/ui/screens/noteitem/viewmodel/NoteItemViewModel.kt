@@ -16,6 +16,7 @@ import com.galacticstudio.digidoro.domain.usecase.note.AddNote
 import com.galacticstudio.digidoro.network.ApiResponse
 import com.galacticstudio.digidoro.network.dto.note.NoteData
 import com.galacticstudio.digidoro.repository.FavoriteNoteRepository
+import com.galacticstudio.digidoro.repository.FolderRepository
 import com.galacticstudio.digidoro.repository.NoteRepository
 import com.galacticstudio.digidoro.ui.screens.noteitem.ActionType
 import com.galacticstudio.digidoro.ui.screens.noteitem.NoteItemEvent
@@ -31,6 +32,7 @@ class NoteItemViewModel(
     private val addNote: AddNote = AddNote(),
     private val noteRepository: NoteRepository,
     private val favoriteRepository: FavoriteNoteRepository,
+    private val folderRepository: FolderRepository,
 ) : ViewModel() {
     private val _state = mutableStateOf(NoteItemState())
     val state: State<NoteItemState> = _state
@@ -291,6 +293,7 @@ class NoteItemViewModel(
                     addNote = AddNote(),
                     noteRepository = app.notesRepository,
                     favoriteRepository = app.favoriteNotesRepository,
+                    folderRepository = app.folderRepository,
                 )
             }
         }
