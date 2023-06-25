@@ -9,3 +9,14 @@ data class FolderModel(
     val createdAt: String,
     val updatedAt: String
 )
+
+data class FolderPopulatedModel(
+    val id: String,
+    val userId: String,
+    val name: String,
+    val theme: String,
+    val notesId: List<NoteModel>,
+    val createdAt: String,
+    val updatedAt: String
+)
+

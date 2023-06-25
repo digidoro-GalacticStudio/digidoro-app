@@ -1,10 +1,15 @@
 package com.galacticstudio.digidoro.ui.screens.noteslist
 
 import android.content.res.Configuration
+import android.util.Log
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,15 +18,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -31,6 +36,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,10 +57,14 @@ import com.galacticstudio.digidoro.RetrofitApplication
 import com.galacticstudio.digidoro.domain.util.NoteOrder
 import com.galacticstudio.digidoro.domain.util.OrderType
 import com.galacticstudio.digidoro.navigation.Screen
+import com.galacticstudio.digidoro.ui.screens.noteitem.components.FolderBottomSheetContent
 import com.galacticstudio.digidoro.ui.screens.noteslist.components.ActionNote
 import com.galacticstudio.digidoro.ui.screens.noteslist.components.FolderItem
 import com.galacticstudio.digidoro.ui.screens.noteslist.components.NoteItem
+import com.galacticstudio.digidoro.ui.screens.noteslist.viewmodel.FolderResponseState
+import com.galacticstudio.digidoro.ui.screens.noteslist.viewmodel.FolderViewModel
 import com.galacticstudio.digidoro.ui.screens.noteslist.viewmodel.NotesViewModel
+import com.galacticstudio.digidoro.ui.shared.floatingCards.BottomSheetLayout
 import com.galacticstudio.digidoro.ui.shared.textfield.SearchBarItem
 import com.galacticstudio.digidoro.ui.shared.titles.CustomMessageData
 import com.galacticstudio.digidoro.ui.shared.titles.Title
@@ -99,14 +109,16 @@ data class ActionNoteData(
 fun NotesListScreen(
     navController: NavHostController,
     notesViewModel: NotesViewModel = viewModel(factory = NotesViewModel.Factory),
+    folderViewModel: FolderViewModel = viewModel(factory = FolderViewModel.Factory),
 ) {
 
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
+                    val folderId = notesViewModel.state.value.selectedFolder?.id ?: ""
                     val color = Color.White.toArgb()
-                    navController.navigate(Screen.Note.route + "?noteId=&noteColor=${color}")
+                    navController.navigate(Screen.Note.route + "?noteId=&noteColor=${color}&folderId=${folderId}")
                 },
                 containerColor = MaterialTheme.colorScheme.tertiary,
                 modifier = Modifier
@@ -129,7 +141,8 @@ fun NotesListScreen(
         ) {
             NotesListContent(
                 navController = navController,
-                notesViewModel = notesViewModel
+                notesViewModel = notesViewModel,
+                folderViewModel = folderViewModel,
             )
         }
     }
@@ -139,14 +152,15 @@ fun NotesListScreen(
 fun NotesListContent(
     navController: NavHostController,
     notesViewModel: NotesViewModel = viewModel(factory = NotesViewModel.Factory),
+    folderViewModel: FolderViewModel,
 ) {
     val app: RetrofitApplication = LocalContext.current.applicationContext as RetrofitApplication
     val state = notesViewModel.state.value
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        notesViewModel.onEvent(NotesEvent.Rebuild)
         notesViewModel.onEvent(NotesEvent.RolesChanged(app.getRoles()))
+        notesViewModel.onEvent(NotesEvent.Rebuild)
     }
 
     LaunchedEffect(key1 = context) {
@@ -162,6 +176,25 @@ fun NotesListContent(
                 }
 
                 is NotesResponseState.ErrorWithMessage -> {
+                    Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+                }
+
+                else -> {}
+            }
+        }
+
+        // Collect the response events from the folderViewModel
+        folderViewModel.responseEvents.collect { event ->
+            when (event) {
+                is FolderResponseState.Error -> {
+                    Toast.makeText(
+                        context,
+                        "An error has occurred ${event.exception}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                is FolderResponseState.ErrorWithMessage -> {
                     Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
                 }
 
@@ -245,24 +278,12 @@ fun NotesListContent(
         }
 
         item(span = { GridItemSpan(cols) }) {
-            TitleNoteList()
+            FolderList(app, notesViewModel, folderViewModel)
         }
 
-        //TODO :: Experimental
-//        if (app.getRoles().contains("premiun")) {
-//            item(span = { GridItemSpan(cols) }) {
-//                LazyRow(
-//
-//                ) {
-//                    item { Text("The folders") }
-//
-//                    items(notesViewModel.state.value.folders) {folder ->
-//                        FolderItem()
-//                    }
-//                }
-//            }
-//        }
-
+        item(span = { GridItemSpan(cols) }) {
+            TitleNoteList("Recent notes", "Keep your ideas at hand")
+        }
 
         item(span = { GridItemSpan(cols) }) {
             ShortNoteItems(
@@ -303,9 +324,12 @@ fun NotesListContent(
                     theme = resNoteColor,
                     isLoading = false,
                 ) {
+                    val folderId = notesViewModel.state.value.selectedFolder?.id ?: ""
+                    val isReadMode = notesViewModel.resultsMode.value == NoteResultsMode.TrashNotes
+
                     navController.navigate(
                         Screen.Note.route +
-                                "?noteId=${dataNote.id}&noteColor=${noteColor.toArgb()}"
+                                "?noteId=${dataNote.id}&noteColor=${noteColor.toArgb()}&folderId=$folderId&isReadMode=${isReadMode.toString()}"
                     )
                 }
             }
@@ -342,16 +366,19 @@ fun HeaderNoteList() {
  * It shows the title "Recent notes" along with a subtitle.
  */
 @Composable
-fun TitleNoteList() {
+fun TitleNoteList(
+    title: String,
+    subTitle: String
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(vertical = 16.dp)
     ) {
         Title(
             message = CustomMessageData(
-                title = "Recent notes",
-                subTitle = "Keep your ideas at hand"
+                title = title,
+                subTitle = subTitle
             ),
             titleStyle = MaterialTheme.typography.headlineSmall
         )
@@ -449,6 +476,86 @@ fun ShortNoteItems(
                     .size(24.dp)
                     .padding(end = 8.dp)
             )
+        }
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun FolderList(
+    app: RetrofitApplication,
+    notesViewModel: NotesViewModel,
+    folderViewModel: FolderViewModel
+) {
+    var openFolderBottomSheet by rememberSaveable { mutableStateOf(false) }
+    BottomSheetLayout(
+        openBottomSheet = openFolderBottomSheet,
+        onDismissRequest = { openFolderBottomSheet = false },
+        content = {
+            FolderBottomSheetContent(
+                onBottomSheetChanged = { newValue -> openFolderBottomSheet = newValue },
+                folderViewModel = folderViewModel,
+            )
+        },
+    )
+
+    AnimatedVisibility(
+        visible = app.getRoles()
+            .contains("premium") && notesViewModel.resultsMode.value == NoteResultsMode.FolderNotes,
+    ) {
+        Column {
+            TitleNoteList("Your Folders", "Organize your files efficiently")
+
+            if (notesViewModel.state.value.folders.isEmpty()) {
+                FlowRow(
+                    modifier = Modifier.padding(16.dp),
+                ) {
+                    Text(
+                        "You don't have any folders yet. ",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Text(
+                        "Create one here.",
+                        modifier = Modifier.clickable { openFolderBottomSheet = true },
+                        color = MaterialTheme.colorScheme.tertiary,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            } else {
+                FlowRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    notesViewModel.state.value.folders.forEach { folder ->
+                        FolderItem(
+                            folder,
+                            colorBackgroundFolder = Color(android.graphics.Color.parseColor(folder.theme))
+                        ) {
+                            notesViewModel.onEvent(
+                                NotesEvent.SelectedFolderChanged(
+                                    folder
+                                )
+                            )
+                        }
+                    }
+
+                    IconButton(
+                        onClick = {
+                        openFolderBottomSheet = true
+                    },
+                        colors = IconButtonDefaults.iconButtonColors(
+                            containerColor = MaterialTheme.colorScheme.onSecondaryContainer
+                        )
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.add_icon),
+                            contentDescription = null,
+                            modifier = Modifier.size(25.dp),
+                        )
+                    }
+                }
+            }
         }
     }
 }

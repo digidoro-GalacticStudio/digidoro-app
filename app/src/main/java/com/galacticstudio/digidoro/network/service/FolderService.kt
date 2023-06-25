@@ -1,9 +1,12 @@
 package com.galacticstudio.digidoro.network.service
 
+import com.galacticstudio.digidoro.network.dto.favoritenote.FavoriteNoteRequest
 import com.galacticstudio.digidoro.network.dto.folder.FolderListResponse
+import com.galacticstudio.digidoro.network.dto.folder.FolderNotesListResponse
 import com.galacticstudio.digidoro.network.dto.folder.FolderRequest
 import com.galacticstudio.digidoro.network.dto.folder.FolderResponse
 import com.galacticstudio.digidoro.network.dto.folder.FolderThemeRequest
+import com.galacticstudio.digidoro.network.dto.folder.ToggleNoteRequest
 import com.galacticstudio.digidoro.network.dto.note.NoteThemeRequest
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -17,7 +20,7 @@ interface FolderService {
     @GET("api/folder/own")
     suspend fun getAllFolders(
         @Query("populateFields") populateFields: String? = null,
-    ): FolderListResponse
+    ): FolderNotesListResponse
 
     @GET("api/folder/own/{id}")
     suspend fun getFolderById(
@@ -39,5 +42,8 @@ interface FolderService {
     suspend fun updateThemeFolderById(@Path("id") folderId: String, @Body theme: FolderThemeRequest): FolderResponse
 
     @PATCH("api/folder/own/toggleItems/{id}")
-    suspend fun toggleFolder(@Path("id") folderId: String): FolderResponse
+    suspend fun toggleFolder(
+        @Path("id") folderId: String,
+        @Body note: ToggleNoteRequest
+    ): FolderResponse
 }

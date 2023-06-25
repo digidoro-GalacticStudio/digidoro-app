@@ -1,14 +1,17 @@
 package com.galacticstudio.digidoro.repository
 
+import android.util.Log
 import com.galacticstudio.digidoro.network.ApiResponse
 import com.galacticstudio.digidoro.network.dto.folder.FolderData
+import com.galacticstudio.digidoro.network.dto.folder.FolderDataPopulated
 import com.galacticstudio.digidoro.network.dto.folder.FolderRequest
 import com.galacticstudio.digidoro.network.dto.folder.FolderThemeRequest
+import com.galacticstudio.digidoro.network.dto.folder.ToggleNoteRequest
 import com.galacticstudio.digidoro.network.service.FolderService
 import com.galacticstudio.digidoro.repository.utils.handleApiCall
 
 class FolderRepository(private val folderService: FolderService) {
-    suspend fun getAllFolders(populateFields: String? = null): ApiResponse<List<FolderData>> {
+    suspend fun getAllFolders(populateFields: String? = null): ApiResponse<List<FolderDataPopulated>> {
         return handleApiCall { folderService.getAllFolders(populateFields).data }
     }
 
@@ -40,7 +43,9 @@ class FolderRepository(private val folderService: FolderService) {
         return handleApiCall { folderService.updateThemeFolderById(folderId, request).data }
     }
 
-    suspend fun toggleFolder(folderId: String): ApiResponse<FolderData> {
-        return handleApiCall { folderService.toggleFolder(folderId).data }
+    suspend fun toggleFolder(folderId: String, noteId: String): ApiResponse<FolderData> {
+        val request  = ToggleNoteRequest(noteId)
+        Log.d("MyErrors", "MY REQUEST: ${request}")
+        return handleApiCall { folderService.toggleFolder(folderId, request).data }
     }
 }

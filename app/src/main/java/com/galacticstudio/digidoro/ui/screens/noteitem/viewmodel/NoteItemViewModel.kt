@@ -57,6 +57,10 @@ class NoteItemViewModel(
                 isFavorite()
             }
 
+            is NoteItemEvent.FolderIdChanged -> {
+                _state.value = state.value.copy(folderId = event.folderId)
+            }
+
             is NoteItemEvent.TitleChanged -> {
                 _state.value = state.value.copy(title = event.title)
             }
@@ -161,8 +165,13 @@ class NoteItemViewModel(
     private fun addNewNote(title: String, message: String, tags: List<String>, color: String) {
         executeOperation(
             operation = { noteRepository.createNote(title, message, tags, color) },
-            onSuccess = {
+            onSuccess = { response ->
+                _state.value = _state.value.copy(noteId = response.data.id)
                 _actionTypeEvents.value = ActionType.CreateNote
+
+                if (!_state.value.folderId.isNullOrEmpty()) {
+                    toggleNoteFolder(_state.value.folderId, response.data.id)
+                }
             }
         )
     }
@@ -215,6 +224,20 @@ class NoteItemViewModel(
             operation = {
                 favoriteRepository.toggleFavoriteNote(
                     _state.value.favoriteContainerId,
+                    noteId
+                )
+            },
+            onSuccess = {
+                _state.value = _state.value.copy(isFavorite = !_state.value.isFavorite)
+            }
+        )
+    }
+
+    private fun toggleNoteFolder(folderId: String, noteId: String) {
+        executeOperation(
+            operation = {
+                folderRepository.toggleFolder(
+                    folderId,
                     noteId
                 )
             },
