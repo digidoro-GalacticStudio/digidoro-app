@@ -1,5 +1,6 @@
 package com.galacticstudio.digidoro.navigation.navgraph
 
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -13,7 +14,14 @@ import com.galacticstudio.digidoro.ui.screens.noteitem.NoteItemScreen
 import com.galacticstudio.digidoro.ui.screens.noteslist.NotesListScreen
 
 fun NavGraphBuilder.noteNavGraph(
-    navController: NavHostController
+    navController: NavHostController,
+    selectionMode: (
+        bottomBarState: MutableState<Boolean>,
+        onRemoveClick: () -> Unit,
+        onDuplicateClick: () -> Unit,
+        onMoveFolderClick: () -> Unit
+    ) -> Unit,
+    onSelectionChange: (Boolean) -> Unit,
 ) {
     navigation(
         startDestination = Screen.Note.route,
@@ -22,7 +30,11 @@ fun NavGraphBuilder.noteNavGraph(
         composable(
             route = Screen.Note.route
         ) {
-            NotesListScreen(navController = navController)
+            NotesListScreen(
+                navController = navController,
+                selectionMode = selectionMode,
+                onSelectionChange = onSelectionChange
+            )
         }
 
         composable(

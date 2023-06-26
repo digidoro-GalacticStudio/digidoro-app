@@ -3,6 +3,10 @@ package com.galacticstudio.digidoro.ui.screens.noteslist.components
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -17,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -58,24 +63,28 @@ fun ActionsBottomBar(
     )
 
     AnimatedVisibility(
+        modifier = Modifier.zIndex(Float.MAX_VALUE),
         visible = bottomBarState.value,
         enter = slideInVertically(initialOffsetY = { it }),
         exit = slideOutVertically(targetOffsetY = { it }),
     ) {
         Surface(
             modifier = Modifier
-                .padding(bottom = 90.dp, start = 8.dp, end = 8.dp)
-                .zIndex(2f)
-                .clip(RoundedCornerShape(16.dp))
+                .zIndex(Float.MAX_VALUE)
+                .padding(bottom = 0.dp, start = 9.dp, end = 9.dp)
+                .height(80.dp)
+                .offset(y = (-10).dp)
                 .dropShadow(
-                    color = MaterialTheme.colorScheme.onPrimary.copy(0.25f),
-                    blurRadius = 14.dp,
-                    spread = 5.dp,
-                    offsetY = (-15).dp,
-                ),
+                    color = MaterialTheme.colorScheme.onPrimary.copy(0.4f),
+                    blurRadius = 10.dp,
+                )
+                .clip(RoundedCornerShape(16.dp))
         ) {
             NavigationBar(
-                containerColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                modifier = Modifier
+                    .zIndex(Float.MAX_VALUE)
+                    .height(12.dp),
+                containerColor = MaterialTheme.colorScheme.background,
             ) {
                 actionsItems.forEach { item ->
                     NavigationBarItem(

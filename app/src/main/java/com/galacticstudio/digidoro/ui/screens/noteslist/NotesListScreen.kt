@@ -2,14 +2,13 @@ package com.galacticstudio.digidoro.ui.screens.noteslist
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -71,7 +70,6 @@ import com.galacticstudio.digidoro.navigation.Screen
 import com.galacticstudio.digidoro.ui.screens.noteitem.components.FolderBottomSheetContent
 import com.galacticstudio.digidoro.ui.screens.noteitem.components.MoveToFolderBottomSheet
 import com.galacticstudio.digidoro.ui.screens.noteslist.components.ActionNote
-import com.galacticstudio.digidoro.ui.screens.noteslist.components.ActionsBottomBar
 import com.galacticstudio.digidoro.ui.screens.noteslist.components.ActionsTopBar
 import com.galacticstudio.digidoro.ui.screens.noteslist.components.FolderItem
 import com.galacticstudio.digidoro.ui.screens.noteslist.components.NoteItem
@@ -102,7 +100,7 @@ fun NotesListSPreview() {
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
         ) {
-            NotesListScreen(navController = navController)
+//            NotesListScreen(navController = navController)
         }
     }
 }
@@ -127,12 +125,21 @@ enum class CardState {
  *
  * @param navController The navigation controller used for navigating to different screens.
  */
+
+
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun NotesListScreen(
     navController: NavHostController,
     notesViewModel: NotesViewModel = viewModel(factory = NotesViewModel.Factory),
     folderViewModel: FolderViewModel = viewModel(factory = FolderViewModel.Factory),
+    selectionMode: (
+        bottomBarState: MutableState<Boolean>,
+        onRemoveClick: () -> Unit,
+        onDuplicateClick: () -> Unit,
+        onMoveFolderClick: () -> Unit
+    ) -> Unit,
+    onSelectionChange: (Boolean) -> Unit,
 ) {
     // State of actions bottomBar
     val isSelectionMode = remember { mutableStateOf(false) }
@@ -147,10 +154,38 @@ fun NotesListScreen(
     BackHandler(enabled = isSelectionMode.value) {
         if (isSelectionMode.value) {
             isSelectionMode.value = false
+            onSelectionChange(false)
             selectedCard.value = null
         } else {
             backDispatcher?.onBackPressed()
         }
+    }
+
+    LaunchedEffect(Unit) {
+        selectionMode(
+            isSelectionMode,
+            {
+                //If the mode is all notes, move to trash
+                if (notesViewModel.resultsMode.value == NoteResultsMode.TrashNotes) {
+                    openDeleteDialog.value = true
+                } else {
+                    openMoveToTrashDialog.value = true
+                }
+                isSelectionMode.value = false
+            },
+            {
+                notesViewModel.onEvent(NotesEvent.DuplicateNote(selectedCard.value))
+                isSelectionMode.value = false
+            },
+            {
+                notesViewModel.onEvent(
+                    NotesEvent.GetSelectedFolder(
+                        selectedCard.value?.id ?: ""
+                    )
+                )
+                openMoveToFolderDialog.value = true
+            }
+        )
     }
 
     Scaffold(
@@ -169,8 +204,6 @@ fun NotesListScreen(
                     },
                     containerColor = MaterialTheme.colorScheme.tertiary,
                     modifier = Modifier
-//                        .padding(bottom = if (!isSelectionMode.value) 80.dp else 0.dp)
-//                        .offset(y = if (isSelectionMode.value) (-85).dp else 0.dp)
                         .offset(y = (-85).dp)
                         .clip(CircleShape)
                 ) {
@@ -188,33 +221,13 @@ fun NotesListScreen(
                 visible = isSelectionMode.value,
                 onReturnClick = {
                     isSelectionMode.value = false
+                    onSelectionChange(false)
                     selectedCard.value = null
                 }
             )
         },
         bottomBar = {
-            ActionsBottomBar(
-                isSelectionMode,
-                onRemoveClick = {
-                    //If the mode is all notes, move to trash
-                    if (notesViewModel.resultsMode.value == NoteResultsMode.TrashNotes) {
-                        openDeleteDialog.value = true
-                    } else {
-                        openMoveToTrashDialog.value = true
-                    }
-                },
-                onDuplicateClick = {
-                    notesViewModel.onEvent(NotesEvent.DuplicateNote(selectedCard.value))
-                },
-                onMoveFolderClick = {
-                    notesViewModel.onEvent(
-                        NotesEvent.GetSelectedFolder(
-                            selectedCard.value?.id ?: ""
-                        )
-                    )
-                    openMoveToFolderDialog.value = true
-                }
-            )
+
         },
     ) {
 //            padding ->
@@ -229,6 +242,9 @@ fun NotesListScreen(
                 folderViewModel = folderViewModel,
                 isSelectionMode = isSelectionMode,
                 selectedCard = selectedCard,
+                onLongNoteClick = {
+                    onSelectionChange(true)
+                },
             )
         }
     }
@@ -282,6 +298,7 @@ fun NotesListContent(
     folderViewModel: FolderViewModel,
     isSelectionMode: MutableState<Boolean>,
     selectedCard: MutableState<NoteModel?>,
+    onLongNoteClick: () -> Unit
 ) {
     val app: RetrofitApplication = LocalContext.current.applicationContext as RetrofitApplication
     val state = notesViewModel.state.value
@@ -289,7 +306,7 @@ fun NotesListContent(
 
     LaunchedEffect(Unit) {
         notesViewModel.onEvent(NotesEvent.RolesChanged(app.getRoles()))
-        notesViewModel.onEvent(NotesEvent.Rebuild)
+        notesViewModel.onEvent(NotesEvent.Rebuild(NoteResultsMode.AllNotes))
     }
 
     LaunchedEffect(key1 = context) {
@@ -371,7 +388,7 @@ fun NotesListContent(
         )
     )
 
-    val contentPadding = PaddingValues(start = 24.dp, top = 24.dp, end = 24.dp, bottom = 100.dp)
+    val contentPadding = PaddingValues(start = 24.dp, top = 24.dp, end = 24.dp, bottom = 120.dp)
     val cols = 2
 
     var search by remember { mutableStateOf("") }
@@ -458,7 +475,6 @@ fun NotesListContent(
 
         if (isLoading) {
             val array = arrayOf(1, 2, 3, 4)
-
             items(array) {
                 NoteItemContainer(
                     message = "",
@@ -467,45 +483,71 @@ fun NotesListContent(
                     theme = Color.Transparent,
                     onNoteClick = {},
                     onLongNoteClick = {},
-                    modifier = Modifier
-                        .shimmerEffect(),
+                    modifier = Modifier.shimmerEffect(),
                     cardState = CardState.LOADING,
                 )
             }
         } else {
-            itemsIndexed(notesViewModel.state.value.notes) { _, dataNote ->
-                val noteColor = Color(android.graphics.Color.parseColor(dataNote.theme))
-                val resNoteColor = noteColor.takeUnless { it == Color.White }
-                    ?: MaterialTheme.colorScheme.primaryContainer
+            val notes = notesViewModel.state.value.notes
+            if (notes.isEmpty()) {
+                item(span = { GridItemSpan(cols) }) {
+                    val noNotesMessage = when (notesViewModel.resultsMode.value) {
+                        is NoteResultsMode.AllNotes -> "You haven't created any notes yet. Start creating your notes now."
+                        is NoteResultsMode.TrashNotes -> "You don't have any notes in the recycle bin."
+                        is NoteResultsMode.FolderNotes -> {
+                            val selectedFolder =
+                                notesViewModel.state.value.selectedFolder?.name ?: "selected"
+                            "No notes in $selectedFolder folder."
+                        }
 
-                //Selection mode and states
-                val isSelected = dataNote.id == selectedCard.value?.id
-
-                NoteItemContainer(
-                    message = dataNote.message,
-                    title = dataNote.title,
-                    updatedAt = dataNote.updatedAt,
-                    theme = resNoteColor,
-                    cardState = if (isSelected) CardState.SELECTED else
-                        if (isSelectionMode.value) CardState.DESELECTED
-                        else CardState.NORMAL,
-                    onLongNoteClick = {
-                        selectedCard.value = dataNote
-                        isSelectionMode.value = true
-                    },
-                ) {
-                    //If not in selection mode, navigate to the item
-                    if (!isSelectionMode.value) {
-                        val folderId = notesViewModel.state.value.selectedFolder?.id ?: ""
-                        val isReadMode =
-                            notesViewModel.resultsMode.value == NoteResultsMode.TrashNotes
-
-                        navController.navigate(
-                            Screen.Note.route +
-                                    "?noteId=${dataNote.id}&noteColor=${noteColor.toArgb()}&folderId=$folderId&isReadMode=${isReadMode}"
+                        is NoteResultsMode.FavoriteNotes -> "You don't have any favorite notes yet. Mark some notes as favorites."
+                    }
+                    Box(modifier = Modifier.padding(24.dp)) {
+                        Text(
+                            noNotesMessage,
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            style = MaterialTheme.typography.bodyMedium
                         )
-                    } else {
-                        selectedCard.value = dataNote
+                    }
+
+                }
+            } else {
+                itemsIndexed(notes) { _, dataNote ->
+                    val noteColor = Color(android.graphics.Color.parseColor(dataNote.theme))
+                    val resNoteColor = noteColor.takeUnless { it == Color.White }
+                        ?: MaterialTheme.colorScheme.primaryContainer
+
+                    //Selection mode and states
+                    val isSelected = dataNote.id == selectedCard.value?.id
+
+                    NoteItemContainer(
+                        message = dataNote.message,
+                        title = dataNote.title,
+                        updatedAt = dataNote.updatedAt,
+                        theme = resNoteColor,
+                        cardState = if (isSelected) CardState.SELECTED else
+                            if (isSelectionMode.value) CardState.DESELECTED
+                            else CardState.NORMAL,
+                        onLongNoteClick = {
+                            Log.d("MyErrors", "cLICKO AL ITEN")
+                            selectedCard.value = dataNote
+                            isSelectionMode.value = true
+                            onLongNoteClick()
+                        },
+                    ) {
+                        //If not in selection mode, navigate to the item
+                        if (!isSelectionMode.value) {
+                            val folderId = notesViewModel.state.value.selectedFolder?.id ?: ""
+                            val isReadMode =
+                                notesViewModel.resultsMode.value == NoteResultsMode.TrashNotes
+
+                            navController.navigate(
+                                Screen.Note.route +
+                                        "?noteId=${dataNote.id}&noteColor=${noteColor.toArgb()}&folderId=$folderId&isReadMode=${isReadMode}"
+                            )
+                        } else {
+                            selectedCard.value = dataNote
+                        }
                     }
                 }
             }

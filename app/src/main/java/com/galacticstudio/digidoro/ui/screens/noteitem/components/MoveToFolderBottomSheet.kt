@@ -178,6 +178,7 @@ fun ExposedDropdownMenuSample(
                 text = { Text(emptyFolderModel.name, color = MaterialTheme.colorScheme.onPrimary) },
                 onClick = {
                     selectedFolder.value = emptyFolderModel
+                    notesViewModel.onEvent(NotesEvent.NewFolderNoteChanged(null))
                 },
                 leadingIcon = {
                     Box(

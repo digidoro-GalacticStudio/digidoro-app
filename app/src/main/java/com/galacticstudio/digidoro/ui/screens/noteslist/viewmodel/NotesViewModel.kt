@@ -72,7 +72,7 @@ class NotesViewModel(
             }
 
             is NotesEvent.Rebuild -> {
-                getNotes(state.value.noteOrder)
+                rebuildUI(event.resultsMode)
             }
 
             is NotesEvent.SelectedFolderChanged -> {
@@ -83,23 +83,7 @@ class NotesViewModel(
             }
 
             is NotesEvent.ResultsChanged -> {
-                if (event.resultsMode == NoteResultsMode.FolderNotes) {
-                    if (_roles.value.contains("premium")) {
-                        _resultsMode.value = event.resultsMode
-                        getNotesWithoutFolders()
-//                        getNotes(state.value.noteOrder)
-                        getFolders()
-                    } else {
-                        apiState = NotesResponseState.ErrorWithMessage("The user is not premium")
-                        viewModelScope.launch {
-                            responseEventChannel.send(apiState as NotesResponseState.ErrorWithMessage)
-                        }
-                    }
-                } else {
-                    _resultsMode.value = event.resultsMode
-                    getNotes(state.value.noteOrder)
-                    _state.value = state.value.copy(selectedFolder = null)
-                }
+                rebuildUI(event.resultsMode)
             }
 
             is NotesEvent.RolesChanged -> {
@@ -143,6 +127,25 @@ class NotesViewModel(
                     actualNoteId = "",
                 )
             }
+        }
+    }
+
+    private fun rebuildUI(resultModel: NoteResultsMode) {
+        if (resultModel == NoteResultsMode.FolderNotes) {
+            if (_roles.value.contains("premium")) {
+                _resultsMode.value = resultModel
+                getNotesWithoutFolders()
+                getFolders()
+            } else {
+                apiState = NotesResponseState.ErrorWithMessage("The user is not premium")
+                viewModelScope.launch {
+                    responseEventChannel.send(apiState as NotesResponseState.ErrorWithMessage)
+                }
+            }
+        } else {
+            _resultsMode.value = resultModel
+            getNotes(state.value.noteOrder)
+            _state.value = state.value.copy(selectedFolder = null)
         }
     }
 
@@ -265,16 +268,8 @@ class NotesViewModel(
     }
 
     private fun saveNewFolder() {
-
         if (_state.value.actualNoteId == null) {
             apiState = NotesResponseState.ErrorWithMessage("There is no selected note")
-            viewModelScope.launch {
-                responseEventChannel.send(apiState as NotesResponseState.ErrorWithMessage)
-            }
-            return
-        }
-        if (_state.value.newSelectedFolder == null) {
-            apiState = NotesResponseState.ErrorWithMessage("There is no new note")
             viewModelScope.launch {
                 responseEventChannel.send(apiState as NotesResponseState.ErrorWithMessage)
             }
@@ -284,6 +279,9 @@ class NotesViewModel(
         if (_state.value.actualFolder == null) {
             //The note has no previous folder
             toggleNoteFolder(_state.value.newSelectedFolder!!.id, _state.value.actualNoteId!!)
+        } else if (_state.value.newSelectedFolder == null) {
+            //The new note is "No folder"
+            toggleNoteFolder(_state.value.actualFolder!!.id, _state.value.actualNoteId!!)
         } else {
             //The note has previous folder
             toggleNoteFolder(_state.value.actualFolder!!.id, _state.value.actualNoteId!!)
@@ -295,24 +293,27 @@ class NotesViewModel(
         executeOperation(
             operation = { folderRepository.getSelectedFolders(noteId) },
             onSuccess = { response ->
-
                 _state.value = _state.value.copy(
                     newFolderList = mapToFolderModels(response.data.folders),
                     actualFolder = mapToFolderModel(response.data.actualFolder),
                 )
+
+                rebuildUI(_resultsMode.value)
             }
         )
     }
 
     private fun deleteNote(noteId: String) {
         executeOperation(
-            operation = { noteRepository.deleteNoteById(noteId) }
+            operation = { noteRepository.deleteNoteById(noteId) },
+            onSuccess = { rebuildUI(_resultsMode.value) }
         )
     }
 
     private fun toggleTrashNote(noteId: String) {
         executeOperation(
-            operation = { noteRepository.toggleTrashNoteById(noteId) }
+            operation = { noteRepository.toggleTrashNoteById(noteId) },
+            onSuccess = { rebuildUI(_resultsMode.value) }
         )
     }
 
@@ -336,6 +337,8 @@ class NotesViewModel(
                     val idFolder = _state.value.selectedFolder?.id ?: ""
                     toggleNoteFolder(idFolder, idNewNote)
                 }
+
+                rebuildUI(_resultsMode.value)
             }
         )
     }
@@ -347,7 +350,8 @@ class NotesViewModel(
                     folderId,
                     noteId
                 )
-            }
+            },
+            onSuccess = { rebuildUI(_resultsMode.value) }
         )
     }
 

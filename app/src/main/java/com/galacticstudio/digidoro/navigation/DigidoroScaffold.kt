@@ -2,18 +2,10 @@ package com.galacticstudio.digidoro.navigation
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -27,9 +19,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -38,6 +30,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.galacticstudio.digidoro.R
 import com.galacticstudio.digidoro.navigation.navgraph.SetupNavGraph
+import com.galacticstudio.digidoro.ui.screens.noteslist.components.ActionsBottomBar
 import com.galacticstudio.digidoro.ui.theme.DigidoroTheme
 import com.galacticstudio.digidoro.ui.theme.Gray30
 import com.galacticstudio.digidoro.util.dropShadow
@@ -110,20 +103,88 @@ fun AppScaffold(navController: NavHostController) {
 
     // Determine whether to show the bottom bar based on the current destination route.
     bottomBarState.value = when (navBackStackEntry?.destination?.route) {
-        in listOf("home_screen", "todo_screen", "pomodoro_screen", "note_screen", "account_screen") -> true
+        in listOf(
+            "home_screen",
+            "todo_screen",
+            "pomodoro_screen",
+            "note_screen",
+            "account_screen"
+        ) -> true
+
         else -> false
     }
 
+    //State of selection bar
+    val modeState: SelectionModeAppState = rememberSelectionModeAppState()
+
+    val selectionBarState = rememberSaveable { (mutableStateOf(false)) }
+
     Scaffold(
         bottomBar = {
-            BottomBarNavigation(
-                navController = navController,
-                bottomBarState = bottomBarState,
-            )
+            AnimatedVisibility(
+                selectionBarState.value,
+                enter = slideInVertically(initialOffsetY = { it }),
+                exit = slideOutVertically(targetOffsetY = { it }),
+            ) {
+                ActionsBottomBar(
+                    selectionBarState,
+                    onRemoveClick = { modeState.onRemoveClick() },
+                    onDuplicateClick = { modeState.onDuplicateClick() },
+                    onMoveFolderClick = { modeState.onMoveFolderClick() }
+                )
+            }
+
+            AnimatedVisibility(
+                !selectionBarState.value,
+                enter = slideInVertically(initialOffsetY = { it }),
+                exit = slideOutVertically(targetOffsetY = { it }),
+            ) {
+                BottomBarNavigation(
+                    navController = navController,
+                    bottomBarState = bottomBarState,
+                )
+            }
         },
     ) {
-        SetupNavGraph(navController = navController)
+        SetupNavGraph(
+            navController = navController,
+            selectionMode = { bottomBarState, onRemoveClick, onDuplicateClick, onMoveFolderClick ->
+                selectionBarState.value = bottomBarState.value
+                modeState.onRemoveClick = onRemoveClick
+                modeState.onDuplicateClick = onDuplicateClick
+                modeState.onMoveFolderClick = onMoveFolderClick
+            },
+            onSelectionChange = { isSelectionMode ->
+                selectionBarState.value = isSelectionMode
+            }
+        )
     }
+}
+
+class SelectionModeAppState(
+    var selectionState: MutableState<Boolean>,
+    val navController: NavHostController,
+    var onDuplicateClick: () -> Unit,
+    var onRemoveClick: () -> Unit,
+    var onMoveFolderClick: () -> Unit,
+) {}
+
+@SuppressLint("RememberReturnType")
+@Composable
+fun rememberSelectionModeAppState(
+    selectionState: MutableState<Boolean> = remember { mutableStateOf(false) },
+    navController: NavHostController = rememberNavController(),
+    onDuplicateClick: () -> Unit = {},
+    onRemoveClick: () -> Unit = {},
+    onMoveFolderClick: () -> Unit = {},
+) = remember(selectionState, navController, onDuplicateClick, onRemoveClick, onMoveFolderClick) {
+    SelectionModeAppState(
+        selectionState = selectionState,
+        navController = navController,
+        onDuplicateClick = onDuplicateClick,
+        onRemoveClick = onRemoveClick,
+        onMoveFolderClick = onMoveFolderClick,
+    )
 }
 
 /**
@@ -152,10 +213,12 @@ fun BottomBarNavigation(
         exit = slideOutVertically(targetOffsetY = { it }),
         content = {
             Surface(
-                modifier = Modifier.dropShadow(
-                    color = MaterialTheme.colorScheme.onPrimary.copy(0.25f),
-                    blurRadius = 4.dp
-                )
+                modifier = Modifier
+                    .height(80.dp)
+                    .dropShadow(
+                        color = MaterialTheme.colorScheme.onPrimary.copy(0.25f),
+                        blurRadius = 4.dp
+                    )
             ) {
                 NavigationBar(
                     containerColor = MaterialTheme.colorScheme.primary,

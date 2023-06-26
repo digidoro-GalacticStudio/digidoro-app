@@ -10,7 +10,7 @@ sealed class NotesEvent {
     data class SelectedFolderChanged(val folder: FolderPopulatedModel): NotesEvent()
     data class Order(val noteOrder: NoteOrder): NotesEvent()
     data class RolesChanged(val roles: List<String>): NotesEvent()
-    object Rebuild: NotesEvent()
+    data class Rebuild(val resultsMode: NoteResultsMode): NotesEvent()
     object ClearData: NotesEvent()
     data class DuplicateNote(val note: NoteModel?): NotesEvent()
     data class DeleteNote(val noteId: String): NotesEvent()
