@@ -3,6 +3,7 @@ package com.galacticstudio.digidoro
 import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import com.galacticstudio.digidoro.network.retrofit.RetrofitInstance
 import com.galacticstudio.digidoro.repository.CredentialsRepository
 import com.galacticstudio.digidoro.repository.FavoriteNoteRepository
@@ -41,6 +42,11 @@ class RetrofitApplication : Application() {
 
     fun getUsername(): String = prefs.getString(USERNAME, "")!!
 
+    fun hasToken(): Boolean {
+        val token = getToken()
+        return token.isNotEmpty()
+    }
+
     //initialize repositories
     val credentialsRepository: CredentialsRepository by lazy {
         CredentialsRepository(getAPIService())
@@ -71,6 +77,16 @@ class RetrofitApplication : Application() {
 
         RetrofitInstance.setToken(token)
     }
+
+    fun clearAuthToken() {
+        val editor = prefs.edit()
+        editor.remove(USER_TOKEN)
+        editor.apply()
+
+        RetrofitInstance.setToken("")
+        RetrofitInstance.clearToken()
+    }
+
 
     fun saveRoles(roles: List<String>) {
         val editor = prefs.edit()

@@ -1,5 +1,6 @@
 package com.galacticstudio.digidoro.ui.screens.account
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -11,11 +12,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.galacticstudio.digidoro.R
+import com.galacticstudio.digidoro.RetrofitApplication
+import com.galacticstudio.digidoro.navigation.ROOT_GRAPH_ROUTE
 import com.galacticstudio.digidoro.ui.screens.account.components.options.OptionComposable
 import com.galacticstudio.digidoro.ui.screens.account.components.options.OptionsComposable
 import com.galacticstudio.digidoro.ui.screens.account.components.userInformation.UserInformation
@@ -25,7 +30,7 @@ import com.galacticstudio.digidoro.ui.theme.DigidoroTheme
 
 @Composable
 @Preview(showSystemUi = true)
-fun AccountPreview(){
+fun AccountPreview() {
     DigidoroTheme() {
         AccountScreen(navController = rememberNavController())
 
@@ -34,19 +39,15 @@ fun AccountPreview(){
 
 @Composable
 fun AccountScreen(
-    navController: NavHostController = rememberNavController()
-){
-    AccountContent()
-}
-
-@Composable
-fun AccountContent(){
+    navController: NavController,
+) {
+    // Retrieve the application instance from the current context
+    val app: RetrofitApplication = LocalContext.current.applicationContext as RetrofitApplication
 
     Column(
         modifier = Modifier
-            .fillMaxHeight()
-            .padding(bottom = 80.dp),
-        verticalArrangement = Arrangement.Bottom
+            .fillMaxHeight(),
+        verticalArrangement = Arrangement.SpaceBetween
     ) {
 
         Column(
@@ -74,8 +75,9 @@ fun AccountContent(){
             description = "Logout",
             backgroundColor = MaterialTheme.colorScheme.secondary,
             color = MaterialTheme.colorScheme.primary
-            ) {
-            
+        ) {
+            app.clearAuthToken()
+            navController.navigate(ROOT_GRAPH_ROUTE)
         }
     }
 }

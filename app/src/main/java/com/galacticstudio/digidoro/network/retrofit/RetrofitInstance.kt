@@ -26,6 +26,11 @@ object RetrofitInstance {
         this.token = token
         interceptor.updateToken(token)
     }
+
+    fun clearToken() {
+        interceptor.updateToken("")
+    }
+
     fun setUsername(username: String) {
         this.username = username
     }

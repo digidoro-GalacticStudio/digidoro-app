@@ -42,7 +42,7 @@ fun OptionComposable(
         modifier = Modifier
             .fillMaxWidth()
             .clickable {
-                onOptionClick
+                onOptionClick()
             }
             .background(backgroundColor)
             .padding(horizontal = 12.dp, vertical = 13.dp)

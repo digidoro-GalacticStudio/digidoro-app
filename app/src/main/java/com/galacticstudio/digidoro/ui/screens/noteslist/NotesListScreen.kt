@@ -230,11 +230,9 @@ fun NotesListScreen(
 
         },
     ) {
-//            padding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
-//                .padding(padding)
         ) {
             NotesListContent(
                 navController = navController,

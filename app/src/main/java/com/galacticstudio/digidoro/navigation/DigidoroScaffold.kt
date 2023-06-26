@@ -28,10 +28,10 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.galacticstudio.digidoro.ui.screens.MainViewModel
 import com.galacticstudio.digidoro.R
 import com.galacticstudio.digidoro.navigation.navgraph.SetupNavGraph
 import com.galacticstudio.digidoro.ui.screens.noteslist.components.ActionsBottomBar
-import com.galacticstudio.digidoro.ui.theme.DigidoroTheme
 import com.galacticstudio.digidoro.ui.theme.Gray30
 import com.galacticstudio.digidoro.util.dropShadow
 
@@ -39,7 +39,7 @@ import com.galacticstudio.digidoro.util.dropShadow
 @Preview(name = "Dark Mode", showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun ScaffoldPreview() {
-    DigidoroTheme { AppScaffold(rememberNavController()) }
+    //DigidoroTheme { AppScaffold(rememberNavController(), context) }
 }
 
 /**
@@ -81,20 +81,26 @@ sealed class ItemsMenu(
     object AccountItem : ItemsMenu(
         R.drawable.manage_account_icon,
         "account",
-//        "account_screen"
-        "login_screen"
+        "account_screen"
+//        "login_screen"
     )
 }
 
 /**
- * A composable function that displays the app scaffold.
+ * Composable function for the main app scaffold.
  *
  * @param navController The NavHostController used for navigation.
- * @param content The content of the app scaffold.
+ * @param mainViewModel The MainViewModel used for app data and state.
  */
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun AppScaffold(navController: NavHostController) {
+fun AppScaffold(
+    navController: NavHostController,
+    mainViewModel: MainViewModel
+) {
+    //Logged status
+    val isLoggedIn = mainViewModel.hasToken()
+    val startDestination = if (isLoggedIn) HOME_GRAPH_ROUTE else AUTH_GRAPH_ROUTE
 
     // State of bottomBar
     val bottomBarState = rememberSaveable { (mutableStateOf(false)) }
@@ -108,7 +114,6 @@ fun AppScaffold(navController: NavHostController) {
             "todo_screen",
             "pomodoro_screen",
             "note_screen",
-            "account_screen"
         ) -> true
 
         else -> false
@@ -148,6 +153,7 @@ fun AppScaffold(navController: NavHostController) {
     ) {
         SetupNavGraph(
             navController = navController,
+            startDestination = startDestination,
             selectionMode = { bottomBarState, onRemoveClick, onDuplicateClick, onMoveFolderClick ->
                 selectionBarState.value = bottomBarState.value
                 modeState.onRemoveClick = onRemoveClick

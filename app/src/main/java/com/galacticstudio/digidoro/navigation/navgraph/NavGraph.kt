@@ -10,17 +10,13 @@ import com.galacticstudio.digidoro.navigation.ROOT_GRAPH_ROUTE
 @Composable
 fun SetupNavGraph(
     navController: NavHostController,
-    selectionMode: (
-        bottomBarState: MutableState<Boolean>,
-        onRemoveClick: () -> Unit,
-        onDuplicateClick: () -> Unit,
-        onMoveFolderClick: () -> Unit
-    ) -> Unit,
+    selectionMode: (bottomBarState: MutableState<Boolean>, onRemoveClick: () -> Unit, onDuplicateClick: () -> Unit, onMoveFolderClick: () -> Unit) -> Unit,
     onSelectionChange: (Boolean) -> Unit,
+    startDestination: String,
 ) {
     NavHost(
         navController = navController,
-        startDestination = HOME_GRAPH_ROUTE,
+        startDestination = startDestination,
         route = ROOT_GRAPH_ROUTE
     ) {
         authNavGraph(navController = navController)
