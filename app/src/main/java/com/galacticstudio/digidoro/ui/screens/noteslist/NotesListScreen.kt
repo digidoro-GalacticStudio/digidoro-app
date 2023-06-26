@@ -1,9 +1,15 @@
 package com.galacticstudio.digidoro.ui.screens.noteslist
 
+import android.annotation.SuppressLint
 import android.content.res.Configuration
-import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,11 +22,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.FloatingActionButton
@@ -33,6 +41,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -49,21 +58,27 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.galacticstudio.digidoro.R
 import com.galacticstudio.digidoro.RetrofitApplication
+import com.galacticstudio.digidoro.data.NoteModel
 import com.galacticstudio.digidoro.domain.util.NoteOrder
 import com.galacticstudio.digidoro.domain.util.OrderType
 import com.galacticstudio.digidoro.navigation.Screen
 import com.galacticstudio.digidoro.ui.screens.noteitem.components.FolderBottomSheetContent
+import com.galacticstudio.digidoro.ui.screens.noteitem.components.MoveToFolderBottomSheet
 import com.galacticstudio.digidoro.ui.screens.noteslist.components.ActionNote
+import com.galacticstudio.digidoro.ui.screens.noteslist.components.ActionsBottomBar
+import com.galacticstudio.digidoro.ui.screens.noteslist.components.ActionsTopBar
 import com.galacticstudio.digidoro.ui.screens.noteslist.components.FolderItem
 import com.galacticstudio.digidoro.ui.screens.noteslist.components.NoteItem
 import com.galacticstudio.digidoro.ui.screens.noteslist.viewmodel.FolderResponseState
 import com.galacticstudio.digidoro.ui.screens.noteslist.viewmodel.FolderViewModel
 import com.galacticstudio.digidoro.ui.screens.noteslist.viewmodel.NotesViewModel
+import com.galacticstudio.digidoro.ui.shared.dialogs.ExitConfirmationDialog
 import com.galacticstudio.digidoro.ui.shared.floatingCards.BottomSheetLayout
 import com.galacticstudio.digidoro.ui.shared.textfield.SearchBarItem
 import com.galacticstudio.digidoro.ui.shared.titles.CustomMessageData
@@ -100,52 +115,164 @@ data class ActionNoteData(
     val resultMode: NoteResultsMode,
 )
 
+enum class CardState {
+    LOADING,
+    SELECTED,
+    DESELECTED,
+    NORMAL,
+}
+
 /**
  * A composable function representing the note list screen.
  *
  * @param navController The navigation controller used for navigating to different screens.
  */
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun NotesListScreen(
     navController: NavHostController,
     notesViewModel: NotesViewModel = viewModel(factory = NotesViewModel.Factory),
     folderViewModel: FolderViewModel = viewModel(factory = FolderViewModel.Factory),
 ) {
+    // State of actions bottomBar
+    val isSelectionMode = remember { mutableStateOf(false) }
+    val selectedCard = remember { mutableStateOf<NoteModel?>(null) }
+    //Move to trash and remove note dialog
+    val openDeleteDialog = remember { mutableStateOf(false) }
+    val openMoveToTrashDialog = remember { mutableStateOf(false) }
+    val openMoveToFolderDialog = remember { mutableStateOf(false) }
+
+    val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+
+    BackHandler(enabled = isSelectionMode.value) {
+        if (isSelectionMode.value) {
+            isSelectionMode.value = false
+            selectedCard.value = null
+        } else {
+            backDispatcher?.onBackPressed()
+        }
+    }
 
     Scaffold(
+        modifier = Modifier.zIndex(10f),
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    val folderId = notesViewModel.state.value.selectedFolder?.id ?: ""
-                    val color = Color.White.toArgb()
-                    navController.navigate(Screen.Note.route + "?noteId=&noteColor=${color}&folderId=${folderId}")
-                },
-                containerColor = MaterialTheme.colorScheme.tertiary,
-                modifier = Modifier
-                    .padding(bottom = 80.dp)
-                    .clip(CircleShape)
+            AnimatedVisibility(
+                visible = !isSelectionMode.value,
+                enter = slideInHorizontally(initialOffsetX = { it }),
+                exit = slideOutHorizontally(targetOffsetX = { it }),
             ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ad_note_icon),
-                    contentDescription = "Add note",
-                    tint = Color.White,
-                    modifier = Modifier.size(30.dp),
-                )
+                FloatingActionButton(
+                    onClick = {
+                        val folderId = notesViewModel.state.value.selectedFolder?.id ?: ""
+                        val color = Color.White.toArgb()
+                        navController.navigate(Screen.Note.route + "?noteId=&noteColor=${color}&folderId=${folderId}")
+                    },
+                    containerColor = MaterialTheme.colorScheme.tertiary,
+                    modifier = Modifier
+//                        .padding(bottom = if (!isSelectionMode.value) 80.dp else 0.dp)
+//                        .offset(y = if (isSelectionMode.value) (-85).dp else 0.dp)
+                        .offset(y = (-85).dp)
+                        .clip(CircleShape)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ad_note_icon),
+                        contentDescription = "Add note",
+                        tint = Color.White,
+                        modifier = Modifier.size(30.dp),
+                    )
+                }
             }
         },
-    ) { padding ->
+        topBar = {
+            ActionsTopBar(
+                visible = isSelectionMode.value,
+                onReturnClick = {
+                    isSelectionMode.value = false
+                    selectedCard.value = null
+                }
+            )
+        },
+        bottomBar = {
+            ActionsBottomBar(
+                isSelectionMode,
+                onRemoveClick = {
+                    //If the mode is all notes, move to trash
+                    if (notesViewModel.resultsMode.value == NoteResultsMode.TrashNotes) {
+                        openDeleteDialog.value = true
+                    } else {
+                        openMoveToTrashDialog.value = true
+                    }
+                },
+                onDuplicateClick = {
+                    notesViewModel.onEvent(NotesEvent.DuplicateNote(selectedCard.value))
+                },
+                onMoveFolderClick = {
+                    notesViewModel.onEvent(
+                        NotesEvent.GetSelectedFolder(
+                            selectedCard.value?.id ?: ""
+                        )
+                    )
+                    openMoveToFolderDialog.value = true
+                }
+            )
+        },
+    ) {
+//            padding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)
+//                .padding(padding)
         ) {
             NotesListContent(
                 navController = navController,
                 notesViewModel = notesViewModel,
                 folderViewModel = folderViewModel,
+                isSelectionMode = isSelectionMode,
+                selectedCard = selectedCard,
             )
         }
     }
+
+    val test = remember { mutableStateOf(false) }
+
+    BottomSheetLayout(
+        openBottomSheet = openMoveToFolderDialog.value,
+        onDismissRequest = { openMoveToFolderDialog.value = false },
+        content = {
+            MoveToFolderBottomSheet(
+                notesViewModel = notesViewModel,
+                openMoveToFolderDialog = openMoveToFolderDialog,
+            )
+        },
+    )
+
+    ExitConfirmationDialog(
+        title = "Delete Confirmation",
+        text = "Do you want to permanently delete this note?",
+        openDialog = openDeleteDialog,
+        onConfirmClick = {
+            notesViewModel.onEvent(NotesEvent.DeleteNote(selectedCard.value?.id ?: ""))
+            openDeleteDialog.value = false
+        },
+        onDismissClick = {
+            openDeleteDialog.value = false
+        },
+        onDismissRequest = { openDeleteDialog.value = false }
+    )
+
+    ExitConfirmationDialog(
+        title = "Move to Trash Confirmation",
+        text = "Do you want to move this note to the Trash?",
+        openDialog = openMoveToTrashDialog,
+        onConfirmClick = {
+            notesViewModel.onEvent(NotesEvent.ToggleTrash(selectedCard.value?.id ?: ""))
+            openMoveToTrashDialog.value = false
+        },
+        onDismissClick = {
+            openMoveToTrashDialog.value = false
+        },
+        onDismissRequest = { openMoveToTrashDialog.value = false }
+    )
 }
 
 @Composable
@@ -153,6 +280,8 @@ fun NotesListContent(
     navController: NavHostController,
     notesViewModel: NotesViewModel = viewModel(factory = NotesViewModel.Factory),
     folderViewModel: FolderViewModel,
+    isSelectionMode: MutableState<Boolean>,
+    selectedCard: MutableState<NoteModel?>,
 ) {
     val app: RetrofitApplication = LocalContext.current.applicationContext as RetrofitApplication
     val state = notesViewModel.state.value
@@ -242,7 +371,7 @@ fun NotesListContent(
         )
     )
 
-    val contentPadding = PaddingValues(start = 24.dp, top = 24.dp, end = 24.dp, bottom = 75.dp)
+    val contentPadding = PaddingValues(start = 24.dp, top = 24.dp, end = 24.dp, bottom = 100.dp)
     val cols = 2
 
     var search by remember { mutableStateOf("") }
@@ -282,7 +411,38 @@ fun NotesListContent(
         }
 
         item(span = { GridItemSpan(cols) }) {
-            TitleNoteList("Recent notes", "Keep your ideas at hand")
+            val message = when (notesViewModel.resultsMode.value) {
+                is NoteResultsMode.AllNotes -> {
+                    CustomMessageData(
+                        title = "Recent notes",
+                        subTitle = "Keep your ideas at hand"
+                    )
+                }
+
+                is NoteResultsMode.TrashNotes -> {
+                    CustomMessageData(
+                        title = "Trashed notes",
+                        subTitle = ""
+                    )
+                }
+
+                is NoteResultsMode.FolderNotes -> {
+                    val selectedFolder =
+                        notesViewModel.state.value.selectedFolder?.name ?: "selected"
+                    CustomMessageData(
+                        title = "Folder notes",
+                        subTitle = "Notes in $selectedFolder folder"
+                    )
+                }
+
+                is NoteResultsMode.FavoriteNotes -> {
+                    CustomMessageData(
+                        title = "Favorite notes",
+                        subTitle = "Your favorite notes"
+                    )
+                }
+            }
+            TitleNoteList(message.title, message.subTitle)
         }
 
         item(span = { GridItemSpan(cols) }) {
@@ -299,16 +459,17 @@ fun NotesListContent(
         if (isLoading) {
             val array = arrayOf(1, 2, 3, 4)
 
-            itemsIndexed(array) { _, value ->
+            items(array) {
                 NoteItemContainer(
                     message = "",
                     title = "Lorem Ipsum",
                     updatedAt = Date(),
                     theme = Color.Transparent,
                     onNoteClick = {},
+                    onLongNoteClick = {},
                     modifier = Modifier
                         .shimmerEffect(),
-                    isLoading = true,
+                    cardState = CardState.LOADING,
                 )
             }
         } else {
@@ -317,20 +478,35 @@ fun NotesListContent(
                 val resNoteColor = noteColor.takeUnless { it == Color.White }
                     ?: MaterialTheme.colorScheme.primaryContainer
 
+                //Selection mode and states
+                val isSelected = dataNote.id == selectedCard.value?.id
+
                 NoteItemContainer(
                     message = dataNote.message,
                     title = dataNote.title,
                     updatedAt = dataNote.updatedAt,
                     theme = resNoteColor,
-                    isLoading = false,
+                    cardState = if (isSelected) CardState.SELECTED else
+                        if (isSelectionMode.value) CardState.DESELECTED
+                        else CardState.NORMAL,
+                    onLongNoteClick = {
+                        selectedCard.value = dataNote
+                        isSelectionMode.value = true
+                    },
                 ) {
-                    val folderId = notesViewModel.state.value.selectedFolder?.id ?: ""
-                    val isReadMode = notesViewModel.resultsMode.value == NoteResultsMode.TrashNotes
+                    //If not in selection mode, navigate to the item
+                    if (!isSelectionMode.value) {
+                        val folderId = notesViewModel.state.value.selectedFolder?.id ?: ""
+                        val isReadMode =
+                            notesViewModel.resultsMode.value == NoteResultsMode.TrashNotes
 
-                    navController.navigate(
-                        Screen.Note.route +
-                                "?noteId=${dataNote.id}&noteColor=${noteColor.toArgb()}&folderId=$folderId&isReadMode=${isReadMode.toString()}"
-                    )
+                        navController.navigate(
+                            Screen.Note.route +
+                                    "?noteId=${dataNote.id}&noteColor=${noteColor.toArgb()}&folderId=$folderId&isReadMode=${isReadMode}"
+                        )
+                    } else {
+                        selectedCard.value = dataNote
+                    }
                 }
             }
         }
@@ -400,18 +576,24 @@ fun NoteItemContainer(
     title: String,
     updatedAt: Date,
     modifier: Modifier = Modifier,
-    isLoading: Boolean,
     theme: Color = Color.White,
+    cardState: CardState,
+    onLongNoteClick: () -> Unit,
     onNoteClick: () -> Unit,
 ) {
+    val textColor =
+        if (cardState == CardState.LOADING) Color.Transparent else MaterialTheme.colorScheme.onPrimary
+
     Column {
         NoteItem(
             text = message,
             color = theme,
             onClick = onNoteClick,
-            modifier = if (isLoading) Modifier.shimmerEffect(12.dp) else modifier,
-            isLoading = isLoading,
+            onLongClick = onLongNoteClick,
+            modifier = if (cardState == CardState.LOADING) Modifier.shimmerEffect(12.dp) else modifier,
+            cardState = cardState,
         )
+
         Title(
             message = CustomMessageData(
                 title = title,
@@ -419,15 +601,16 @@ fun NoteItemContainer(
             ),
             alignment = Alignment.CenterHorizontally,
             titleStyle = TextStyle(
-                color = if (isLoading) Color.Transparent else MaterialTheme.colorScheme.onPrimary,
+                color = textColor,
                 fontStyle = MaterialTheme.typography.bodyMedium.fontStyle,
             ),
             subtitleStyle =
             TextStyle(
-                color = if (isLoading) Color.Transparent else MaterialTheme.colorScheme.onPrimary,
+                color = textColor,
                 fontStyle = MaterialTheme.typography.bodySmall.fontStyle,
             ),
-            modifier = modifier,
+            modifier = if (cardState == CardState.LOADING) Modifier
+                .shimmerEffect() else Modifier,
         )
         Spacer(modifier = Modifier.height(24.dp))
     }
@@ -542,8 +725,8 @@ fun FolderList(
 
                     IconButton(
                         onClick = {
-                        openFolderBottomSheet = true
-                    },
+                            openFolderBottomSheet = true
+                        },
                         colors = IconButtonDefaults.iconButtonColors(
                             containerColor = MaterialTheme.colorScheme.onSecondaryContainer
                         )

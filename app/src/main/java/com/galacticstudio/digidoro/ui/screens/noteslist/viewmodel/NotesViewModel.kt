@@ -27,7 +27,6 @@ import com.galacticstudio.digidoro.network.dto.note.NoteData
 import com.galacticstudio.digidoro.repository.FavoriteNoteRepository
 import com.galacticstudio.digidoro.repository.FolderRepository
 import com.galacticstudio.digidoro.repository.NoteRepository
-import com.galacticstudio.digidoro.ui.screens.login.LoginResponseState
 import com.galacticstudio.digidoro.ui.screens.noteslist.NoteResultsMode
 import com.galacticstudio.digidoro.ui.screens.noteslist.NotesEvent
 import com.galacticstudio.digidoro.ui.screens.noteslist.NotesResponseState
@@ -83,17 +82,12 @@ class NotesViewModel(
                 )
             }
 
-            is NotesEvent.ToggleOrderSection -> {
-                _state.value = state.value.copy(
-                    isOrderSectionVisible = !state.value.isOrderSectionVisible
-                )
-            }
-
             is NotesEvent.ResultsChanged -> {
                 if (event.resultsMode == NoteResultsMode.FolderNotes) {
                     if (_roles.value.contains("premium")) {
                         _resultsMode.value = event.resultsMode
-                        getNotes(state.value.noteOrder)
+                        getNotesWithoutFolders()
+//                        getNotes(state.value.noteOrder)
                         getFolders()
                     } else {
                         apiState = NotesResponseState.ErrorWithMessage("The user is not premium")
@@ -110,6 +104,44 @@ class NotesViewModel(
 
             is NotesEvent.RolesChanged -> {
                 _roles.value = event.roles
+            }
+
+
+            is NotesEvent.DeleteNote -> {
+                deleteNote(event.noteId)
+            }
+
+            is NotesEvent.ToggleTrash -> {
+                toggleTrashNote(event.noteId)
+            }
+
+            is NotesEvent.DuplicateNote -> {
+                if (event.note == null) return
+                duplicateData(event.note)
+            }
+
+            is NotesEvent.NewFolderNoteChanged -> {
+                _state.value = _state.value.copy(
+                    newSelectedFolder = event.folder
+                )
+            }
+
+            is NotesEvent.GetSelectedFolder -> {
+                _state.value = _state.value.copy(actualNoteId = event.noteId)
+                getNotesWithoutFolders(event.noteId)
+            }
+
+            is NotesEvent.MoveToAnotherFolder -> {
+                saveNewFolder()
+            }
+
+            is NotesEvent.ClearData -> {
+                _state.value = _state.value.copy(
+                    newFolderList = emptyList(),
+                    newSelectedFolder = null,
+                    actualFolder = null,
+                    actualNoteId = "",
+                )
             }
         }
     }
@@ -207,6 +239,140 @@ class NotesViewModel(
         }
     }
 
+
+    private fun getNotesWithoutFolders() {
+        viewModelScope.launch {
+//            _state.value = _state.value.copy(isLoading = true)
+
+            when (val response = folderRepository.getAllWithoutFolders()) {
+                is ApiResponse.Error -> {
+                    sendResponseEvent(NotesResponseState.Error(response.exception))
+                }
+
+                is ApiResponse.ErrorWithMessage -> {
+                    sendResponseEvent(NotesResponseState.ErrorWithMessage(response.message))
+                }
+
+                is ApiResponse.Success -> {
+                    _state.value = _state.value.copy(
+                        notes = mapToNoteModels(response.data),
+//                        isLoading = false,
+                    )
+                    sendResponseEvent(NotesResponseState.Success)
+                }
+            }
+        }
+    }
+
+    private fun saveNewFolder() {
+
+        if (_state.value.actualNoteId == null) {
+            apiState = NotesResponseState.ErrorWithMessage("There is no selected note")
+            viewModelScope.launch {
+                responseEventChannel.send(apiState as NotesResponseState.ErrorWithMessage)
+            }
+            return
+        }
+        if (_state.value.newSelectedFolder == null) {
+            apiState = NotesResponseState.ErrorWithMessage("There is no new note")
+            viewModelScope.launch {
+                responseEventChannel.send(apiState as NotesResponseState.ErrorWithMessage)
+            }
+            return
+        }
+
+        if (_state.value.actualFolder == null) {
+            //The note has no previous folder
+            toggleNoteFolder(_state.value.newSelectedFolder!!.id, _state.value.actualNoteId!!)
+        } else {
+            //The note has previous folder
+            toggleNoteFolder(_state.value.actualFolder!!.id, _state.value.actualNoteId!!)
+            toggleNoteFolder(_state.value.newSelectedFolder!!.id, _state.value.actualNoteId!!)
+        }
+    }
+
+    private fun getNotesWithoutFolders(noteId: String) {
+        executeOperation(
+            operation = { folderRepository.getSelectedFolders(noteId) },
+            onSuccess = { response ->
+
+                _state.value = _state.value.copy(
+                    newFolderList = mapToFolderModels(response.data.folders),
+                    actualFolder = mapToFolderModel(response.data.actualFolder),
+                )
+            }
+        )
+    }
+
+    private fun deleteNote(noteId: String) {
+        executeOperation(
+            operation = { noteRepository.deleteNoteById(noteId) }
+        )
+    }
+
+    private fun toggleTrashNote(noteId: String) {
+        executeOperation(
+            operation = { noteRepository.toggleTrashNoteById(noteId) }
+        )
+    }
+
+    private fun duplicateData(note: NoteModel) {
+        addNewNote(
+            note.title,
+            note.message,
+            note.tags,
+            note.theme
+        )
+    }
+
+    private fun addNewNote(title: String, message: String, tags: List<String>, color: String) {
+        executeOperation(
+            operation = { noteRepository.createNote(title, message, tags, color) },
+            onSuccess = { response ->
+                val idNewNote = response.data.id
+
+                //If I want to duplicate a note in a selected folder
+                if (_state.value.selectedFolder != null) {
+                    val idFolder = _state.value.selectedFolder?.id ?: ""
+                    toggleNoteFolder(idFolder, idNewNote)
+                }
+            }
+        )
+    }
+
+    private fun toggleNoteFolder(folderId: String, noteId: String) {
+        executeOperation(
+            operation = {
+                folderRepository.toggleFolder(
+                    folderId,
+                    noteId
+                )
+            }
+        )
+    }
+
+    private fun <T> executeOperation(
+        operation: suspend () -> ApiResponse<T>,
+        onSuccess: ((ApiResponse.Success<T>) -> Unit)? = null
+    ) {
+        viewModelScope.launch {
+            when (val response = operation()) {
+                is ApiResponse.Error -> {
+                    sendResponseEvent(NotesResponseState.Error(response.exception))
+                }
+
+                is ApiResponse.ErrorWithMessage -> {
+                    sendResponseEvent(NotesResponseState.ErrorWithMessage(response.message))
+                }
+
+                is ApiResponse.Success -> {
+                    onSuccess?.invoke(response)
+                    sendResponseEvent(NotesResponseState.Success)
+                }
+            }
+        }
+    }
+
     private fun mapToNoteModels(noteDataList: List<NoteData>): List<NoteModel> {
         return noteDataList.map { noteData ->
             NoteModel(
@@ -249,6 +415,20 @@ class NotesViewModel(
                 updatedAt = folderData.updatedAt
             )
         }
+    }
+
+    private fun mapToFolderModel(folderData: FolderData?): FolderModel? {
+        if (folderData == null) return null
+        return FolderModel(
+            id = folderData.id,
+            userId = folderData.userId,
+            name = folderData.name,
+            theme = folderData.theme,
+            notesId = folderData.notesId,
+            createdAt = folderData.createdAt,
+            updatedAt = folderData.updatedAt
+        )
+
     }
 
     companion object {

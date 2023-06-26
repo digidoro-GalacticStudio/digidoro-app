@@ -11,6 +11,9 @@ data class NotesState (
     val folders: List<FolderPopulatedModel> = emptyList(),
     val selectedFolder: FolderPopulatedModel? = null,
     val noteOrder: NoteOrder = NoteOrder.Date(OrderType.Descending),
-    val isOrderSectionVisible: Boolean = false,
     val isLoading: Boolean = false,
+    val newFolderList: List<FolderModel> = emptyList(),
+    val newSelectedFolder: FolderModel? = null, //The new folder
+    val actualFolder: FolderModel? = null, //The previous folder
+    val actualNoteId: String? = null,
 )

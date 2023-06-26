@@ -6,7 +6,9 @@ import com.galacticstudio.digidoro.network.dto.folder.FolderNotesListResponse
 import com.galacticstudio.digidoro.network.dto.folder.FolderRequest
 import com.galacticstudio.digidoro.network.dto.folder.FolderResponse
 import com.galacticstudio.digidoro.network.dto.folder.FolderThemeRequest
+import com.galacticstudio.digidoro.network.dto.folder.SelFolderResponse
 import com.galacticstudio.digidoro.network.dto.folder.ToggleNoteRequest
+import com.galacticstudio.digidoro.network.dto.note.NoteListResponse
 import com.galacticstudio.digidoro.network.dto.note.NoteThemeRequest
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -21,6 +23,14 @@ interface FolderService {
     suspend fun getAllFolders(
         @Query("populateFields") populateFields: String? = null,
     ): FolderNotesListResponse
+
+    @GET("api/folder/ownNoFolder")
+    suspend fun getAllWithoutFolders(): NoteListResponse
+
+    @GET("api/folder/own/note/{id}")
+    suspend fun getSelectedFolders(
+        @Path("id") folderId: String,
+    ): SelFolderResponse
 
     @GET("api/folder/own/{id}")
     suspend fun getFolderById(

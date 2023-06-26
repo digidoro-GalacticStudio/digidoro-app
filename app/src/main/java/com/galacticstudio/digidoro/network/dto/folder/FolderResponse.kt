@@ -18,6 +18,7 @@ data class FolderResponse(
     @SerializedName("data") val data: FolderData,
 )
 
+//The basic folder structure
 data class FolderData(
     @SerializedName("_id") val id: String,
     @SerializedName("user_id") val userId: String,
@@ -28,6 +29,7 @@ data class FolderData(
     @SerializedName("updatedAt") val updatedAt: String,
 )
 
+// All folder with notes
 data class FolderNotesListResponse(
     @SerializedName("status") val status: String,
     @SerializedName("code") val code: Int,
@@ -35,6 +37,7 @@ data class FolderNotesListResponse(
     @SerializedName("data") val data: List<FolderDataPopulated>,
     @SerializedName("totalCount") val totalCount: Int
 )
+
 data class FolderDataPopulated(
     @SerializedName("_id") val id: String,
     @SerializedName("user_id") val userId: String,
@@ -43,4 +46,17 @@ data class FolderDataPopulated(
     @SerializedName("notes_id") val notesId: List<NoteData>,
     @SerializedName("createdAt") val createdAt: String,
     @SerializedName("updatedAt") val updatedAt: String,
+)
+
+// Get the selected folder
+data class SelFolderResponse(
+    @SerializedName("status") val status: String,
+    @SerializedName("code") val code: Int,
+    @SerializedName("message") val message: String,
+    @SerializedName("data") val data: SelectedFolderResponse
+)
+
+data class SelectedFolderResponse(
+    @SerializedName("actualFolder") val actualFolder: FolderData?,
+    @SerializedName("folders") val folders: List<FolderData>
 )

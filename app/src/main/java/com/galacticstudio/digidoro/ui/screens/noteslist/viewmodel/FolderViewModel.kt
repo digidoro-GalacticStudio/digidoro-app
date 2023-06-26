@@ -13,8 +13,6 @@ import com.galacticstudio.digidoro.RetrofitApplication
 import com.galacticstudio.digidoro.domain.usecase.fields.ValidateTextField
 import com.galacticstudio.digidoro.network.ApiResponse
 import com.galacticstudio.digidoro.repository.FolderRepository
-import com.galacticstudio.digidoro.ui.screens.noteitem.ActionType
-import com.galacticstudio.digidoro.ui.screens.noteitem.NoteItemResponseState
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -69,6 +67,14 @@ class FolderViewModel(
         addNewFolder(_state.value.name, "#${_noteColor.value}", emptyList())
     }
 
+    private fun clearData() {
+        _state.value = _state.value.copy(
+            name = "",
+            nameError = null,
+        )
+        _noteColor.value = "ffffff"
+    }
+
     private fun validateData(): Boolean {
         val nameResult = validateTextField.execute(_state.value.name, 20)
 
@@ -83,7 +89,7 @@ class FolderViewModel(
         return !hasError
     }
 
-    private fun addNewFolder(name: String, color: String, notesId: List<String> ) {
+    private fun addNewFolder(name: String, color: String, notesId: List<String>) {
         viewModelScope.launch {
             when (val response = folderRepository.createFolder(name, color, notesId)) {
                 is ApiResponse.Error -> {
@@ -96,6 +102,7 @@ class FolderViewModel(
 
                 is ApiResponse.Success -> {
                     sendResponseEvent(FolderResponseState.Success)
+                    clearData()
                 }
             }
         }
@@ -105,7 +112,8 @@ class FolderViewModel(
         // Factory for creating instances of LoginViewModel.
         val Factory = viewModelFactory {
             initializer {
-                val app = this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as RetrofitApplication
+                val app =
+                    this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as RetrofitApplication
                 // Create a new instance of LoginViewModel with dependencies.
                 FolderViewModel(
                     validateTextField = ValidateTextField(),
@@ -117,12 +125,12 @@ class FolderViewModel(
 }
 
 sealed class FolderEvent {
-    data class NameChanged(val name: String): FolderEvent()
-    data class ColorChanged(val color: String): FolderEvent()
-    object SaveFolder: FolderEvent()
+    data class NameChanged(val name: String) : FolderEvent()
+    data class ColorChanged(val color: String) : FolderEvent()
+    object SaveFolder : FolderEvent()
 }
 
-data class FolderState (
+data class FolderState(
     val name: String,
     val nameError: String? = null,
 )

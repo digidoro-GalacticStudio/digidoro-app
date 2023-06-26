@@ -6,13 +6,24 @@ import com.galacticstudio.digidoro.network.dto.folder.FolderData
 import com.galacticstudio.digidoro.network.dto.folder.FolderDataPopulated
 import com.galacticstudio.digidoro.network.dto.folder.FolderRequest
 import com.galacticstudio.digidoro.network.dto.folder.FolderThemeRequest
+import com.galacticstudio.digidoro.network.dto.folder.SelFolderResponse
+import com.galacticstudio.digidoro.network.dto.folder.SelectedFolderResponse
 import com.galacticstudio.digidoro.network.dto.folder.ToggleNoteRequest
+import com.galacticstudio.digidoro.network.dto.note.NoteData
 import com.galacticstudio.digidoro.network.service.FolderService
 import com.galacticstudio.digidoro.repository.utils.handleApiCall
 
 class FolderRepository(private val folderService: FolderService) {
     suspend fun getAllFolders(populateFields: String? = null): ApiResponse<List<FolderDataPopulated>> {
         return handleApiCall { folderService.getAllFolders(populateFields).data }
+    }
+
+    suspend fun getAllWithoutFolders(): ApiResponse<List<NoteData>> {
+        return handleApiCall { folderService.getAllWithoutFolders().data }
+    }
+
+    suspend fun getSelectedFolders(folderId: String): ApiResponse<SelectedFolderResponse> {
+        return handleApiCall { folderService.getSelectedFolders(folderId).data }
     }
 
     suspend fun getFolderById(folderId: String, populateFields: String? = null): ApiResponse<FolderData> {

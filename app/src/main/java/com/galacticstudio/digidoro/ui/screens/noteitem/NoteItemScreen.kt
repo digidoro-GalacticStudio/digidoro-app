@@ -214,7 +214,7 @@ fun NoteItemScreen(
             }
 
             if (noteItemViewModel.state.value.noteError == null) {
-                navController.navigate(Screen.Note.route)
+                navController.popBackStack()
             } else {
                 scope.launch {
                     snackbarHostState.showSnackbar(

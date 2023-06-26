@@ -20,3 +20,15 @@ data class FolderPopulatedModel(
     val updatedAt: String
 )
 
+fun convertToFolderPopulatedModel(folder: FolderModel): FolderPopulatedModel {
+    val emptyNotes = folder.notesId.map { NoteModel(it, "", "", "", listOf(), "", false) }
+    return FolderPopulatedModel(
+        folder.id,
+        folder.userId,
+        folder.name,
+        folder.theme,
+        emptyNotes,
+        folder.createdAt,
+        folder.updatedAt
+    )
+}
