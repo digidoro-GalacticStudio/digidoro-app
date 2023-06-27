@@ -13,8 +13,8 @@ class RankingRepository(private val rankingService: RankingService) {
         return handleApiCall { rankingService.getOwnRanking() }
     }
 
-    suspend fun getTopUsers(): ApiResponse<RankingListResponse> {
-        return handleApiCall { rankingService.getTopUsers() }
+    suspend fun getTopUsers(orderBy : String): ApiResponse<RankingListResponse> {
+        return handleApiCall { rankingService.getTopUsers(orderBy) }
     }
 
     suspend fun updateScore(score: Int): ApiResponse<UpdateScoreResponse> {

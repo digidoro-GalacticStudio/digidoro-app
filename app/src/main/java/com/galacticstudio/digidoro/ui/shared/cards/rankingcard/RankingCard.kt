@@ -48,8 +48,8 @@ fun RankingCard(
     levelName: String,
     currentScore: Int,
     nextLevelScore: Int,
+    cardSmall: Boolean,
     modifier: Modifier = Modifier,
-    modifierCard: Modifier = Modifier,
 ) {
     val borderWidth = 1.dp
     val gap = 7.dp
@@ -67,8 +67,7 @@ fun RankingCard(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
-                .then(modifierCard),
+                .padding(16.dp),
             contentAlignment = Alignment.TopEnd
         ) {
             Row(
@@ -79,7 +78,7 @@ fun RankingCard(
                     painter = painterResource(R.drawable.fire_icon),
                     contentDescription = null,
                     modifier = Modifier
-                        .size(70.dp)
+                        .size(if (cardSmall) 50.dp else 70.dp)
                         .clip(CircleShape)
                         .border(2.dp, MaterialTheme.colorScheme.onPrimary, CircleShape)
                         .background(Color.White),
@@ -92,7 +91,7 @@ fun RankingCard(
                     Text(
                         text = username,
                         fontWeight = FontWeight.W800,
-                        fontSize = 20.sp,
+                        fontSize = if (cardSmall) 16.sp else 20.sp,
                         fontFamily = Nunito,
                         color = MaterialTheme.colorScheme.onPrimary,
                     )

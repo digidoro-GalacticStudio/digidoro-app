@@ -6,7 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.galacticstudio.digidoro.navigation.POMODORO_GRAPH_ROUTE
 import com.galacticstudio.digidoro.navigation.Screen
-import com.galacticstudio.digidoro.ui.screens.ranking.RankingScreen
+import com.galacticstudio.digidoro.ui.PomodoroScreen
 
 fun NavGraphBuilder.pomodoroNavGraph(
     navController: NavHostController
@@ -18,7 +18,7 @@ fun NavGraphBuilder.pomodoroNavGraph(
         composable(
             route = Screen.Pomodoro.route
         ) {
-            RankingScreen(navController = navController)
+            PomodoroScreen(navController = navController)
         }
     }
 }

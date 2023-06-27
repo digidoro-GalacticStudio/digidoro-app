@@ -6,6 +6,7 @@ const val HOME_GRAPH_ROUTE = "home"
 const val TODO_GRAPH_ROUTE = "todo"
 const val NOTE_GRAPH_ROUTE = "note"
 const val POMODORO_GRAPH_ROUTE = "pomodoro"
+const val RANKING_GRAPH_ROUTE = "ranking"
 const val ACCOUNT_GRAPH_ROUTE = "account"
 
 sealed class Screen(val route: String) {

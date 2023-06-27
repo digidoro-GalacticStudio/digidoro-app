@@ -1,6 +1,5 @@
 package com.galacticstudio.digidoro.ui.screens.account.components.options
 
-import android.graphics.drawable.Icon
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -25,9 +24,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.galacticstudio.digidoro.R
+import com.galacticstudio.digidoro.navigation.Screen
 import com.galacticstudio.digidoro.ui.theme.DigidoroTheme
-import com.galacticstudio.digidoro.ui.theme.White60
 
 @Composable
 fun OptionComposable(
@@ -69,13 +70,16 @@ fun OptionComposable(
 @Preview(showSystemUi = true)
 @Composable
 fun OptionsPreview(){
+    val navController = rememberNavController()
     DigidoroTheme() {
-        OptionsComposable()
+        OptionsComposable(navController)
     }
 }
 
 @Composable
-fun OptionsComposable(){
+fun OptionsComposable(
+    navController: NavController,
+){
     Column(modifier =  Modifier.verticalScroll(rememberScrollState())) {
         OptionComposable(
             title = "Configuración general",
@@ -91,8 +95,9 @@ fun OptionsComposable(){
             title = "Verifica tu ranking",
             icon = R.drawable.partner_exchange_icon,
             description = "Icono de ranking"
-
-        ){}
+        ){
+            navController.navigate(Screen.Ranking.route)
+        }
         OptionComposable(
             title = "Configura tus pomodoros",
             icon = R.drawable.pomo,

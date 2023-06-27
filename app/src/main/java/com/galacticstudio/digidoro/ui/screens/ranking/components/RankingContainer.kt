@@ -41,8 +41,8 @@ fun RankingContainer(
     currentScore: Int,
     nextLevelScore: Int,
     modifier: Modifier = Modifier,
-    modifierCard: Modifier = Modifier,
     index: Int = 0,
+    cardSmall: Boolean = true,
 ) {
     Box(
         contentAlignment = Alignment.TopEnd,
@@ -53,7 +53,7 @@ fun RankingContainer(
             currentScore = currentScore,
             nextLevelScore = nextLevelScore,
             modifier = modifier,
-            modifierCard = modifierCard,
+            cardSmall = cardSmall,
         )
 
         Box(

@@ -7,13 +7,16 @@ import com.galacticstudio.digidoro.network.dto.ranking.UpdateScoreResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.PATCH
+import retrofit2.http.Query
 
 interface RankingService {
-    @GET("api/user/topUsers")
+    @GET("api/user/ranking")
     suspend fun getOwnRanking(): RankingResponse
 
-    @GET("api/user/ranking")
-    suspend fun getTopUsers(): RankingListResponse
+    @GET("api/user/topUsers")
+    suspend fun getTopUsers(
+        @Query("sortBy") sortBy: String? = null,
+    ): RankingListResponse
 
     @PATCH("api/user/updateScores/")
     suspend fun updateScore(@Body score: RankingRequest): UpdateScoreResponse
