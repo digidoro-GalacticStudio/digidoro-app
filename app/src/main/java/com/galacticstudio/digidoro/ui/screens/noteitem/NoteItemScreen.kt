@@ -2,6 +2,7 @@ package com.galacticstudio.digidoro.ui.screens.noteitem
 
 import android.content.res.Configuration
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -53,7 +54,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.galacticstudio.digidoro.R
-import com.galacticstudio.digidoro.navigation.Screen
 import com.galacticstudio.digidoro.ui.screens.noteitem.components.ColorBottomSheetContent
 import com.galacticstudio.digidoro.ui.screens.noteitem.components.DottedDivider
 import com.galacticstudio.digidoro.ui.screens.noteitem.components.TagBottomSheetContent
@@ -115,6 +115,11 @@ fun NoteItemScreen(
     val openExitDialog = remember { mutableStateOf(false) }
     val openDeleteDialog = remember { mutableStateOf(false) }
     val openMoveToTrashDialog = remember { mutableStateOf(false) }
+
+    // Custom component to handle back events
+    BackHandler(enabled = (isReadMode != null && !isReadMode) ) {
+        openExitDialog.value = true
+    }
 
     LaunchedEffect(noteId) {
         if (!noteId.isNullOrEmpty()) {
@@ -438,7 +443,7 @@ fun DropDownNoteMenu(
     onToggleFavoriteNote: () -> Unit,
     noteItemViewModel: NoteItemViewModel,
 ) {
-    var openTagBottomSheet by rememberSaveable { mutableStateOf(false) }
+    var openTagBottomSheet = rememberSaveable { mutableStateOf(false) }
     var openFolderBottomSheet by rememberSaveable { mutableStateOf(false) }
     var openColorBottomSheet by rememberSaveable { mutableStateOf(false) }
 
@@ -476,7 +481,7 @@ fun DropDownNoteMenu(
         )
         DropdownMenuItem(
             text = { Text("Tags", color = MaterialTheme.colorScheme.onPrimary) },
-            onClick = { openTagBottomSheet = true }
+            onClick = { openTagBottomSheet.value = true }
         )
         DropdownMenuItem(
             text = { Text("Colors", color = MaterialTheme.colorScheme.onPrimary) },
@@ -521,9 +526,9 @@ fun DropDownNoteMenu(
         }
     }
     BottomSheetLayout(
-        openBottomSheet = openTagBottomSheet,
-        onDismissRequest = { openTagBottomSheet = false },
-        content = { TagBottomSheetContent() },
+        openBottomSheet = openTagBottomSheet.value,
+        onDismissRequest = { openTagBottomSheet.value = false },
+        content = { TagBottomSheetContent(noteItemViewModel, openTagBottomSheet) },
     )
     // TODO REVIEW THIS
 //    BottomSheetLayout(

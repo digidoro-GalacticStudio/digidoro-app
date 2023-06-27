@@ -74,7 +74,7 @@ class NoteItemViewModel(
             }
 
             is NoteItemEvent.TagsChanged -> {
-
+                _state.value = state.value.copy(tags = event.tags)
             }
 
             is NoteItemEvent.ActionTypeChanged -> {

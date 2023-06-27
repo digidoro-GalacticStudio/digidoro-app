@@ -20,6 +20,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.galacticstudio.digidoro.R
 import com.galacticstudio.digidoro.RetrofitApplication
+import com.galacticstudio.digidoro.navigation.HOME_GRAPH_ROUTE
 import com.galacticstudio.digidoro.navigation.ROOT_GRAPH_ROUTE
 import com.galacticstudio.digidoro.ui.screens.account.components.options.OptionComposable
 import com.galacticstudio.digidoro.ui.screens.account.components.options.OptionsComposable
@@ -77,7 +78,7 @@ fun AccountScreen(
             color = MaterialTheme.colorScheme.primary
         ) {
             app.clearAuthToken()
-            navController.navigate(ROOT_GRAPH_ROUTE)
+            navController.navigate(HOME_GRAPH_ROUTE)
         }
     }
 }

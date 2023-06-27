@@ -30,6 +30,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -150,7 +151,10 @@ fun NotesListScreen(
     val openMoveToFolderDialog = remember { mutableStateOf(false) }
 
     val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+    val app: RetrofitApplication = LocalContext.current.applicationContext as RetrofitApplication
+    val context = LocalContext.current
 
+    // Custom component to handle back events
     BackHandler(enabled = isSelectionMode.value) {
         if (isSelectionMode.value) {
             isSelectionMode.value = false
@@ -174,18 +178,73 @@ fun NotesListScreen(
                 isSelectionMode.value = false
             },
             {
+                //Duplicate Note event
                 notesViewModel.onEvent(NotesEvent.DuplicateNote(selectedCard.value))
                 isSelectionMode.value = false
             },
             {
-                notesViewModel.onEvent(
-                    NotesEvent.GetSelectedFolder(
-                        selectedCard.value?.id ?: ""
-                    )
-                )
-                openMoveToFolderDialog.value = true
+                // Move to another folder event
+                if (app.getRoles().contains("premium")) {
+                        notesViewModel.onEvent(
+                            NotesEvent.GetSelectedFolder(
+                                selectedCard.value?.id ?: ""
+                            )
+                        )
+                        openMoveToFolderDialog.value = true
+                } else {
+                    Toast.makeText(
+                        context,
+                        "You are not a PRO user. Upgrade your account to unlock PRO features",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
         )
+    }
+
+    LaunchedEffect(Unit) {
+        notesViewModel.onEvent(NotesEvent.RolesChanged(app.getRoles()))
+        notesViewModel.onEvent(NotesEvent.Rebuild(NoteResultsMode.AllNotes))
+    }
+
+    LaunchedEffect(key1 = context) {
+        // Collect the response events from the notesViewModel
+        notesViewModel.responseEvents.collect { event ->
+            when (event) {
+                is NotesResponseState.Error -> {
+                    Toast.makeText(
+                        context,
+                        "An error has occurred ${event.exception}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                is NotesResponseState.ErrorWithMessage -> {
+                    Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+                }
+
+                else -> {}
+            }
+        }
+
+        // Collect the response events from the folderViewModel
+        folderViewModel.responseEvents.collect { event ->
+            when (event) {
+                is FolderResponseState.Error -> {
+                    Toast.makeText(
+                        context,
+                        "An error has occurred ${event.exception}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                is FolderResponseState.ErrorWithMessage -> {
+                    Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+                }
+
+                else -> {}
+            }
+        }
     }
 
     Scaffold(
@@ -247,8 +306,6 @@ fun NotesListScreen(
         }
     }
 
-    val test = remember { mutableStateOf(false) }
-
     BottomSheetLayout(
         openBottomSheet = openMoveToFolderDialog.value,
         onDismissRequest = { openMoveToFolderDialog.value = false },
@@ -300,52 +357,6 @@ fun NotesListContent(
 ) {
     val app: RetrofitApplication = LocalContext.current.applicationContext as RetrofitApplication
     val state = notesViewModel.state.value
-    val context = LocalContext.current
-
-    LaunchedEffect(Unit) {
-        notesViewModel.onEvent(NotesEvent.RolesChanged(app.getRoles()))
-        notesViewModel.onEvent(NotesEvent.Rebuild(NoteResultsMode.AllNotes))
-    }
-
-    LaunchedEffect(key1 = context) {
-        // Collect the response events from the notesViewModel
-        notesViewModel.responseEvents.collect { event ->
-            when (event) {
-                is NotesResponseState.Error -> {
-                    Toast.makeText(
-                        context,
-                        "An error has occurred ${event.exception}",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-
-                is NotesResponseState.ErrorWithMessage -> {
-                    Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
-                }
-
-                else -> {}
-            }
-        }
-
-        // Collect the response events from the folderViewModel
-        folderViewModel.responseEvents.collect { event ->
-            when (event) {
-                is FolderResponseState.Error -> {
-                    Toast.makeText(
-                        context,
-                        "An error has occurred ${event.exception}",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-
-                is FolderResponseState.ErrorWithMessage -> {
-                    Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
-                }
-
-                else -> {}
-            }
-        }
-    }
 
     val actionNotesList = listOf(
         ActionNoteData(
@@ -407,7 +418,13 @@ fun NotesListContent(
                     hintText = "Seach",
                     onValueChange = { search = it },
                     onSearchClick = { /* TODO */ }
-                )
+                ) {
+                    Icon(
+                        imageVector = androidx.compose.material.icons.Icons.Default.Search,
+                        contentDescription = null,
+                        modifier = Modifier.Companion.size(24.dp)
+                    )
+                }
             }
         }
 

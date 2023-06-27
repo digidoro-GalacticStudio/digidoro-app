@@ -23,7 +23,7 @@ suspend fun <T> handleApiCall(call: suspend () -> T): ApiResponse<T> {
         val message = response?.message
 
         when (code) {
-            409 -> {
+            409, 401 -> {
                 val error = if (message is String) message else (message as? Map<*, *>)?.get("error") as? String
                 ApiResponse.ErrorWithMessage(error ?: "Unknown error")
             }

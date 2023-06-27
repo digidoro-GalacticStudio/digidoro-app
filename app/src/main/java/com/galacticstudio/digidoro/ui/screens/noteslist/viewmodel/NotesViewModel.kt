@@ -137,7 +137,7 @@ class NotesViewModel(
                 getNotesWithoutFolders()
                 getFolders()
             } else {
-                apiState = NotesResponseState.ErrorWithMessage("The user is not premium")
+                apiState = NotesResponseState.ErrorWithMessage("You are not a PRO user. Upgrade your account to unlock PRO features")
                 viewModelScope.launch {
                     responseEventChannel.send(apiState as NotesResponseState.ErrorWithMessage)
                 }
