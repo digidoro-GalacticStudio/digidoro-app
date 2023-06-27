@@ -130,7 +130,7 @@ fun PasswordTextField(
                     ColorFilter.tint(Gray60)
                 }
 
-                if (showPassword) {
+                if (!showPassword) {
                     IconButton(onClick = { showPassword = false }) {
                         Image(
                             painter = painterResource(R.drawable.visibility_icom),

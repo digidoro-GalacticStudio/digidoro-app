@@ -155,7 +155,7 @@ fun LoginScreen(
         TextFieldForm(
             value = state.password,
             label = "Your password",
-            placeholder = "*******",
+            placeholder = "e.g: *******",
             type = TextFieldType.PASSWORD,
             leadingIcon = null,
             isPassword = true,
@@ -231,7 +231,7 @@ fun ForgotPassword(text: String, onClick: () -> Unit) {
             modifier = Modifier
                 .clickable { onClick() },
             style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onPrimary.copy(0.4f)
+            color = MaterialTheme.colorScheme.onPrimary.copy(0.7f)
         )
     }
 }
@@ -248,7 +248,6 @@ fun RegisterButton(text: String, onClick: () -> Unit) {
                 .clickable { onClick() },
             textDecoration = TextDecoration.Underline,
             fontSize = 20.sp,
-            color = Color(0xFF202124)
         )
     }
 }

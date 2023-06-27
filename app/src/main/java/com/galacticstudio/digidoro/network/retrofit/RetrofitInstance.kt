@@ -5,6 +5,7 @@ import com.galacticstudio.digidoro.network.service.FavoriteNoteService
 import com.galacticstudio.digidoro.network.service.FolderService
 import com.galacticstudio.digidoro.network.service.NoteService
 import com.galacticstudio.digidoro.network.service.TodoService
+import com.galacticstudio.digidoro.network.service.UserService
 import com.galacticstudio.digidoro.util.NetworkService.BASE_URL
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -20,7 +21,6 @@ object RetrofitInstance {
     private val client = OkHttpClient.Builder()
         .addInterceptor(interceptor)
         .build()
-
 
     fun setToken(token: String) {
         this.token = token
@@ -59,6 +59,10 @@ object RetrofitInstance {
 
     fun getFolderService(): FolderService {
         return retrofit.create(FolderService::class.java)
+    }
+
+    fun getUserService(): UserService {
+        return retrofit.create(UserService::class.java)
     }
 
     fun getTodoService(): TodoService{

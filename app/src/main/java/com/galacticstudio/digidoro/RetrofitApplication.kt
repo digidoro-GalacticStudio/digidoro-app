@@ -3,13 +3,13 @@ package com.galacticstudio.digidoro
 import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
-import android.util.Log
 import com.galacticstudio.digidoro.network.retrofit.RetrofitInstance
 import com.galacticstudio.digidoro.repository.CredentialsRepository
 import com.galacticstudio.digidoro.repository.FavoriteNoteRepository
 import com.galacticstudio.digidoro.repository.FolderRepository
 import com.galacticstudio.digidoro.repository.NoteRepository
 import com.galacticstudio.digidoro.repository.TodoRepository
+import com.galacticstudio.digidoro.repository.UserRepository
 
 class RetrofitApplication : Application() {
 
@@ -34,6 +34,10 @@ class RetrofitApplication : Application() {
 
     private fun getFolderAPIService() = with(RetrofitInstance){
         getFolderService()
+    }
+
+    private fun getUserAPIService() = with(RetrofitInstance){
+        getUserService()
     }
 
     fun getToken(): String = prefs.getString(USER_TOKEN, "")!!
@@ -62,6 +66,10 @@ class RetrofitApplication : Application() {
 
     val folderRepository: FolderRepository by lazy {
         FolderRepository(getFolderAPIService())
+    }
+
+    val userRepository: UserRepository by lazy {
+        UserRepository(getUserAPIService())
     }
 
     val todoRepository: TodoRepository by lazy{

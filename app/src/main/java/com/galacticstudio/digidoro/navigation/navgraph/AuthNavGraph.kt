@@ -9,7 +9,7 @@ import androidx.navigation.navigation
 import com.galacticstudio.digidoro.navigation.AUTH_GRAPH_ROUTE
 import com.galacticstudio.digidoro.navigation.Screen
 import com.galacticstudio.digidoro.ui.screens.login.LoginScreen
-import com.galacticstudio.digidoro.ui.forgotpassword.ForgotPasswordScreen
+import com.galacticstudio.digidoro.ui.screens.forgotpassword.ForgotPasswordScreen
 import com.galacticstudio.digidoro.ui.screens.editcredentials.EditCredentialsScreen
 import com.galacticstudio.digidoro.ui.screens.verifyaccount.VerifyAccountScreen
 import com.galacticstudio.digidoro.ui.screens.register.RegisterScreen
@@ -32,9 +32,18 @@ fun NavGraphBuilder.authNavGraph(
             ForgotPasswordScreen(navController = navController)
         }
         composable(
-            route = Screen.VerifyAccount.route
+            route = Screen.VerifyAccount.route + "?email={email}",
+            arguments = listOf(
+                navArgument(
+                    name = "email"
+                ) {
+                    type = NavType.StringType
+                    defaultValue = ""
+                },
+            )
         ) {
-            VerifyAccountScreen(navController = navController)
+            val email = it.arguments?.getString("email") ?: ""
+            VerifyAccountScreen(email, navController = navController)
         }
         composable(
             route = Screen.EditCredentials.route + "?email={email}&recoveryCode={recoveryCode}",
@@ -53,8 +62,8 @@ fun NavGraphBuilder.authNavGraph(
                 },
             )
         ) {
-            val recoveryCode = it.arguments?.getInt("noteColor") ?: 0
-            val  email  = it.arguments?.getString("noteId") ?: ""
+            val recoveryCode = it.arguments?.getInt("recoveryCode") ?: 0
+            val email = it.arguments?.getString("email") ?: ""
             EditCredentialsScreen(
                 email = email,
                 recoveryCode = recoveryCode,
