@@ -8,6 +8,7 @@ import com.galacticstudio.digidoro.repository.CredentialsRepository
 import com.galacticstudio.digidoro.repository.FavoriteNoteRepository
 import com.galacticstudio.digidoro.repository.FolderRepository
 import com.galacticstudio.digidoro.repository.NoteRepository
+import com.galacticstudio.digidoro.repository.RankingRepository
 import com.galacticstudio.digidoro.repository.TodoRepository
 import com.galacticstudio.digidoro.repository.UserRepository
 
@@ -40,6 +41,10 @@ class RetrofitApplication : Application() {
         getUserService()
     }
 
+    private fun getRankingAPIService() = with(RetrofitInstance){
+        getRankingService()
+    }
+
     fun getToken(): String = prefs.getString(USER_TOKEN, "")!!
 
     fun getRoles(): List<String> = prefs.getStringSet(USER_ROLES, emptySet())?.toList() ?: emptyList()
@@ -70,6 +75,10 @@ class RetrofitApplication : Application() {
 
     val userRepository: UserRepository by lazy {
         UserRepository(getUserAPIService())
+    }
+
+    val rankingRepository: RankingRepository by lazy {
+        RankingRepository(getRankingAPIService())
     }
 
     val todoRepository: TodoRepository by lazy{

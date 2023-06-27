@@ -49,6 +49,7 @@ fun RankingCard(
     currentScore: Int,
     nextLevelScore: Int,
     modifier: Modifier = Modifier,
+    modifierCard: Modifier = Modifier,
 ) {
     val borderWidth = 1.dp
     val gap = 7.dp
@@ -59,13 +60,15 @@ fun RankingCard(
         ),
         shape = RoundedCornerShape(16.dp),
         border = BorderStroke(borderWidth, MaterialTheme.colorScheme.onPrimary),
-        modifier = Modifier.padding(start = 13.dp, top = 10.dp, end = 13.dp, bottom = 13.dp)
+        modifier = Modifier
+            .padding(start = 13.dp, top = 10.dp, end = 13.dp, bottom = 13.dp)
             .then(modifier),
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(16.dp)
+                .then(modifierCard),
             contentAlignment = Alignment.TopEnd
         ) {
             Row(

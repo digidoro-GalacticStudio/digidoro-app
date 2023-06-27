@@ -40,6 +40,8 @@ fun RankingContainer(
     levelName: String,
     currentScore: Int,
     nextLevelScore: Int,
+    modifier: Modifier = Modifier,
+    modifierCard: Modifier = Modifier,
     index: Int = 0,
 ) {
     Box(
@@ -50,7 +52,8 @@ fun RankingContainer(
             levelName = levelName,
             currentScore = currentScore,
             nextLevelScore = nextLevelScore,
-            modifier = Modifier.scale(0.9f),
+            modifier = modifier,
+            modifierCard = modifierCard,
         )
 
         Box(
@@ -71,7 +74,7 @@ fun RankingContainer(
                     .border(1.dp, MaterialTheme.colorScheme.onPrimary, CircleShape),
                 contentAlignment = Alignment.Center,
             ) {
-                Row (
+                Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.Bottom,
                     horizontalArrangement = Arrangement.Center
@@ -96,9 +99,8 @@ fun RankingContainer(
 
         Box(
             modifier = Modifier
-                .offset((-35).dp, (-35).dp)
+                .offset((-20).dp, (-25).dp)
                 .align(Alignment.BottomEnd)
-
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.awesome_icon),
