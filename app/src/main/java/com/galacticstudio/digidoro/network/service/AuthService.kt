@@ -1,5 +1,7 @@
 package com.galacticstudio.digidoro.network.service
 
+import com.galacticstudio.digidoro.network.dto.recoverypassword.RecoveryPasswordRequest
+import com.galacticstudio.digidoro.network.dto.recoverypassword.RecoveryPasswordResponse
 import com.galacticstudio.digidoro.network.dto.login.LoginRequest
 import com.galacticstudio.digidoro.network.dto.login.LoginResponse
 import com.galacticstudio.digidoro.network.dto.register.RegisterRequest
@@ -13,4 +15,7 @@ interface AuthService {
 
     @POST("api/user/register")
     suspend fun register(@Body credentials: RegisterRequest): RegisterResponse
+
+    @POST("api/user/recoveryPassword")
+    suspend fun recoveryCredentials(@Body credentials: RecoveryPasswordRequest): RecoveryPasswordResponse
 }
