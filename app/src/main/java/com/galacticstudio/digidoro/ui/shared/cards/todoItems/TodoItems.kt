@@ -63,7 +63,7 @@ fun TodoItem(
     var isChecked by remember { mutableStateOf(value = done) }
 
     Box(modifier = Modifier.clickable {
-        onClick
+        onClick()
     }){
 
         TodoInformation(

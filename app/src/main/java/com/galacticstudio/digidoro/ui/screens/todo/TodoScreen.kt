@@ -46,16 +46,19 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.galacticstudio.digidoro.R
-import com.galacticstudio.digidoro.data.TodoModel
-import com.galacticstudio.digidoro.data.todoList
+import com.galacticstudio.digidoro.ui.screens.todo.list.TodosEvent
 import com.galacticstudio.digidoro.ui.screens.todo.components.DisplayTodo
 import com.galacticstudio.digidoro.ui.screens.todo.components.TodosResponseState
-import com.galacticstudio.digidoro.ui.shared.floatingCards.todo.TodoFloatingBox
+import com.galacticstudio.digidoro.ui.screens.todo.item.ItemTodoEvent
+import com.galacticstudio.digidoro.ui.screens.todo.item.ItemTodoViewModel
+import com.galacticstudio.digidoro.ui.screens.todo.list.viewmodel.TodoViewModel
+import com.galacticstudio.digidoro.ui.shared.floatingCards.todo.TodoCreateFloatingBox
+import com.galacticstudio.digidoro.ui.shared.floatingCards.todo.TodoUpdateControler
+import com.galacticstudio.digidoro.ui.shared.floatingCards.todo.TodoUpdateFloatingBox
 import com.galacticstudio.digidoro.ui.shared.titles.CustomMessageData
 import com.galacticstudio.digidoro.ui.shared.titles.Title
 import com.galacticstudio.digidoro.ui.theme.DigidoroTheme
 import java.text.SimpleDateFormat
-import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -80,6 +83,7 @@ fun TodoScreen(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
     todoViewModel: TodoViewModel = viewModel(factory = TodoViewModel.Factory),
+    itemTodoViewModel: ItemTodoViewModel = viewModel(factory = ItemTodoViewModel.Factory)
 ){
     val state = todoViewModel.state.value
     val context = LocalContext.current
@@ -111,7 +115,7 @@ fun TodoScreen(
                 is TodosResponseState.Success ->{
                     Toast.makeText(
                         context,
-                        "Todos los todos me la pelan",
+                        "Todos retrieved successfully",
                         Toast.LENGTH_SHORT
                     ).show()
                 }
@@ -121,13 +125,17 @@ fun TodoScreen(
     }
 
 //    variables and functions to use
-    var isFloatingTodoVisible by remember {
+    var isCreateTodoFloatingVisible by remember {
         mutableStateOf(false)
     }
-    val density = LocalDensity.current
+    var isUpdateTodoFloatingVisible by remember {
+        mutableStateOf(false)
+    }
 
-    fun FloatingTodoVisibleHandler (){ isFloatingTodoVisible = true}
-    fun FloatingTodoHideHandler (){ isFloatingTodoVisible = false}
+    fun CreateTodoFloatingVisibleHandler (){ isCreateTodoFloatingVisible = true}
+    fun CreateTodoFloatingHideHandler (){ isCreateTodoFloatingVisible = false}
+    fun UpdateTodoFloatingVisibleHandler (){ isUpdateTodoFloatingVisible = true}
+    fun UpdateTodoFloatingHideHandler (){ isUpdateTodoFloatingVisible = false}
 
     Scaffold(
         floatingActionButtonPosition = FabPosition.Center,
@@ -135,7 +143,7 @@ fun TodoScreen(
 
             //floating elements
             FloatingActionButton(
-                onClick = { FloatingTodoVisibleHandler() },
+                onClick = { CreateTodoFloatingVisibleHandler() },
                 containerColor = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier
                     .padding(bottom = 80.dp)
@@ -157,48 +165,80 @@ fun TodoScreen(
             //checking loading
             val isLoading = todoViewModel.state.value.isLoading
             if(isLoading)
-                TodoStaticBody(
-                    todoList = todoList.toList()
-                )
+                TodoStaticBody(){}
             else 
-                TodoStaticBody(todoList = todoViewModel.state.value.todos)
+                TodoStaticBody(
+                    todoViewModel = todoViewModel,
+                    itemTodoViewModel = itemTodoViewModel
+                ){
+                    UpdateTodoFloatingVisibleHandler()
+                }
 
             //floating no scrollable element
-            if(isFloatingTodoVisible)
+            if(isCreateTodoFloatingVisible)
                 Box(modifier = Modifier
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
                 )
 
-            //animated floating card
-           AnimatedVisibility(
-               visible = isFloatingTodoVisible,
-               enter = slideInVertically {
-                   // Slide in from 40 dp from the top.
-                   with(density) { -40.dp.roundToPx() }
-               } + expandVertically(
-                   // Expand from the top.
-                   expandFrom = Alignment.Top
-               ) + fadeIn(
-                   // Fade in with the initial alpha of 0.3f.
-                   initialAlpha = 0.3f
-               ),
-               exit = slideOutVertically() + shrinkVertically() + fadeOut()
-           ) {
-               TodoFloatingBox(
-                   modifier = Modifier
-                       .offset(x = 0.dp, y = 90.dp),
-                   FloatingTodoHideHandler = { FloatingTodoHideHandler() }
-               )
-           }
+
+            AnimatedBox(visibility = isCreateTodoFloatingVisible){
+                TodoCreateFloatingBox(
+                    modifier = Modifier
+                        .offset(x = 0.dp, y = 90.dp),
+                    viewModel = itemTodoViewModel
+                ){
+                    CreateTodoFloatingHideHandler()
+                    itemTodoViewModel.onExit()
+                }
+            }
+
+                AnimatedBox(visibility = isUpdateTodoFloatingVisible) {
+                    TodoUpdateFloatingBox(
+                        modifier = Modifier
+                            .offset(x = 0.dp, y = 90.dp),
+                        viewModel = itemTodoViewModel
+                    ){
+                        UpdateTodoFloatingHideHandler()
+                        itemTodoViewModel.onExit()
+                    }
+                }
         }
+    }
+}
+
+@Composable
+fun AnimatedBox(
+    visibility: Boolean,
+    content: @Composable() ()-> Unit,
+    ){
+    val density = LocalDensity.current
+
+    //animated floating card
+    AnimatedVisibility(
+        visible = visibility,
+        enter = slideInVertically {
+            // Slide in from 40 dp from the top.
+            with(density) { -40.dp.roundToPx() }
+        } + expandVertically(
+            // Expand from the top.
+            expandFrom = Alignment.Top
+        ) + fadeIn(
+            // Fade in with the initial alpha of 0.3f.
+            initialAlpha = 0.3f
+        ),
+        exit = slideOutVertically() + shrinkVertically() + fadeOut()
+    ) {
+        content()
     }
 }
 
 @Composable
 fun TodoStaticBody(
     modifier: Modifier = Modifier,
-    todoList: List<TodoModel>
+    todoViewModel: TodoViewModel = viewModel(factory = TodoViewModel.Factory),
+    itemTodoViewModel: ItemTodoViewModel = viewModel(factory = ItemTodoViewModel.Factory),
+    onClick: ()-> Unit
     ){
     //const
     val dateFormatter = SimpleDateFormat("EEE. MMMM dd", Locale.getDefault())
@@ -230,7 +270,12 @@ fun TodoStaticBody(
             .padding(end = 16.dp)
             .background(MaterialTheme.colorScheme.secondary))
 
-        DisplayTodo(todoList = todayFilter(todoList))
+        DisplayTodo(
+            todoList = todoViewModel.state.value.todayTodos,
+            viewModel = itemTodoViewModel
+        ){
+            onClick()
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
         Title(
@@ -239,30 +284,24 @@ fun TodoStaticBody(
         )
         Spacer(modifier = Modifier.height(16.dp))
 
-        DisplayTodo(todoList = noTodayFilter(todoList))
+        DisplayTodo(
+            todoList = todoViewModel.state.value.notTodayTodos,
+            viewModel = itemTodoViewModel
+        ){
+            onClick()
+        }
 
         Spacer(modifier = Modifier.height(24.dp))
         Title(
             message = CustomMessageData("¡Lo lograste!", "Mira tus tareas completadas"),
             alignment = Alignment.CenterHorizontally
         )
-        DisplayTodo(todoList = doneFilter(todoList))
+        DisplayTodo(
+            todoList = todoViewModel.state.value.doneTodos,
+            viewModel = itemTodoViewModel
+        ){
+            onClick()
+        }
     }
 }
 
-//display today todos
-private fun todayFilter(list: List<TodoModel>): MutableList<TodoModel>{
-    val today = Calendar.getInstance().time
-    return list.filter { item -> item.createdAt!!.date == today.date && item.state == false}.toMutableList()
-}
-
-//display notToday todos
-private fun noTodayFilter(list: List<TodoModel>): MutableList<TodoModel>{
-    val today = Calendar.getInstance().time
-    return list.filter { item -> item.createdAt!!.date != today.date && item.state == false}.toMutableList()
-}
-
-//display todos marked as complete
-private fun doneFilter(list: List<TodoModel>): MutableList<TodoModel>{
-    return list.filter { item -> item.state == true }.toMutableList()
-}

@@ -1,12 +1,12 @@
 package com.galacticstudio.digidoro.network.dto.todo
 
-import java.util.Calendar
+import java.util.Date
 
 data class RequestTodo(
     val title: String,
     val description: String,
     val theme: String,
-    val reminder: Calendar
+    val reminder: String
 )
 
 data class RequestChangeTodoTheme(

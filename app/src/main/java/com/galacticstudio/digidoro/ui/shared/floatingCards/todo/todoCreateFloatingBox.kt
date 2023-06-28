@@ -1,7 +1,5 @@
 package com.galacticstudio.digidoro.ui.shared.floatingCards.todo
 
-import android.content.res.Configuration
-import android.content.res.Configuration.UI_MODE_NIGHT_MASK
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -26,6 +24,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.galacticstudio.digidoro.R
+import com.galacticstudio.digidoro.ui.screens.todo.item.ItemTodoViewModel
 import com.galacticstudio.digidoro.ui.shared.floatingCards.floatingElementCard.ButtonControl
 import com.galacticstudio.digidoro.ui.shared.floatingCards.floatingElementCard.ColorBox
 import com.galacticstudio.digidoro.ui.shared.floatingCards.floatingElementCard.GrayInput
@@ -36,17 +35,20 @@ import com.galacticstudio.digidoro.util.shadowWithCorner
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.galacticstudio.digidoro.ui.screens.noteitem.NoteItemEvent
+import com.galacticstudio.digidoro.ui.screens.todo.item.ItemTodoActionType
+import com.galacticstudio.digidoro.ui.screens.todo.item.ItemTodoEvent
+import com.galacticstudio.digidoro.util.ColorCustomUtils
 
 
 @Preview()
 @Composable
-fun todoFloatingBox() {
+fun PreviewTodoCreateFloatingBox() {
     DigidoroTheme() {
-        TodoFloatingBox(FloatingTodoHideHandler = fun() {})
+        TodoCreateFloatingBox(FloatingTodoHideHandler = fun() {})
     }
 }
-
-val cornerRadius = 5.dp
 
 /**
  * This composable function represent a floating box to create new todo elements
@@ -55,11 +57,13 @@ val cornerRadius = 5.dp
  */
 
 @Composable
-fun TodoFloatingBox(
+fun TodoCreateFloatingBox(
     modifier: Modifier = Modifier,
-    FloatingTodoHideHandler: ()-> Unit
-){
+    viewModel: ItemTodoViewModel = viewModel(factory = ItemTodoViewModel.Factory),
+    FloatingTodoHideHandler: ()-> Unit,
 
+    ){
+    val cornerRadius = 5.dp
     val day = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault()).format(Calendar.getInstance().time)
     Box(
         modifier = modifier
@@ -84,7 +88,12 @@ fun TodoFloatingBox(
                 .wrapContentWidth()
         ){
             Column(Modifier.wrapContentWidth()) {
-                TitleCard(placeHolder = "Nombra tu task")
+                TitleCard(
+                    placeHolder = "Nombra tu task",
+                    value =  viewModel.state.value.title
+                ){
+                    viewModel.onEvent(ItemTodoEvent.titleChanged(it))
+                }
                 GrayInput(
                     label = "Fecha",
                     placeHolder = day,
@@ -99,11 +108,15 @@ fun TodoFloatingBox(
                         modifier = Modifier.padding(vertical = 4.dp)
                     )
                     //TODO Update
-                    ColorBox(Color.White, {})
+                    ColorBox(
+                        selectedColor = Color(android.graphics.Color.parseColor("#${viewModel.state.value.theme}")),
+                        onColorChange = {viewModel.onEvent(
+                            ItemTodoEvent.themeChanged(ColorCustomUtils.convertColorToString(it)))})
                 }
                 Spacer(modifier = Modifier.height(14.dp))
-                PomodoroControler(
-                    FloatingTodoHideHandler
+                TodoCreateControler(
+                    FloatingTodoHideHandler = FloatingTodoHideHandler,
+                    CreateTodoHandler = { viewModel.onEvent(ItemTodoEvent.SaveTodo) }
                 )
             }
         }
@@ -115,8 +128,9 @@ fun TodoFloatingBox(
  * @param FloatingTodoHideHandler handles on cancel method
  */
 @Composable
-fun PomodoroControler(
-    FloatingTodoHideHandler: () -> Unit
+fun TodoCreateControler(
+    FloatingTodoHideHandler: () -> Unit,
+    CreateTodoHandler: () -> Unit
 ){
     Row(
         modifier = Modifier.fillMaxWidth()
@@ -134,7 +148,10 @@ fun PomodoroControler(
             contentColor = MaterialTheme.colorScheme.secondary,
             backgroundColor =  colorResource(id = R.color.gray_text_color),
             borderColor = MaterialTheme.colorScheme.secondary,
-            onClick = { /*todo*/ }
+            onClick = {
+                CreateTodoHandler()
+                FloatingTodoHideHandler()
+            }
         )
     }
 }

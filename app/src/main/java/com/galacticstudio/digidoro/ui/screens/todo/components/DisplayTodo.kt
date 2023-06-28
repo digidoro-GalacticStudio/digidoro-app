@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.galacticstudio.digidoro.data.TodoModel
 import com.galacticstudio.digidoro.ui.screens.todo.DateFormatData
+import com.galacticstudio.digidoro.ui.screens.todo.item.ItemTodoViewModel
 import com.galacticstudio.digidoro.ui.shared.cards.todoItems.TodoItem
 import com.galacticstudio.digidoro.ui.shared.cards.todoItems.TodoMessageData
 import java.text.SimpleDateFormat
@@ -25,7 +26,11 @@ import java.util.Locale
  * @param todoList its a casted list of todos data
  */
 @Composable
-fun DisplayTodo(todoList: List<TodoModel>){
+fun DisplayTodo(
+    todoList: List<TodoModel>,
+    viewModel: ItemTodoViewModel = androidx.lifecycle.viewmodel.compose.viewModel(factory = ItemTodoViewModel.Factory),
+    onClick: ()-> Unit
+){
     LazyColumn(
         modifier = Modifier.heightIn(100.dp, 270.dp),
         contentPadding = PaddingValues(16.dp),
@@ -41,8 +46,20 @@ fun DisplayTodo(todoList: List<TodoModel>){
                     messageNoBold = date.date
                 ),
                 colorTheme = Color(android.graphics.Color.parseColor(item.theme)),
-                done = item.state!!
-            )
+                done = item.state
+            ){
+                //TODO: Allow item.description on view
+                viewModel.onElementClick(
+                    id = item.id,
+                    title = item.title,
+                    description = item.title,
+                    createdAt = item.createdAt,
+                    state = item.state,
+                    reminder = item.reminder
+                )
+
+                onClick()
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
         }

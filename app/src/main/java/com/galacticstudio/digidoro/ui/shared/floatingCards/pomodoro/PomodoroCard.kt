@@ -65,7 +65,7 @@ fun PomodoroFloatingBox(){
 
             ){
                 Column(Modifier.wrapContentWidth()) {
-                    TitleCard(placeHolder = "Agregar Flujo de Datos")
+//                    TitleCard(placeHolder = "Agregar Flujo de Datos")
                     GrayInput(
                         label = "Número de sesiones",
                         placeHolder = "1",

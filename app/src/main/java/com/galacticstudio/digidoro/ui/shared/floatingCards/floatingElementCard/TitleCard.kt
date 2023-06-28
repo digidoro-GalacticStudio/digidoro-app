@@ -29,13 +29,13 @@ import com.galacticstudio.digidoro.ui.theme.DigidoroTheme
 fun TitleCard(
     placeHolder: String,
     value: String = "",
+    onValueChange: (String)-> Unit
 ){
-    var value by remember { mutableStateOf(value) }
     DigidoroTheme {
         Box {
             TextField(
                 value = value,
-                onValueChange = { value = it },
+                onValueChange = onValueChange,
                 textStyle = MaterialTheme.typography.headlineMedium + TextStyle( fontWeight = FontWeight.ExtraBold ),
                 placeholder = { Text(placeHolder, style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.ExtraBold) },
                 modifier = Modifier
