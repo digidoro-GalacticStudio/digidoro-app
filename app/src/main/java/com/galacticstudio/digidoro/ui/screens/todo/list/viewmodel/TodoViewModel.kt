@@ -1,4 +1,4 @@
-package com.galacticstudio.digidoro.ui.screens.todo
+package com.galacticstudio.digidoro.ui.screens.todo.list.viewmodel
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
@@ -10,12 +10,15 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.galacticstudio.digidoro.RetrofitApplication
+import com.galacticstudio.digidoro.data.TodoModel
 import com.galacticstudio.digidoro.domain.usecase.todo.AddTodo
 import com.galacticstudio.digidoro.domain.usecase.todo.DeleteTodo
 import com.galacticstudio.digidoro.domain.usecase.todo.GetTodos
 import com.galacticstudio.digidoro.domain.usecase.todo.TodoUseCases
 import com.galacticstudio.digidoro.network.ApiResponse
 import com.galacticstudio.digidoro.repository.TodoRepository
+import com.galacticstudio.digidoro.ui.screens.todo.list.TodoState
+import com.galacticstudio.digidoro.ui.screens.todo.list.TodosEvent
 import com.galacticstudio.digidoro.ui.screens.todo.components.TodosResponseState
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -63,33 +66,6 @@ class TodoViewModel(
             reponseEventChanel.send(event)
         }
     }
-//
-//    private fun createTodo(
-//        title: String,
-//        description: String,
-//        theme: String,
-//        reminder: Calendar
-//    ){
-//        viewModelScope.launch {
-//            when(val response = repository.createTodo(
-//                title, theme, reminder, description
-//            )){
-//                is ApiResponse.Error -> {
-//                    sendResponseEvent(TodosResponseState.Error(response.exception))
-//                }
-//
-//                is ApiResponse.ErrorWithMessage -> {
-//                    sendResponseEvent(TodosResponseState.ErrorWithMessage(response.message))
-//                }
-//
-//                is ApiResponse.Success ->{
-//                    sendResponseEvent(
-//                        TodosResponseState.Success(response.data)
-//                    )
-//                }
-//            }
-//        }
-//    }
 
     private fun getAllTodo(todosOrder: TodoOrder) {
         viewModelScope.launch {
@@ -119,6 +95,9 @@ class TodoViewModel(
                 is ApiResponse.Success -> {
                     _state.value = _state.value.copy(
                         todos =  response.data,
+                        todayTodos = todayFilter(response.data),
+                        notTodayTodos = noTodayFilter(response.data),
+                        doneTodos = doneFilter(response.data),
                         todosOrder = todosOrder,
                         isLoading = false
                     )
@@ -128,6 +107,37 @@ class TodoViewModel(
         }
     }
 
+    //display today todos
+    private fun todayFilter(list: List<TodoModel>): MutableList<TodoModel>{
+        val today = Calendar.getInstance().time
+        return list.filter { item -> item.createdAt.date == today.date && !item.state }.toMutableList()
+    }
+
+    //display notToday todos
+    private fun noTodayFilter(list: List<TodoModel>): MutableList<TodoModel>{
+        val today = Calendar.getInstance().time
+        return list.filter { item -> item.createdAt.date != today.date && !item.state }.toMutableList()
+    }
+
+    //display todos marked as complete
+    private fun doneFilter(list: List<TodoModel>): MutableList<TodoModel>{
+        return list.filter { item -> item.state == true }.toMutableList()
+    }
+
+
+// add code to TodosOrder:
+
+    sealed class TodoOrder(val orderType: OrderType){
+        class Date(orderType: OrderType): TodoOrder(orderType)
+        class Done(orderType: OrderType): TodoOrder(orderType)
+
+        fun copy(orderType: OrderType): TodoOrder {
+            return when(this){
+                is Date -> Date(orderType)
+                is Done -> Done(orderType)
+            }
+        }
+    }
     companion object{
         val Factory = viewModelFactory {
             initializer {
@@ -147,19 +157,6 @@ class TodoViewModel(
 }
 
 
-// add code to TodosOrder:
-
-sealed class TodoOrder(val orderType: OrderType){
-    class Date(orderType: OrderType): TodoOrder(orderType)
-    class Done(orderType: OrderType): TodoOrder(orderType)
-
-    fun copy(orderType: OrderType): TodoOrder{
-        return when(this){
-            is Date -> Date(orderType)
-            is Done -> Done(orderType)
-        }
-    }
-}
 
 
 sealed class OrderType{

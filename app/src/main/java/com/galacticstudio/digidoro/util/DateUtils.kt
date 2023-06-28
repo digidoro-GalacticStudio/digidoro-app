@@ -1,6 +1,7 @@
 package com.galacticstudio.digidoro.util
 
 import android.annotation.SuppressLint
+import android.util.Log
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -26,6 +27,11 @@ class DateUtils {
             val localDate = LocalDate.parse(dateString, inputFormatter)
             val outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
             return localDate.format(outputFormatter)
+        }
+
+        fun dateKTToDateAPI(date: Date): String{
+            val dateFormatter = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
+            return dateFormatter.format(date)
         }
 
         fun convertISO8601ToDate(dateString: String): Date {

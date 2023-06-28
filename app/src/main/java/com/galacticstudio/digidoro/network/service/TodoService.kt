@@ -44,6 +44,12 @@ interface TodoService {
         @Body changeTodoTheme: RequestChangeTodoTheme
     ) : ResponseTodo
 
+    @PATCH("api/todoItem/own/{id}")
+    suspend fun updateTodo(
+        @Path("id") id: String,
+        @Body request: RequestTodo
+    ) : ResponseTodo
+
     @DELETE("api/todoItem/own/{id}")
     suspend fun deleteNoteById(
         @Path("id") id: String
