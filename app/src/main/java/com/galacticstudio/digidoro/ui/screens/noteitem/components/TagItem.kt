@@ -22,12 +22,12 @@ import com.galacticstudio.digidoro.R
  * A composable function representing a tag item.
  *
  * @param name The name of the tag.
- * @param onClick The callback function invoked when the tag is clicked.
+ * @param onDeleteClick The callback function invoked when the tag is clicked.
  */
 @Composable
 fun TagItem(
     name: String,
-    onClick: () -> Unit,
+    onDeleteClick: () -> Unit,
 ) {
     Card(
         shape = MaterialTheme.shapes.extraLarge,
@@ -51,7 +51,7 @@ fun TagItem(
             )
             IconButton(
                 modifier = Modifier.size(35.dp),
-                onClick = onClick
+                onClick = onDeleteClick
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.delete_icon),

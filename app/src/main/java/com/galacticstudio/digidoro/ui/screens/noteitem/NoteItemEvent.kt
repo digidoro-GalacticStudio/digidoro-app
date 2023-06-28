@@ -2,6 +2,7 @@ package com.galacticstudio.digidoro.ui.screens.noteitem
 
 sealed class NoteItemEvent {
     data class NoteIdChanged(val noteId: String): NoteItemEvent()
+    data class FolderIdChanged(val folderId: String): NoteItemEvent()
     data class TitleChanged(val title: String): NoteItemEvent()
     data class ContentChanged(val message: String): NoteItemEvent()
     data class ColorChanged(val color: String): NoteItemEvent()

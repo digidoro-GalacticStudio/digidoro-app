@@ -18,6 +18,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -26,11 +27,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.galacticstudio.digidoro.R
-import com.galacticstudio.digidoro.data.userList
 import com.galacticstudio.digidoro.ui.screens.ranking.components.RankingContainer
+import com.galacticstudio.digidoro.ui.screens.ranking.mapper.UserRankingMapper.getScoreRange
+import com.galacticstudio.digidoro.ui.screens.ranking.viewmodel.RankingViewModel
+import com.galacticstudio.digidoro.ui.shared.button.ToggleButton
 import com.galacticstudio.digidoro.ui.shared.cards.rankingcard.RankingCard
 import com.galacticstudio.digidoro.ui.shared.titles.CustomMessageData
 import com.galacticstudio.digidoro.ui.shared.titles.Title
@@ -60,8 +64,15 @@ fun RankingScreenPreview() {
  */
 @Composable
 fun RankingScreen(
-    navController: NavHostController
+    navController: NavController,
+    rankingViewModel: RankingViewModel = viewModel(factory = RankingViewModel.Factory),
 ) {
+    val state = rankingViewModel.state
+
+    LaunchedEffect(Unit) {
+        rankingViewModel.onEvent(RankingUIEvent.Rebuild)
+    }
+
     val borderRadius = 28.dp
 
     LazyColumn(
@@ -79,23 +90,24 @@ fun RankingScreen(
         }
 
         item {
-            val myUser = userList[1]
-            RankingCard(
-                username = myUser.name,
-                levelName = myUser.level,
-                currentScore = myUser.total_score,
-                nextLevelScore = 2000,
-                modifier = Modifier.shadowWithBorder(
-                    borderWidth = 2.dp,
-                    borderColor = MaterialTheme.colorScheme.onPrimary,
-                    cornerRadius = 16.dp,
-                    shadowColor = MaterialTheme.colorScheme.onTertiary,
-                    shadowOffset = Offset(15f, 15f)
+            val myUser = state.value.user
+            if (myUser != null) {
+                RankingCard(
+                    username = myUser.username ?: "no-username",
+                    levelName = myUser.level,
+                    currentScore = myUser.totalScore,
+                    nextLevelScore = getScoreRange(myUser.level),
+                    cardSmall = false,
+                    modifier = Modifier.shadowWithBorder(
+                        borderWidth = 2.dp,
+                        borderColor = MaterialTheme.colorScheme.onPrimary,
+                        cornerRadius = 16.dp,
+                        shadowColor = MaterialTheme.colorScheme.onTertiary,
+                        shadowOffset = Offset(15f, 15f)
+                    )
                 )
-            )
+            }
         }
-
-        //TODO Implement the segmented button
 
         item {
             Spacer(modifier = Modifier.height(16.dp))
@@ -106,7 +118,19 @@ fun RankingScreen(
                 ),
                 titleStyle = MaterialTheme.typography.headlineSmall
             )
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(24.dp))
+        }
+
+        item {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                ToggleButton() { selectedOption ->
+                    rankingViewModel.onEvent(RankingUIEvent.ResultTypeChange(selectedOption.type))
+                }
+            }
+            Spacer(modifier = Modifier.height(24.dp))
         }
 
         item {
@@ -130,15 +154,16 @@ fun RankingScreen(
                         color = MaterialTheme.colorScheme.onPrimary,
                         shape = RoundedCornerShape(borderRadius)
                     )
-                    .padding(vertical = 28.dp)
+                    .padding(vertical = 24.dp, horizontal = 5.dp)
             ) {
-                userList.forEachIndexed { index, user ->
+                state.value.users.forEachIndexed { index, user ->
                     RankingContainer(
-                        username = user.name,
+                        username = user.username ?: "no-username",
                         levelName = user.level,
-                        currentScore = user.total_score,
-                        nextLevelScore = 2000,
+                        currentScore = user.totalScore,
+                        nextLevelScore = getScoreRange(user.level),
                         index = index + 1,
+                        cardSmall = true,
                     )
                 }
             }

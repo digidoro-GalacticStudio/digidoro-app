@@ -34,6 +34,7 @@ fun TransparentTextField(
     text: String,
     hint: String,
     modifier: Modifier = Modifier,
+    readOnly: Boolean = false,
     applyFillMaxHeight: Boolean = false,
     textStyle: TextStyle = MaterialTheme.typography.bodyMedium,
     hintStyle: TextStyle = MaterialTheme.typography.bodyMedium,
@@ -51,6 +52,7 @@ fun TransparentTextField(
             onValueChange = onValueChange,
             singleLine = singleLine,
             textStyle = textStyle,
+            readOnly = readOnly,
             modifier = Modifier
                 .fillMaxWidth()
                 .run {

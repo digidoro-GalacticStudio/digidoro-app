@@ -29,6 +29,14 @@ class DateUtils {
             return localDate.format(outputFormatter)
         }
 
+        fun convertDateFormat(inputDate: String): String {
+            val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+            val outputFormat = SimpleDateFormat("MM-dd-yyyy", Locale.getDefault())
+
+            val date = inputFormat.parse(inputDate)
+            return outputFormat.format(date)
+        }
+
         fun dateKTToDateAPI(date: Date): String{
             val dateFormatter = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
             return dateFormatter.format(date)

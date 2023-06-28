@@ -9,3 +9,7 @@ data class FolderRequest(
 data class FolderThemeRequest(
     val theme: String
 )
+
+data class ToggleNoteRequest(
+    val notes_id: String,
+)

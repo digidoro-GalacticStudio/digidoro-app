@@ -12,6 +12,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.galacticstudio.digidoro.RetrofitApplication
 import com.galacticstudio.digidoro.data.FolderModel
+import com.galacticstudio.digidoro.data.FolderPopulatedModel
 import com.galacticstudio.digidoro.data.NoteModel
 import com.galacticstudio.digidoro.domain.usecase.note.AddNote
 import com.galacticstudio.digidoro.domain.usecase.note.DeleteNote
@@ -21,11 +22,11 @@ import com.galacticstudio.digidoro.domain.util.NoteOrder
 import com.galacticstudio.digidoro.domain.util.OrderType
 import com.galacticstudio.digidoro.network.ApiResponse
 import com.galacticstudio.digidoro.network.dto.folder.FolderData
+import com.galacticstudio.digidoro.network.dto.folder.FolderDataPopulated
 import com.galacticstudio.digidoro.network.dto.note.NoteData
 import com.galacticstudio.digidoro.repository.FavoriteNoteRepository
 import com.galacticstudio.digidoro.repository.FolderRepository
 import com.galacticstudio.digidoro.repository.NoteRepository
-import com.galacticstudio.digidoro.ui.screens.login.LoginResponseState
 import com.galacticstudio.digidoro.ui.screens.noteslist.NoteResultsMode
 import com.galacticstudio.digidoro.ui.screens.noteslist.NotesEvent
 import com.galacticstudio.digidoro.ui.screens.noteslist.NotesResponseState
@@ -71,33 +72,80 @@ class NotesViewModel(
             }
 
             is NotesEvent.Rebuild -> {
-                getNotes(state.value.noteOrder)
-                getFolders()
+                rebuildUI(event.resultsMode)
             }
 
-            is NotesEvent.ToggleOrderSection -> {
+            is NotesEvent.SelectedFolderChanged -> {
                 _state.value = state.value.copy(
-                    isOrderSectionVisible = !state.value.isOrderSectionVisible
+                    selectedFolder = event.folder,
+                    notes = event.folder.notesId,
                 )
             }
 
             is NotesEvent.ResultsChanged -> {
-                if (event.resultsMode == NoteResultsMode.FolderNotes) {
-                    if (_roles.value.contains("premiun")) {
-                        _resultsMode.value = event.resultsMode
-                        getNotes(state.value.noteOrder)
-                    } else {
-                        apiState = NotesResponseState.ErrorWithMessage("The user is not premium")
-                    }
-                } else {
-                    _resultsMode.value = event.resultsMode
-                    getNotes(state.value.noteOrder)
-                }
+                rebuildUI(event.resultsMode)
             }
 
             is NotesEvent.RolesChanged -> {
                 _roles.value = event.roles
             }
+
+
+            is NotesEvent.DeleteNote -> {
+                deleteNote(event.noteId)
+            }
+
+            is NotesEvent.ToggleTrash -> {
+                toggleTrashNote(event.noteId)
+            }
+
+            is NotesEvent.DuplicateNote -> {
+                if (event.note == null) return
+                duplicateData(event.note)
+            }
+
+            is NotesEvent.NewFolderNoteChanged -> {
+                _state.value = _state.value.copy(
+                    newSelectedFolder = event.folder
+                )
+            }
+
+            is NotesEvent.GetSelectedFolder -> {
+                _state.value = _state.value.copy(actualNoteId = event.noteId)
+                getNotesWithoutFolders(event.noteId)
+            }
+
+            is NotesEvent.MoveToAnotherFolder -> {
+                saveNewFolder()
+            }
+
+            is NotesEvent.ClearData -> {
+                _state.value = _state.value.copy(
+                    newFolderList = emptyList(),
+                    newSelectedFolder = null,
+                    actualFolder = null,
+                    actualNoteId = "",
+                )
+            }
+        }
+    }
+
+    private fun rebuildUI(resultModel: NoteResultsMode) {
+        if (resultModel == NoteResultsMode.FolderNotes) {
+            if (_roles.value.contains("premium")) {
+                _resultsMode.value = resultModel
+                getNotesWithoutFolders()
+                getFolders()
+            } else {
+                apiState = NotesResponseState.ErrorWithMessage("You are not a PRO user. Upgrade your account to unlock PRO features")
+                viewModelScope.launch {
+                    responseEventChannel.send(apiState as NotesResponseState.ErrorWithMessage)
+                }
+            }
+        } else {
+            _resultsMode.value = resultModel
+            getNotes(state.value.noteOrder)
+            _state.value = state.value.copy(selectedFolder = null)
         }
     }
 
@@ -139,13 +187,13 @@ class NotesViewModel(
                 is NoteResultsMode.TrashNotes -> noteRepository.getAllNotes(
                     sortBy,
                     order,
-                    isTrashed = false
+                    isTrashed = true
                 )
 
                 is NoteResultsMode.FolderNotes -> noteRepository.getAllNotes(
                     sortBy,
                     order,
-                    isTrashed = true
+                    isTrashed = false
                 ) //noteRepository.getFolderNotes(sortBy, order)
             }
 
@@ -174,7 +222,7 @@ class NotesViewModel(
         viewModelScope.launch {
 //            _state.value = _state.value.copy(isLoading = true)
 
-            when (val response = folderRepository.getAllFolders()) {
+            when (val response = folderRepository.getAllFolders(populateFields = "notes_id")) {
                 is ApiResponse.Error -> {
                     sendResponseEvent(NotesResponseState.Error(response.exception))
                 }
@@ -185,9 +233,144 @@ class NotesViewModel(
 
                 is ApiResponse.Success -> {
                     _state.value = _state.value.copy(
-                        folders = mapToFolderModels(response.data),
+                        folders = mapToFolderNotesModels(response.data),
 //                        isLoading = false,
                     )
+                    sendResponseEvent(NotesResponseState.Success)
+                }
+            }
+        }
+    }
+
+
+    private fun getNotesWithoutFolders() {
+        viewModelScope.launch {
+//            _state.value = _state.value.copy(isLoading = true)
+
+            when (val response = folderRepository.getAllWithoutFolders()) {
+                is ApiResponse.Error -> {
+                    sendResponseEvent(NotesResponseState.Error(response.exception))
+                }
+
+                is ApiResponse.ErrorWithMessage -> {
+                    sendResponseEvent(NotesResponseState.ErrorWithMessage(response.message))
+                }
+
+                is ApiResponse.Success -> {
+                    _state.value = _state.value.copy(
+                        notes = mapToNoteModels(response.data),
+//                        isLoading = false,
+                    )
+                    sendResponseEvent(NotesResponseState.Success)
+                }
+            }
+        }
+    }
+
+    private fun saveNewFolder() {
+        if (_state.value.actualNoteId == null) {
+            apiState = NotesResponseState.ErrorWithMessage("There is no selected note")
+            viewModelScope.launch {
+                responseEventChannel.send(apiState as NotesResponseState.ErrorWithMessage)
+            }
+            return
+        }
+
+        if (_state.value.actualFolder == null) {
+            //The note has no previous folder
+            toggleNoteFolder(_state.value.newSelectedFolder!!.id, _state.value.actualNoteId!!)
+        } else if (_state.value.newSelectedFolder == null) {
+            //The new note is "No folder"
+            toggleNoteFolder(_state.value.actualFolder!!.id, _state.value.actualNoteId!!)
+        } else {
+            //The note has previous folder
+            toggleNoteFolder(_state.value.actualFolder!!.id, _state.value.actualNoteId!!)
+            toggleNoteFolder(_state.value.newSelectedFolder!!.id, _state.value.actualNoteId!!)
+        }
+    }
+
+    private fun getNotesWithoutFolders(noteId: String) {
+        executeOperation(
+            operation = { folderRepository.getSelectedFolders(noteId) },
+            onSuccess = { response ->
+                _state.value = _state.value.copy(
+                    newFolderList = mapToFolderModels(response.data.folders),
+                    actualFolder = mapToFolderModel(response.data.actualFolder),
+                )
+
+                rebuildUI(_resultsMode.value)
+            }
+        )
+    }
+
+    private fun deleteNote(noteId: String) {
+        executeOperation(
+            operation = { noteRepository.deleteNoteById(noteId) },
+            onSuccess = { rebuildUI(_resultsMode.value) }
+        )
+    }
+
+    private fun toggleTrashNote(noteId: String) {
+        executeOperation(
+            operation = { noteRepository.toggleTrashNoteById(noteId) },
+            onSuccess = { rebuildUI(_resultsMode.value) }
+        )
+    }
+
+    private fun duplicateData(note: NoteModel) {
+        addNewNote(
+            note.title,
+            note.message,
+            note.tags,
+            note.theme
+        )
+    }
+
+    private fun addNewNote(title: String, message: String, tags: List<String>, color: String) {
+        executeOperation(
+            operation = { noteRepository.createNote(title, message, tags, color) },
+            onSuccess = { response ->
+                val idNewNote = response.data.id
+
+                //If I want to duplicate a note in a selected folder
+                if (_state.value.selectedFolder != null) {
+                    val idFolder = _state.value.selectedFolder?.id ?: ""
+                    toggleNoteFolder(idFolder, idNewNote)
+                }
+
+                rebuildUI(_resultsMode.value)
+            }
+        )
+    }
+
+    private fun toggleNoteFolder(folderId: String, noteId: String) {
+        executeOperation(
+            operation = {
+                folderRepository.toggleFolder(
+                    folderId,
+                    noteId
+                )
+            },
+            onSuccess = { rebuildUI(_resultsMode.value) }
+        )
+    }
+
+    private fun <T> executeOperation(
+        operation: suspend () -> ApiResponse<T>,
+        onSuccess: ((ApiResponse.Success<T>) -> Unit)? = null
+    ) {
+        viewModelScope.launch {
+            when (val response = operation()) {
+                is ApiResponse.Error -> {
+                    sendResponseEvent(NotesResponseState.Error(response.exception))
+                }
+
+                is ApiResponse.ErrorWithMessage -> {
+                    sendResponseEvent(NotesResponseState.ErrorWithMessage(response.message))
+                }
+
+                is ApiResponse.Success -> {
+                    onSuccess?.invoke(response)
                     sendResponseEvent(NotesResponseState.Success)
                 }
             }
@@ -210,6 +393,20 @@ class NotesViewModel(
         }
     }
 
+    private fun mapToFolderNotesModels(folderDataList: List<FolderDataPopulated>): List<FolderPopulatedModel> {
+        return folderDataList.map { folderData ->
+            FolderPopulatedModel(
+                id = folderData.id,
+                userId = folderData.userId,
+                name = folderData.name,
+                theme = folderData.theme,
+                notesId = mapToNoteModels(folderData.notesId),
+                createdAt = folderData.createdAt,
+                updatedAt = folderData.updatedAt
+            )
+        }
+    }
+
     private fun mapToFolderModels(folderDataList: List<FolderData>): List<FolderModel> {
         return folderDataList.map { folderData ->
             FolderModel(
@@ -222,6 +419,20 @@ class NotesViewModel(
                 updatedAt = folderData.updatedAt
             )
         }
+    }
+
+    private fun mapToFolderModel(folderData: FolderData?): FolderModel? {
+        if (folderData == null) return null
+        return FolderModel(
+            id = folderData.id,
+            userId = folderData.userId,
+            name = folderData.name,
+            theme = folderData.theme,
+            notesId = folderData.notesId,
+            createdAt = folderData.createdAt,
+            updatedAt = folderData.updatedAt
+        )
+
     }
 
     companion object {

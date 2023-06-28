@@ -1,6 +1,6 @@
 package com.galacticstudio.digidoro.ui.shared.floatingCards.floatingElementCard
 
-import android.util.Log
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -14,6 +14,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -23,17 +24,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.galacticstudio.digidoro.R
 import com.galacticstudio.digidoro.ui.theme.DigidoroTheme
-import com.galacticstudio.digidoro.util.ColorCustomUtils.Companion.convertColorToString
 
-val buttonSize = 32.dp
+val buttonSize = 36.dp
 
 data class ColorItem(val color: Color, val isPremium: Boolean)
+
+@Preview(name = "Dark Mode", showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 
 @Preview(name = "Full Preview", showSystemUi = true)
 @Composable
@@ -57,13 +56,17 @@ fun ColorBox(
 ) {
 
     val colors = listOf(
-        ColorItem(colorResource(id = R.color.secondary_color), isPremium = false),
-        ColorItem(colorResource(id = R.color.mint_accent), isPremium = false),
-        ColorItem(colorResource(id = R.color.azure_light_blue_accent), isPremium = false),
-        ColorItem(colorResource(id = R.color.cherry_red_accent), isPremium = true),
-        ColorItem(colorResource(id = R.color.honey_yellow_accent), isPremium = true),
-        ColorItem(colorResource(id = R.color.lavender_accent), isPremium = true),
-        ColorItem(colorResource(id = R.color.gray_text_color), isPremium = true)
+        ColorItem(Color.White, isPremium = false),
+        ColorItem(Color(0xFFD9D9D9), isPremium = false),
+        ColorItem(Color(0xFFB0FFCA), isPremium = false),
+        ColorItem(Color(0xFFA5DAF8), isPremium = true),
+        ColorItem(Color(0xFFFF9791), isPremium = true),
+        ColorItem(Color(0xFFFADC73), isPremium = true),
+        ColorItem(Color(0xFFC7B9FF), isPremium = true),
+        ColorItem(Color(0xFF845EC2), isPremium = true),
+        ColorItem(Color(0xFF4D8076), isPremium = true),
+        ColorItem(Color(0xFF4B4453), isPremium = true),
+        ColorItem(Color(0xFFD09EA7), isPremium = true)
     )
 
     FlowRow(
@@ -79,17 +82,12 @@ fun ColorBox(
                 if (!isUserPremium && colors.any { it.color == color && it.isPremium }) {
                     //If the user is NO premium, keep the previous value
                 } else {
-                    Log.d("MyErrors", ".color ${color}")
-                    Log.d("MyErrors", ".toArgb() ${color.toArgb()}")
-                    Log.d("MyErrors", ".convertColorToString() ${convertColorToString(color)}")
                     onColorChange(color)
                 }
             }
         }
     }
 }
-
-
 
 
 @Composable
@@ -107,13 +105,23 @@ fun ColorButton(
         Button(
             onClick = { onColorSelected(color) },
             colors = ButtonDefaults.buttonColors(
-                containerColor = color
+                containerColor = color.takeUnless { it == Color.White }
+                    ?: MaterialTheme.colorScheme.background
             ),
             modifier = Modifier
                 .padding(3.dp)
-                .border((0.5).dp, colorResource(id = R.color.secondary_color), CircleShape)
+                .border((0.5).dp, MaterialTheme.colorScheme.onPrimary, CircleShape)
                 .size(buttonSize)
-        ){}
+        ) {}
+
+        if (color == Color.White) {
+            Icon(
+                Icons.Outlined.Close,
+                contentDescription = null,
+                tint = Color.Red,
+                modifier = Modifier.size(buttonSize),
+            )
+        }
 
         if (isPremium && !isUserPremium) {
             Box(
@@ -130,12 +138,14 @@ fun ColorButton(
         }
 
         if (isSelected) {
-            Icon(
-                Icons.Filled.CheckCircle,
-                contentDescription = null,
-                tint = Color.White.copy(0.8f),
-                modifier = Modifier.size(buttonSize)
-            )
+            if (color != Color.White) {
+                Icon(
+                    Icons.Filled.CheckCircle,
+                    contentDescription = null,
+                    tint = Color.White.copy(0.8f),
+                    modifier = Modifier.size(buttonSize)
+                )
+            }
             Box(
                 modifier = Modifier
                     .fillMaxSize()

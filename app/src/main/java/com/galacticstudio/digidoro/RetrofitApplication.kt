@@ -8,7 +8,9 @@ import com.galacticstudio.digidoro.repository.CredentialsRepository
 import com.galacticstudio.digidoro.repository.FavoriteNoteRepository
 import com.galacticstudio.digidoro.repository.FolderRepository
 import com.galacticstudio.digidoro.repository.NoteRepository
+import com.galacticstudio.digidoro.repository.RankingRepository
 import com.galacticstudio.digidoro.repository.TodoRepository
+import com.galacticstudio.digidoro.repository.UserRepository
 
 class RetrofitApplication : Application() {
 
@@ -35,11 +37,24 @@ class RetrofitApplication : Application() {
         getFolderService()
     }
 
+    private fun getUserAPIService() = with(RetrofitInstance){
+        getUserService()
+    }
+
+    private fun getRankingAPIService() = with(RetrofitInstance){
+        getRankingService()
+    }
+
     fun getToken(): String = prefs.getString(USER_TOKEN, "")!!
 
     fun getRoles(): List<String> = prefs.getStringSet(USER_ROLES, emptySet())?.toList() ?: emptyList()
 
     fun getUsername(): String = prefs.getString(USERNAME, "")!!
+
+    fun hasToken(): Boolean {
+        val token = getToken()
+        return token.isNotEmpty()
+    }
 
     //initialize repositories
     val credentialsRepository: CredentialsRepository by lazy {
@@ -58,6 +73,14 @@ class RetrofitApplication : Application() {
         FolderRepository(getFolderAPIService())
     }
 
+    val userRepository: UserRepository by lazy {
+        UserRepository(getUserAPIService())
+    }
+
+    val rankingRepository: RankingRepository by lazy {
+        RankingRepository(getRankingAPIService())
+    }
+
     val todoRepository: TodoRepository by lazy{
         TodoRepository(
             todoService = RetrofitInstance.getTodoService()
@@ -71,6 +94,16 @@ class RetrofitApplication : Application() {
 
         RetrofitInstance.setToken(token)
     }
+
+    fun clearAuthToken() {
+        val editor = prefs.edit()
+        editor.remove(USER_TOKEN)
+        editor.apply()
+
+        RetrofitInstance.setToken("")
+        RetrofitInstance.clearToken()
+    }
+
 
     fun saveRoles(roles: List<String>) {
         val editor = prefs.edit()

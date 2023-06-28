@@ -1,6 +1,6 @@
 package com.galacticstudio.digidoro.ui.screens.account.components.options
 
-import android.graphics.drawable.Icon
+import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -21,13 +21,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat.startActivity
+import androidx.core.net.toUri
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.galacticstudio.digidoro.R
+import com.galacticstudio.digidoro.navigation.Screen
 import com.galacticstudio.digidoro.ui.theme.DigidoroTheme
-import com.galacticstudio.digidoro.ui.theme.White60
 
 @Composable
 fun OptionComposable(
@@ -42,7 +48,7 @@ fun OptionComposable(
         modifier = Modifier
             .fillMaxWidth()
             .clickable {
-                onOptionClick
+                onOptionClick()
             }
             .background(backgroundColor)
             .padding(horizontal = 12.dp, vertical = 13.dp)
@@ -69,46 +75,66 @@ fun OptionComposable(
 @Preview(showSystemUi = true)
 @Composable
 fun OptionsPreview(){
+    val navController = rememberNavController()
     DigidoroTheme() {
-        OptionsComposable()
+        OptionsComposable(navController)
     }
 }
 
 @Composable
-fun OptionsComposable(){
-    Column(modifier =  Modifier.verticalScroll(rememberScrollState())) {
+fun OptionsComposable(
+    navController: NavController,
+){
+    val context = LocalContext.current
+
+    Column {
         OptionComposable(
-            title = "Configuración general",
+            title = "Change user Settings",
             icon = R.drawable.settings_icon,
-            description = "Icono de configuración"
-        ){}
+            description = "Settings icon"
+        ){
+            navController.navigate(Screen.EditUser.route)
+        }
         OptionComposable(
-            title = "Tus logros",
+            title = "Your Achievements",
             icon = R.drawable.medal_icon,
-            description = "Icono de logros"
-        ){}
+            description = "Achievements icon"
+        ){
+
+        }
         OptionComposable(
-            title = "Verifica tu ranking",
+            title = "Check Your Ranking",
             icon = R.drawable.partner_exchange_icon,
-            description = "Icono de ranking"
-
-        ){}
+            description = "Ranking icon"
+        ){
+            navController.navigate(Screen.Ranking.route)
+        }
         OptionComposable(
-            title = "Configura tus pomodoros",
+            title = "Create Your Pomodoros",
             icon = R.drawable.pomo,
-            description = "Icono de pomodoro"
+            description = "Pomodoro icon"
 
-        ){}
+        ){
+            navController.navigate(Screen.Pomodoro.route)
+        }
         OptionComposable(
-            title = "Pasate a Pro+",
+            title = "Upgrade to Pro+",
             icon = R.drawable.fire_icon,
-            description = "Icono de habilitar pro"
-        ){}
-        OptionComposable(
-            title = "Califícanos en la Play Store",
-            icon = R.drawable.level_star_icon,
-            description = "Icono de calificar en play store"
+            description = "Enable Pro icon"
+        ){
 
-        ){}
+        }
+        OptionComposable(
+            title = "Rate Us on Play Store",
+            icon = R.drawable.level_star_icon,
+            description = "Rate on Play Store icon"
+        ){
+            //TODO REPLACE THIS
+            val appPackageName = "com.example.myapp"
+            val playStoreUrl = "https://play.google.com/store/apps/details?id=$appPackageName".toUri()
+            val intent = Intent(Intent.ACTION_VIEW, playStoreUrl)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            startActivity(context, intent, null)
+        }
     }
 }

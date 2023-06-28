@@ -1,16 +1,13 @@
 package com.galacticstudio.digidoro.ui.shared.floatingCards
 
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
 
 /**
@@ -33,11 +30,11 @@ fun BottomSheetLayout(
     if (openBottomSheet) {
         ModalBottomSheet(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(10.dp),
+                .fillMaxWidth(),
             onDismissRequest = onDismissRequest,
             sheetState = bottomSheetState,
-            containerColor = Color.White,
+            containerColor = MaterialTheme.colorScheme.background,
+            contentColor = MaterialTheme.colorScheme.onPrimary,
         ) {
             content(scope)
         }

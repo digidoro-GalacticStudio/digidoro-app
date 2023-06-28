@@ -4,6 +4,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.TextSelectionColors
@@ -14,11 +15,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.*
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.galacticstudio.digidoro.util.shadowWithBorder
@@ -34,12 +38,17 @@ enum class TextFieldType {
 /**
  * A composable function that represents a text field item.
  *
+ * @param value The current value of the text field.
  * @param placeholder The placeholder text to be displayed when the text field is empty.
- * @param modifier The modifier to be applied to the text field item.
- * @param type The type of the text field.
- * @param leadingIcon The leading icon to be displayed in the text field.
+ * @param modifier The modifier to be applied to the text field.
+ * @param type The type of the text field. Defaults to [TextFieldType.TEXT].
+ * @param leadingIcon The leading icon to be displayed before the text field. (optional)
+ * @param trailingIcon The trailing icon composable to be displayed after the text field. (optional)
+ * @param isError Whether the text field should display an error state.
+ * @param enabled Whether the text field is enabled for user interaction. Defaults to `true`.
+ * @param onTextFieldChanged The callback function to be called when the text field value changes.
  */
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun TextFieldItem(
     value: String,
@@ -52,6 +61,8 @@ fun TextFieldItem(
     enabled: Boolean = true,
     onTextFieldChanged: (String) -> Unit
 ) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+
     val borderWidth = LocalDensity.current.run { 2.toDp() }
     val borderRadius = LocalDensity.current.run { 18.toDp() }
 
@@ -117,12 +128,18 @@ fun TextFieldItem(
             maxLines = 1,
             textStyle = MaterialTheme.typography.titleMedium,
             isError = isError,
-            keyboardOptions = when (type) {
-                TextFieldType.TEXT -> KeyboardOptions(keyboardType = KeyboardType.Text)
-                TextFieldType.NUMBER -> KeyboardOptions(keyboardType = KeyboardType.Number)
-                TextFieldType.PASSWORD -> KeyboardOptions(keyboardType = KeyboardType.Password)
-                TextFieldType.PHONE -> KeyboardOptions(keyboardType = KeyboardType.Phone)
-            }
+            keyboardOptions = KeyboardOptions(
+                keyboardType = when (type) {
+                    TextFieldType.TEXT -> KeyboardType.Text
+                    TextFieldType.NUMBER -> KeyboardType.Number
+                    TextFieldType.PASSWORD -> KeyboardType.Password
+                    TextFieldType.PHONE -> KeyboardType.Phone
+                },
+                imeAction = ImeAction.Done
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = { keyboardController?.hide() }
+            )
         )
     }
 }

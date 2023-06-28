@@ -18,6 +18,7 @@ import com.galacticstudio.digidoro.network.dto.note.NoteData
 import com.galacticstudio.digidoro.repository.FavoriteNoteRepository
 import com.galacticstudio.digidoro.repository.FolderRepository
 import com.galacticstudio.digidoro.repository.NoteRepository
+import com.galacticstudio.digidoro.repository.RankingRepository
 import com.galacticstudio.digidoro.ui.screens.noteitem.ActionType
 import com.galacticstudio.digidoro.ui.screens.noteitem.NoteItemEvent
 import com.galacticstudio.digidoro.ui.screens.noteitem.NoteItemResponseState
@@ -26,6 +27,7 @@ import com.galacticstudio.digidoro.util.DateUtils
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 class NoteItemViewModel(
@@ -33,6 +35,7 @@ class NoteItemViewModel(
     private val noteRepository: NoteRepository,
     private val favoriteRepository: FavoriteNoteRepository,
     private val folderRepository: FolderRepository,
+    private val rankingRepository: RankingRepository,
 ) : ViewModel() {
     private val _state = mutableStateOf(NoteItemState())
     val state: State<NoteItemState> = _state
@@ -57,6 +60,10 @@ class NoteItemViewModel(
                 isFavorite()
             }
 
+            is NoteItemEvent.FolderIdChanged -> {
+                _state.value = state.value.copy(folderId = event.folderId)
+            }
+
             is NoteItemEvent.TitleChanged -> {
                 _state.value = state.value.copy(title = event.title)
             }
@@ -70,7 +77,7 @@ class NoteItemViewModel(
             }
 
             is NoteItemEvent.TagsChanged -> {
-
+                _state.value = state.value.copy(tags = event.tags)
             }
 
             is NoteItemEvent.ActionTypeChanged -> {
@@ -161,11 +168,25 @@ class NoteItemViewModel(
     private fun addNewNote(title: String, message: String, tags: List<String>, color: String) {
         executeOperation(
             operation = { noteRepository.createNote(title, message, tags, color) },
-            onSuccess = {
+            onSuccess = { response ->
+                _state.value = _state.value.copy(noteId = response.data.id)
                 _actionTypeEvents.value = ActionType.CreateNote
+
+                if (_state.value.folderId.isNotEmpty()) {
+                    toggleNoteFolder(_state.value.folderId, response.data.id)
+                }
+
+                updateScore()
             }
         )
     }
+
+    private fun updateScore() {
+        viewModelScope.launch {
+            rankingRepository.updateScore(2)
+        }
+    }
+
 
     private fun updateNote(
         noteId: String,
@@ -215,6 +236,20 @@ class NoteItemViewModel(
             operation = {
                 favoriteRepository.toggleFavoriteNote(
                     _state.value.favoriteContainerId,
+                    noteId
+                )
+            },
+            onSuccess = {
+                _state.value = _state.value.copy(isFavorite = !_state.value.isFavorite)
+            }
+        )
+    }
+
+    private fun toggleNoteFolder(folderId: String, noteId: String) {
+        executeOperation(
+            operation = {
+                folderRepository.toggleFolder(
+                    folderId,
                     noteId
                 )
             },
@@ -294,6 +329,7 @@ class NoteItemViewModel(
                     noteRepository = app.notesRepository,
                     favoriteRepository = app.favoriteNotesRepository,
                     folderRepository = app.folderRepository,
+                    rankingRepository = app.rankingRepository,
                 )
             }
         }

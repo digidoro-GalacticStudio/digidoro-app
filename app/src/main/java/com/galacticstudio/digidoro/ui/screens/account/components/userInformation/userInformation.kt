@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -29,16 +30,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.galacticstudio.digidoro.R
+import com.galacticstudio.digidoro.ui.theme.AzureBlue10
 import com.galacticstudio.digidoro.ui.theme.DigidoroTheme
 import com.galacticstudio.digidoro.ui.theme.Nunito
 
 
 @Preview(showSystemUi = true)
 @Composable
-fun InformationPreview(){
+fun InformationPreview() {
     DigidoroTheme {
         UserInformation(
-            userName = "Jenny" ,
+            userName = "Jenny",
             R.drawable.manage_account_icon,
             levelName = "dreamer",
             currentScore = 85,
@@ -54,22 +56,29 @@ fun UserInformation(
     levelName: String,
     currentScore: Int,
     nextLevelScore: Int
-    ){
+) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Title()
         Spacer(modifier = Modifier.height(16.dp))
-        UserData(userName = userName ,imgProfile = profilePic)
+        UserData(userName = userName, imgProfile = profilePic)
         Spacer(modifier = Modifier.height(16.dp))
-        AccountData(levelName = levelName, currentScore = currentScore, nextLevelScore = nextLevelScore)
+        AccountData(
+            levelName = levelName,
+            currentScore = currentScore,
+            nextLevelScore = nextLevelScore
+        )
     }
 }
 
 @Composable
-fun Title(){
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+fun Title() {
+    Column(
+        modifier = Modifier.padding(top = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Text(
             text = "Perfil",
-            style = MaterialTheme.typography.displayMedium,
+            style = MaterialTheme.typography.displaySmall,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(vertical = 6.dp)
         )
@@ -84,13 +93,13 @@ fun Title(){
                 text = " digidoro ",
                 style = MaterialTheme.typography.labelLarge,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onTertiary
+                color = AzureBlue10
             )
             Text(
                 text = "en tus manos",
                 style = MaterialTheme.typography.labelLarge,
                 fontWeight = FontWeight.Bold,
-                )
+            )
         }
     }
 }
@@ -99,15 +108,16 @@ fun Title(){
 fun UserData(
     imgProfile: Int,
     userName: String = "User_14657"
-){
+) {
     Box(
         modifier = Modifier
-            .clickable {  }
-    ){
+            .clickable { }
+    ) {
 
         Image(
             painter = painterResource(id = imgProfile),
             contentDescription = "User's profile pic",
+            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary),
             modifier = Modifier
                 .size(90.dp)
                 .background(
@@ -119,11 +129,12 @@ fun UserData(
                     color = MaterialTheme.colorScheme.secondary,
                     shape = RoundedCornerShape(size = 150f)
                 )
-                .padding(4.dp)
+                .padding(4.dp),
         )
         Image(
             painter = painterResource(id = R.drawable.settings_icon),
             contentDescription = "Change profile pic icon",
+            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary),
             modifier = Modifier
                 .offset(
                     x = 65.dp,
@@ -156,14 +167,13 @@ fun AccountData(
     levelName: String,
     currentScore: Int,
     nextLevelScore: Int
-){
+) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text("Nivel")
 
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 text = levelName,
-                style = TextStyle(color = Color.Black),
                 fontSize = 14.sp,
                 fontFamily = Nunito,
             )
@@ -191,6 +201,6 @@ fun AccountData(
             color = Color(0xFF4981FF),
             trackColor = MaterialTheme.colorScheme.primary,
 
-        )
+            )
     }
 }

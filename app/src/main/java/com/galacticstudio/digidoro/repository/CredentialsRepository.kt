@@ -1,8 +1,10 @@
 package com.galacticstudio.digidoro.repository
 
 import com.galacticstudio.digidoro.network.ApiResponse
+import com.galacticstudio.digidoro.network.dto.recoverypassword.RecoveryPasswordRequest
 import com.galacticstudio.digidoro.network.dto.login.LoginRequest
 import com.galacticstudio.digidoro.network.dto.register.RegisterRequest
+import com.galacticstudio.digidoro.network.dto.register.UserData
 import com.galacticstudio.digidoro.network.service.AuthService
 import com.galacticstudio.digidoro.repository.utils.handleApiCall
 
@@ -39,6 +41,11 @@ class CredentialsRepository(private val api: AuthService) {
             phone_number = phoneNumber
         )
         return handleApiCall { api.register(request).message }
+    }
+
+    suspend fun recoveryCredentials(email: String, recoveryCode: Int, newPassword: String): ApiResponse<UserData> {
+        val request = RecoveryPasswordRequest(email,recoveryCode, newPassword)
+        return handleApiCall { api.recoveryCredentials(request).data }
     }
 
     data class LoginResponseData(

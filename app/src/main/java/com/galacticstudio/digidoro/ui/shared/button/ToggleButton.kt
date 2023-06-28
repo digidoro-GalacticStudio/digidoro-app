@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.galacticstudio.digidoro.ui.theme.AzureBlue10
 
 enum class SelectionType {
     NONE,
@@ -28,16 +29,28 @@ enum class SelectionType {
     MULTIPLE,
 }
 
-@Composable
-fun ToggleButton (
-    backgroundColor: Color,
-    onClick: (selectedOptions: Array<ToggleButtonOption>) -> Unit = {}
-) {
+data class ToggleButtonOption(
+    val type: ToggleButtonOptionType,
+    val text: String,
+    val iconRes: Int?,
+)
 
+sealed class ToggleButtonOptionType {
+    object Today : ToggleButtonOptionType()
+    object Weekly : ToggleButtonOptionType()
+    object Monthly : ToggleButtonOptionType()
+    object Total : ToggleButtonOptionType()
+}
+
+@Composable
+fun ToggleButton(
+    backgroundColor: Color = AzureBlue10,
+    onButtonClick: (selectedOption: ToggleButtonOption) -> Unit = {}
+) {
     val options = arrayOf(
-        ToggleButtonOption("Today", null),
-        ToggleButtonOption("Semanal", null),
-        ToggleButtonOption("Mensual", null),
+        ToggleButtonOption(ToggleButtonOptionType.Today, "Today", null),
+        ToggleButtonOption(ToggleButtonOptionType.Weekly, "Semanal", null),
+        ToggleButtonOption(ToggleButtonOptionType.Monthly, "Mensual", null),
     )
 
     ContainerToggleButton(
@@ -45,14 +58,9 @@ fun ToggleButton (
         options = options,
         type = SelectionType.SINGLE,
         modifier = Modifier.padding(end = 4.dp),
-        onClick = onClick
+        onButtonClick = onButtonClick
     )
 }
-
-data class ToggleButtonOption(
-    val text: String,
-    val iconRes: Int?,
-)
 
 @Composable
 fun VerticalDivider() {
@@ -69,7 +77,7 @@ fun ContainerToggleButton(
     options: Array<ToggleButtonOption>,
     modifier: Modifier = Modifier,
     type: SelectionType = SelectionType.SINGLE,
-    onClick: (selectedOptions: Array<ToggleButtonOption>) -> Unit = {},
+    onButtonClick: (selectedOption: ToggleButtonOption) -> Unit = {},
 ) {
     val state = remember { mutableStateMapOf<String, ToggleButtonOption>() }
 
@@ -108,7 +116,7 @@ fun ContainerToggleButton(
                     state.remove(key)
                 }
             }
-            onClick(state.values.toTypedArray())
+            onButtonClick(option)
         }
 
         if (options.size == 1) {
@@ -161,7 +169,6 @@ fun SelectionPill(
             containerColor = Color.Transparent,
         ),
         shape = RoundedCornerShape(0),
-//        elevation = ButtonDefaults.elevation(0.dp, 0.dp),
         contentPadding = PaddingValues(0.dp),
         modifier = Modifier.padding(14.dp, 0.dp),
     ) {

@@ -41,7 +41,8 @@ fun SearchBarItem(
     hintText: String,
     modifier: Modifier = Modifier,
     onValueChange: (String) -> Unit,
-    onSearchClick: () -> Unit
+    onSearchClick: () -> Unit,
+    trailingIcon: @Composable () -> Unit
 ) {
     Box(
         modifier = modifier
@@ -86,11 +87,7 @@ fun SearchBarItem(
                         }
                     }
                     IconButton(onClick = onSearchClick) {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = "",
-                            modifier = Modifier.size(24.dp)
-                        )
+                        trailingIcon()
                     }
                 }
             },

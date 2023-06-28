@@ -28,21 +28,20 @@ private val DarkColorScheme = darkColorScheme(
 
     //Gray from the note taking squares
     primaryContainer = DarkNotes_accent,
-    secondaryContainer = OnGray_accent,
-    tertiaryContainer = DarkNotes_accent,
     onPrimaryContainer = White60,
+    secondaryContainer = OnGray_accent,
+    onSecondaryContainer = DarkNotes_accent,
+    tertiaryContainer = DarkNotes_accent,
     onTertiaryContainer = Lavender_accent,
-    // for pomo bar
+
     error = Cherry_accent,
     onError = GreenPepper_accent,
 )
 
 private val LightColorScheme = lightColorScheme(
     //https://m2.material.io/design/color/the-color-system.html#color-theme-creation
-
     primary = White60,
     onPrimary = Gray30,
-    onPrimaryContainer = OnGray_accent, //menu's color hover
 
     secondary = Gray30,
     onSecondary = White60,
@@ -56,14 +55,16 @@ private val LightColorScheme = lightColorScheme(
     surface = White60,
     onSurface = Gray60,
 
-    //accents, ni modo, no hay otras variables
     //Gray from the note taking squares
     primaryContainer = White60,
+    onPrimaryContainer = OnGray_accent, //menu's color hover
     secondaryContainer = OnGray_accent,
+    onSecondaryContainer = BabyGray30,
     tertiaryContainer = LightGray_accent,
+
     surfaceVariant = HoneyYellow_accent,
     onSurfaceVariant = Gray60,
-    // for pomo bar
+
     error = Cherry_accent,
     onError = GreenPepper_accent,
 )

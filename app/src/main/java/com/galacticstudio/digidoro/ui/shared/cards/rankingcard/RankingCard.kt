@@ -28,6 +28,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.galacticstudio.digidoro.R
@@ -48,6 +49,7 @@ fun RankingCard(
     levelName: String,
     currentScore: Int,
     nextLevelScore: Int,
+    cardSmall: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val borderWidth = 1.dp
@@ -59,7 +61,8 @@ fun RankingCard(
         ),
         shape = RoundedCornerShape(16.dp),
         border = BorderStroke(borderWidth, MaterialTheme.colorScheme.onPrimary),
-        modifier = Modifier.padding(start = 13.dp, top = 10.dp, end = 13.dp, bottom = 13.dp)
+        modifier = Modifier
+            .padding(start = 13.dp, top = 10.dp, end = 13.dp, bottom = 13.dp)
             .then(modifier),
     ) {
         Box(
@@ -76,7 +79,7 @@ fun RankingCard(
                     painter = painterResource(R.drawable.fire_icon),
                     contentDescription = null,
                     modifier = Modifier
-                        .size(70.dp)
+                        .size(if (cardSmall) 50.dp else 70.dp)
                         .clip(CircleShape)
                         .border(2.dp, MaterialTheme.colorScheme.onPrimary, CircleShape)
                         .background(Color.White),
@@ -89,7 +92,9 @@ fun RankingCard(
                     Text(
                         text = username,
                         fontWeight = FontWeight.W800,
-                        fontSize = 20.sp,
+                        fontSize = if (cardSmall) 15.sp else 18.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                         fontFamily = Nunito,
                         color = MaterialTheme.colorScheme.onPrimary,
                     )

@@ -36,10 +36,9 @@ interface NoteService {
     @DELETE("api/note/own/{id}")
     suspend fun deleteNoteById(@Path("id") noteId: String): NoteResponse
 
-    //TODO :: Experimental
     @PATCH("api/note/own/theme/{id}")
     suspend fun updateThemeOfNoteById(@Path("id") noteId: String, @Body theme: NoteThemeRequest): NoteResponse
 
-    @PATCH("api/note/own/theme/{id}")
+    @PATCH("api/note/own/toggleTrash/{id}")
     suspend fun toggleTrashNoteById(@Path("id") noteId: String): NoteResponse
 }

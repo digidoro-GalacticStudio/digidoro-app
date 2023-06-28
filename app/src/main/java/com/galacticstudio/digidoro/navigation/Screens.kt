@@ -6,7 +6,9 @@ const val HOME_GRAPH_ROUTE = "home"
 const val TODO_GRAPH_ROUTE = "todo"
 const val NOTE_GRAPH_ROUTE = "note"
 const val POMODORO_GRAPH_ROUTE = "pomodoro"
+const val RANKING_GRAPH_ROUTE = "ranking"
 const val ACCOUNT_GRAPH_ROUTE = "account"
+const val USER_GRAPH_ROUTE = "user"
 
 sealed class Screen(val route: String) {
     object Home : Screen(route = "home_screen")
@@ -19,4 +21,6 @@ sealed class Screen(val route: String) {
     object Ranking: Screen(route = "ranking_screen")
     object ForgotPassword: Screen(route = "forgot_password_screen")
     object VerifyAccount: Screen(route = "verify_account_screen")
+    object EditCredentials: Screen(route = "edit_credentials_screen")
+    object EditUser: Screen(route = "edit_user_screen")
 }
