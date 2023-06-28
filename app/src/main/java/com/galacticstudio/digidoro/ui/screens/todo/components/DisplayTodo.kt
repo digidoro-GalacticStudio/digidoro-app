@@ -11,9 +11,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.galacticstudio.digidoro.data.TodoModel
 import com.galacticstudio.digidoro.ui.screens.todo.DateFormatData
+import com.galacticstudio.digidoro.ui.screens.todo.item.ItemTodoEvent
 import com.galacticstudio.digidoro.ui.screens.todo.item.ItemTodoViewModel
+import com.galacticstudio.digidoro.ui.screens.todo.list.TodosEvent
+import com.galacticstudio.digidoro.ui.screens.todo.list.viewmodel.TodoViewModel
 import com.galacticstudio.digidoro.ui.shared.cards.todoItems.TodoItem
 import com.galacticstudio.digidoro.ui.shared.cards.todoItems.TodoMessageData
 import java.text.SimpleDateFormat
@@ -28,8 +32,9 @@ import java.util.Locale
 @Composable
 fun DisplayTodo(
     todoList: List<TodoModel>,
-    viewModel: ItemTodoViewModel = androidx.lifecycle.viewmodel.compose.viewModel(factory = ItemTodoViewModel.Factory),
-    onClick: ()-> Unit
+    itemViewModel: ItemTodoViewModel = viewModel(factory = ItemTodoViewModel.Factory),
+    todoViewModel: TodoViewModel = viewModel(factory = TodoViewModel.Factory),
+    onClick: () -> Unit
 ){
     LazyColumn(
         modifier = Modifier.heightIn(100.dp, 270.dp),
@@ -37,7 +42,7 @@ fun DisplayTodo(
         state = rememberLazyListState()
     ){
         itemsIndexed(todoList){ _, item ->
-            val date = dayFormat(item.createdAt!!)
+            val date = dayFormat(item.createdAt)
 
             TodoItem(
                 message = TodoMessageData(
@@ -46,10 +51,12 @@ fun DisplayTodo(
                     messageNoBold = date.date
                 ),
                 colorTheme = Color(android.graphics.Color.parseColor(item.theme)),
-                done = item.state
+                status = item.state,
+                ForceRebuild = { todoViewModel.onEvent(TodosEvent.Rebuild) },
+                stateHandler = { itemViewModel.onEvent(ItemTodoEvent.ToggleComplete(item.id)) }
             ){
                 //TODO: Allow item.description on view
-                viewModel.onElementClick(
+                itemViewModel.onElementClick(
                     id = item.id,
                     title = item.title,
                     description = item.title,

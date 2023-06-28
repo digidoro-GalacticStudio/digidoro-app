@@ -87,6 +87,7 @@ class ItemTodoViewModel(
             }
 
             is ItemTodoEvent.ToggleComplete -> {
+                _state.value = state.value.copy(id = event.id)
                 toggleComplete(_state.value.id)
             }
 
@@ -225,6 +226,7 @@ class ItemTodoViewModel(
     }
 
     private fun toggleComplete(id: String){
+        Log.d("id mine", "my id ${_state.value.id}")
         executeOperation(
             operation  = {
                 todoRepository.toggleTodoState(

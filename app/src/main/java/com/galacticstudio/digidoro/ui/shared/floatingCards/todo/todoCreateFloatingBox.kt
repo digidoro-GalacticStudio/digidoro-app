@@ -36,9 +36,9 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.galacticstudio.digidoro.ui.screens.noteitem.NoteItemEvent
-import com.galacticstudio.digidoro.ui.screens.todo.item.ItemTodoActionType
 import com.galacticstudio.digidoro.ui.screens.todo.item.ItemTodoEvent
+import com.galacticstudio.digidoro.ui.screens.todo.list.TodosEvent
+import com.galacticstudio.digidoro.ui.screens.todo.list.viewmodel.TodoViewModel
 import com.galacticstudio.digidoro.util.ColorCustomUtils
 
 
@@ -59,7 +59,8 @@ fun PreviewTodoCreateFloatingBox() {
 @Composable
 fun TodoCreateFloatingBox(
     modifier: Modifier = Modifier,
-    viewModel: ItemTodoViewModel = viewModel(factory = ItemTodoViewModel.Factory),
+    itemViewModel: ItemTodoViewModel = viewModel(factory = ItemTodoViewModel.Factory),
+    todosViewModel: TodoViewModel = viewModel(factory = TodoViewModel.Factory),
     FloatingTodoHideHandler: ()-> Unit,
 
     ){
@@ -90,9 +91,9 @@ fun TodoCreateFloatingBox(
             Column(Modifier.wrapContentWidth()) {
                 TitleCard(
                     placeHolder = "Nombra tu task",
-                    value =  viewModel.state.value.title
+                    value =  itemViewModel.state.value.title
                 ){
-                    viewModel.onEvent(ItemTodoEvent.titleChanged(it))
+                    itemViewModel.onEvent(ItemTodoEvent.titleChanged(it))
                 }
                 GrayInput(
                     label = "Fecha",
@@ -109,14 +110,15 @@ fun TodoCreateFloatingBox(
                     )
                     //TODO Update
                     ColorBox(
-                        selectedColor = Color(android.graphics.Color.parseColor("#${viewModel.state.value.theme}")),
-                        onColorChange = {viewModel.onEvent(
+                        selectedColor = Color(android.graphics.Color.parseColor("#${itemViewModel.state.value.theme}")),
+                        onColorChange = {itemViewModel.onEvent(
                             ItemTodoEvent.themeChanged(ColorCustomUtils.convertColorToString(it)))})
                 }
                 Spacer(modifier = Modifier.height(14.dp))
                 TodoCreateControler(
                     FloatingTodoHideHandler = FloatingTodoHideHandler,
-                    CreateTodoHandler = { viewModel.onEvent(ItemTodoEvent.SaveTodo) }
+                    CreateTodoHandler = { itemViewModel.onEvent(ItemTodoEvent.SaveTodo) },
+                    ForceRebuildHanlder = { todosViewModel.onEvent(TodosEvent.Rebuild) }
                 )
             }
         }
@@ -130,6 +132,7 @@ fun TodoCreateFloatingBox(
 @Composable
 fun TodoCreateControler(
     FloatingTodoHideHandler: () -> Unit,
+    ForceRebuildHanlder: () -> Unit,
     CreateTodoHandler: () -> Unit
 ){
     Row(
@@ -150,6 +153,7 @@ fun TodoCreateControler(
             borderColor = MaterialTheme.colorScheme.secondary,
             onClick = {
                 CreateTodoHandler()
+                ForceRebuildHanlder()
                 FloatingTodoHideHandler()
             }
         )

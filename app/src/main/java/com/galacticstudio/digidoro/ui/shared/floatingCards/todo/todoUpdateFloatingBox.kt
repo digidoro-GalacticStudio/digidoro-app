@@ -27,6 +27,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.galacticstudio.digidoro.R
 import com.galacticstudio.digidoro.ui.screens.todo.item.ItemTodoEvent
 import com.galacticstudio.digidoro.ui.screens.todo.item.ItemTodoViewModel
+import com.galacticstudio.digidoro.ui.screens.todo.list.TodosEvent
+import com.galacticstudio.digidoro.ui.screens.todo.list.viewmodel.TodoViewModel
 import com.galacticstudio.digidoro.ui.shared.floatingCards.floatingElementCard.ButtonControl
 import com.galacticstudio.digidoro.ui.shared.floatingCards.floatingElementCard.ColorBox
 import com.galacticstudio.digidoro.ui.shared.floatingCards.floatingElementCard.GrayInput
@@ -58,7 +60,8 @@ fun PreviewTodoUpdateFloatingBox() {
 @Composable
 fun TodoUpdateFloatingBox(
     modifier: Modifier = Modifier,
-    viewModel: ItemTodoViewModel = viewModel(factory = ItemTodoViewModel.Factory),
+    itemViewModel: ItemTodoViewModel = viewModel(factory = ItemTodoViewModel.Factory),
+    todosViewModel: TodoViewModel = viewModel(factory = TodoViewModel.Factory),
     FloatingTodoHideHandler: () -> Unit,
 
     ){
@@ -89,9 +92,9 @@ fun TodoUpdateFloatingBox(
             Column(Modifier.wrapContentWidth()) {
                 TitleCard(
                     placeHolder = "Nombra tu task",
-                    value = viewModel.state.value.title
+                    value = itemViewModel.state.value.title
                 ){
-                    viewModel.onEvent(ItemTodoEvent.titleChanged(it))
+                    itemViewModel.onEvent(ItemTodoEvent.titleChanged(it))
                 }
                 GrayInput(
                     label = "Fecha",
@@ -108,9 +111,9 @@ fun TodoUpdateFloatingBox(
                     )
                     //TODO Update
                     ColorBox(
-                        selectedColor = Color(android.graphics.Color.parseColor("#${viewModel.state.value.theme}")),
+                        selectedColor = Color(android.graphics.Color.parseColor("#${itemViewModel.state.value.theme}")),
                         onColorChange = {
-                            viewModel.onEvent(
+                            itemViewModel.onEvent(
                                 ItemTodoEvent.themeChanged(ColorCustomUtils.convertColorToString(it))
                             )
                         }
@@ -120,8 +123,10 @@ fun TodoUpdateFloatingBox(
                 TodoUpdateControler(
                     FloatingTodoHideHandler = FloatingTodoHideHandler,
                     UpdateTodoHandler = {
-                        viewModel.onEvent(ItemTodoEvent.UpdateTodo)},
-                    DeleteTodoHandler = { viewModel.onEvent(ItemTodoEvent.RemoveTodo) }
+                        itemViewModel.onEvent(ItemTodoEvent.UpdateTodo)},
+                    DeleteTodoHandler = { itemViewModel.onEvent(ItemTodoEvent.RemoveTodo) },
+                    OnExitHandler = { itemViewModel.onExit() },
+                    ForceRebuildHandler = { todosViewModel.onEvent(TodosEvent.Rebuild) }
                 )
             }
         }
@@ -137,6 +142,8 @@ fun TodoUpdateControler(
     DeleteTodoHandler: ()-> Unit,
     UpdateTodoHandler: ()-> Unit,
     FloatingTodoHideHandler: () -> Unit,
+    OnExitHandler: ()-> Unit,
+    ForceRebuildHandler: ()-> Unit
     ){
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -157,7 +164,9 @@ fun TodoUpdateControler(
             borderColor = Color.Transparent,
             onClick = {
                 DeleteTodoHandler()
+                OnExitHandler()
                 FloatingTodoHideHandler()
+                ForceRebuildHandler()
             }
         )
 
@@ -168,7 +177,9 @@ fun TodoUpdateControler(
             borderColor = MaterialTheme.colorScheme.secondary,
             onClick = {
                 UpdateTodoHandler()
+                OnExitHandler()
                 FloatingTodoHideHandler()
+                ForceRebuildHandler()
             }
         )
     }

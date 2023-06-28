@@ -49,11 +49,9 @@ import com.galacticstudio.digidoro.R
 import com.galacticstudio.digidoro.ui.screens.todo.list.TodosEvent
 import com.galacticstudio.digidoro.ui.screens.todo.components.DisplayTodo
 import com.galacticstudio.digidoro.ui.screens.todo.components.TodosResponseState
-import com.galacticstudio.digidoro.ui.screens.todo.item.ItemTodoEvent
 import com.galacticstudio.digidoro.ui.screens.todo.item.ItemTodoViewModel
 import com.galacticstudio.digidoro.ui.screens.todo.list.viewmodel.TodoViewModel
 import com.galacticstudio.digidoro.ui.shared.floatingCards.todo.TodoCreateFloatingBox
-import com.galacticstudio.digidoro.ui.shared.floatingCards.todo.TodoUpdateControler
 import com.galacticstudio.digidoro.ui.shared.floatingCards.todo.TodoUpdateFloatingBox
 import com.galacticstudio.digidoro.ui.shared.titles.CustomMessageData
 import com.galacticstudio.digidoro.ui.shared.titles.Title
@@ -186,7 +184,8 @@ fun TodoScreen(
                 TodoCreateFloatingBox(
                     modifier = Modifier
                         .offset(x = 0.dp, y = 90.dp),
-                    viewModel = itemTodoViewModel
+                    itemViewModel = itemTodoViewModel,
+                    todosViewModel = todoViewModel
                 ){
                     CreateTodoFloatingHideHandler()
                     itemTodoViewModel.onExit()
@@ -197,7 +196,7 @@ fun TodoScreen(
                     TodoUpdateFloatingBox(
                         modifier = Modifier
                             .offset(x = 0.dp, y = 90.dp),
-                        viewModel = itemTodoViewModel
+                        itemViewModel = itemTodoViewModel
                     ){
                         UpdateTodoFloatingHideHandler()
                         itemTodoViewModel.onExit()
@@ -272,7 +271,8 @@ fun TodoStaticBody(
 
         DisplayTodo(
             todoList = todoViewModel.state.value.todayTodos,
-            viewModel = itemTodoViewModel
+            itemViewModel = itemTodoViewModel,
+            todoViewModel = todoViewModel
         ){
             onClick()
         }
@@ -286,7 +286,8 @@ fun TodoStaticBody(
 
         DisplayTodo(
             todoList = todoViewModel.state.value.notTodayTodos,
-            viewModel = itemTodoViewModel
+            itemViewModel = itemTodoViewModel,
+            todoViewModel = todoViewModel
         ){
             onClick()
         }
@@ -298,7 +299,8 @@ fun TodoStaticBody(
         )
         DisplayTodo(
             todoList = todoViewModel.state.value.doneTodos,
-            viewModel = itemTodoViewModel
+            itemViewModel = itemTodoViewModel,
+            todoViewModel = todoViewModel
         ){
             onClick()
         }

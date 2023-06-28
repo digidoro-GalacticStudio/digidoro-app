@@ -110,13 +110,13 @@ class TodoViewModel(
     //display today todos
     private fun todayFilter(list: List<TodoModel>): MutableList<TodoModel>{
         val today = Calendar.getInstance().time
-        return list.filter { item -> item.createdAt!!.date == today.date && item.state == false}.toMutableList()
+        return list.filter { item -> item.createdAt.date == today.date && !item.state }.toMutableList()
     }
 
     //display notToday todos
     private fun noTodayFilter(list: List<TodoModel>): MutableList<TodoModel>{
         val today = Calendar.getInstance().time
-        return list.filter { item -> item.createdAt!!.date != today.date && item.state == false}.toMutableList()
+        return list.filter { item -> item.createdAt.date != today.date && !item.state }.toMutableList()
     }
 
     //display todos marked as complete

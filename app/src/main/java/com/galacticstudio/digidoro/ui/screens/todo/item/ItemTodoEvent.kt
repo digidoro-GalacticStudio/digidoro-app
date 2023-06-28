@@ -20,5 +20,5 @@ sealed class ItemTodoEvent {
 
     object RemoveTodo: ItemTodoEvent()
 
-    object ToggleComplete: ItemTodoEvent()
+    data class ToggleComplete(val id: String): ItemTodoEvent()
 }
