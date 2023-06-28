@@ -18,6 +18,7 @@ import com.galacticstudio.digidoro.network.dto.note.NoteData
 import com.galacticstudio.digidoro.repository.FavoriteNoteRepository
 import com.galacticstudio.digidoro.repository.FolderRepository
 import com.galacticstudio.digidoro.repository.NoteRepository
+import com.galacticstudio.digidoro.repository.RankingRepository
 import com.galacticstudio.digidoro.ui.screens.noteitem.ActionType
 import com.galacticstudio.digidoro.ui.screens.noteitem.NoteItemEvent
 import com.galacticstudio.digidoro.ui.screens.noteitem.NoteItemResponseState
@@ -26,6 +27,7 @@ import com.galacticstudio.digidoro.util.DateUtils
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 class NoteItemViewModel(
@@ -33,6 +35,7 @@ class NoteItemViewModel(
     private val noteRepository: NoteRepository,
     private val favoriteRepository: FavoriteNoteRepository,
     private val folderRepository: FolderRepository,
+    private val rankingRepository: RankingRepository,
 ) : ViewModel() {
     private val _state = mutableStateOf(NoteItemState())
     val state: State<NoteItemState> = _state
@@ -169,12 +172,21 @@ class NoteItemViewModel(
                 _state.value = _state.value.copy(noteId = response.data.id)
                 _actionTypeEvents.value = ActionType.CreateNote
 
-                if (!_state.value.folderId.isNullOrEmpty()) {
+                if (_state.value.folderId.isNotEmpty()) {
                     toggleNoteFolder(_state.value.folderId, response.data.id)
                 }
+
+                updateScore()
             }
         )
     }
+
+    private fun updateScore() {
+        viewModelScope.launch {
+            rankingRepository.updateScore(2)
+        }
+    }
+
 
     private fun updateNote(
         noteId: String,
@@ -317,6 +329,7 @@ class NoteItemViewModel(
                     noteRepository = app.notesRepository,
                     favoriteRepository = app.favoriteNotesRepository,
                     folderRepository = app.folderRepository,
+                    rankingRepository = app.rankingRepository,
                 )
             }
         }

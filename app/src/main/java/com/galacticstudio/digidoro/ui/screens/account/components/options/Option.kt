@@ -87,7 +87,7 @@ fun OptionsComposable(
 ){
     val context = LocalContext.current
 
-    Column(modifier =  Modifier.verticalScroll(rememberScrollState())) {
+    Column {
         OptionComposable(
             title = "Change user Settings",
             icon = R.drawable.settings_icon,

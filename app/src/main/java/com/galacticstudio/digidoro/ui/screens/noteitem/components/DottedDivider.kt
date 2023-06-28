@@ -2,6 +2,7 @@ package com.galacticstudio.digidoro.ui.screens.noteitem.components
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -15,7 +16,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
  */
 @Composable
 fun DottedDivider(
-    color: Color = Color.Black
+    color: Color = MaterialTheme.colorScheme.onPrimary
 ) {
     val stroke = Stroke(
         width = 2f,

@@ -10,14 +10,13 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.galacticstudio.digidoro.RetrofitApplication
-import com.galacticstudio.digidoro.data.UserRankingModel
-import com.galacticstudio.digidoro.domain.util.OrderType
 import com.galacticstudio.digidoro.network.ApiResponse
-import com.galacticstudio.digidoro.network.dto.ranking.UserInformationData
 import com.galacticstudio.digidoro.repository.RankingRepository
 import com.galacticstudio.digidoro.ui.screens.ranking.RankingResponseState
 import com.galacticstudio.digidoro.ui.screens.ranking.RankingUIEvent
 import com.galacticstudio.digidoro.ui.screens.ranking.RankingUIState
+import com.galacticstudio.digidoro.ui.screens.ranking.mapper.UserRankingMapper.mapToUserRankingModel
+import com.galacticstudio.digidoro.ui.screens.ranking.mapper.UserRankingMapper.mapToUserRankingModelList
 import com.galacticstudio.digidoro.ui.shared.button.ToggleButtonOptionType
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -108,46 +107,6 @@ class RankingViewModel(
                     sendResponseEvent(RankingResponseState.Success)
                 }
             }
-        }
-    }
-
-    private fun mapToUserRankingModel(userInformationData: UserInformationData): UserRankingModel {
-        return UserRankingModel(
-            id = userInformationData.id,
-            firstname = userInformationData.firstname,
-            username = userInformationData.username,
-            profilePic = userInformationData.profilePic,
-            level = getRankingName(userInformationData.totalScore),
-            dailyScore = userInformationData.dailyScore,
-            weeklyScore = userInformationData.weeklyScore,
-            monthlyScore = userInformationData.monthlyScore,
-            totalScore = userInformationData.totalScore
-        )
-    }
-
-    private fun mapToUserRankingModelList(userInformationDataList: List<UserInformationData>): List<UserRankingModel> {
-        return userInformationDataList.map { userInformationData ->
-            UserRankingModel(
-                id = userInformationData.id,
-                firstname = userInformationData.firstname,
-                username = userInformationData.username,
-                profilePic = userInformationData.profilePic,
-                level = getRankingName(userInformationData.totalScore),
-                dailyScore = userInformationData.dailyScore,
-                weeklyScore = userInformationData.weeklyScore,
-                monthlyScore = userInformationData.monthlyScore,
-                totalScore = userInformationData.totalScore
-            )
-        }
-    }
-
-    private fun getRankingName(score: Int): String {
-        return when (score) {
-            in 0 until 250 -> "Dreamer"
-            in 250 until 750 -> "Thunder"
-            in 750 until 1000 -> "Engineer"
-            in 1000 until 1300 -> "Master"
-            else -> "Legend"
         }
     }
 

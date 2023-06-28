@@ -28,6 +28,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.galacticstudio.digidoro.R
@@ -91,7 +92,9 @@ fun RankingCard(
                     Text(
                         text = username,
                         fontWeight = FontWeight.W800,
-                        fontSize = if (cardSmall) 16.sp else 20.sp,
+                        fontSize = if (cardSmall) 15.sp else 18.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                         fontFamily = Nunito,
                         color = MaterialTheme.colorScheme.onPrimary,
                     )

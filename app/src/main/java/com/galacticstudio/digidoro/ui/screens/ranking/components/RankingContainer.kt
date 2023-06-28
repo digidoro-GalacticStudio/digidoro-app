@@ -58,8 +58,8 @@ fun RankingContainer(
 
         Box(
             modifier = Modifier
-                .size(50.dp)
-                .offset((-40).dp, (-10).dp)
+                .size(40.dp)
+                .offset((-30).dp, (-10).dp)
                 .align(Alignment.TopEnd)
         ) {
             Box(
@@ -82,7 +82,7 @@ fun RankingContainer(
                     Text(
                         text = "#",
                         color = MaterialTheme.colorScheme.onPrimary,
-                        style = MaterialTheme.typography.titleLarge,
+                        style = MaterialTheme.typography.titleMedium,
                         fontFamily = Nunito,
                         fontWeight = FontWeight.W700,
                     )

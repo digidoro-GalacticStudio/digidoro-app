@@ -32,6 +32,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.galacticstudio.digidoro.R
 import com.galacticstudio.digidoro.ui.screens.ranking.components.RankingContainer
+import com.galacticstudio.digidoro.ui.screens.ranking.mapper.UserRankingMapper.getScoreRange
 import com.galacticstudio.digidoro.ui.screens.ranking.viewmodel.RankingViewModel
 import com.galacticstudio.digidoro.ui.shared.button.ToggleButton
 import com.galacticstudio.digidoro.ui.shared.cards.rankingcard.RankingCard
@@ -175,15 +176,5 @@ fun RankingScreen(
             contentDescription = null,
             modifier = Modifier.size(25.dp),
         )
-    }
-}
-
-fun getScoreRange(rankingName: String): Int {
-    return when (rankingName) {
-        "Dreamer" -> 250
-        "Thunder" -> 750
-        "Engineer" -> 1000
-        "Master" -> 1300
-        else -> 0 //"Legend"
     }
 }

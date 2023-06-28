@@ -1,7 +1,6 @@
 package com.galacticstudio.digidoro.ui.screens.home
 
 import android.content.res.Configuration
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -21,7 +20,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -46,6 +47,10 @@ import com.galacticstudio.digidoro.data.pomodoroList
 import com.galacticstudio.digidoro.data.todoList
 import com.galacticstudio.digidoro.network.retrofit.RetrofitInstance
 import com.galacticstudio.digidoro.ui.screens.home.viewmodel.HomeViewModel
+import com.galacticstudio.digidoro.ui.screens.ranking.RankingUIEvent
+import com.galacticstudio.digidoro.ui.screens.ranking.mapper.UserRankingMapper.getRankingName
+import com.galacticstudio.digidoro.ui.screens.ranking.mapper.UserRankingMapper.getScoreRange
+import com.galacticstudio.digidoro.ui.screens.ranking.viewmodel.RankingViewModel
 import com.galacticstudio.digidoro.ui.shared.cards.pomodoroCard.PomodoroCard
 import com.galacticstudio.digidoro.ui.shared.cards.todocard.TodoCard
 import com.galacticstudio.digidoro.ui.shared.titles.CustomMessageData
@@ -78,15 +83,20 @@ fun HomeScreenPreview() {
 @Composable
 fun HomeScreen(
     navController: NavHostController = rememberNavController(),
-    homeViewModel: HomeViewModel = viewModel(),
+    homeViewModel: HomeViewModel = viewModel(factory = HomeViewModel.Factory),
 ) {
     val app: RetrofitApplication = LocalContext.current.applicationContext as RetrofitApplication
     val state = homeViewModel.state // Retrieves the current state from the HomeViewModel.
 
     val username = remember { mutableStateOf(app.getUsername()) }
+
     SideEffect {
         username.value = app.getUsername()
         RetrofitInstance.setToken(app.getToken())
+    }
+
+    LaunchedEffect(Unit) {
+        homeViewModel.onEvent(HomeUIEvent.Rebuild)
     }
 
     val contentPadding = PaddingValues(start = 24.dp, top = 24.dp, end = 24.dp, bottom = 75.dp)
@@ -103,7 +113,8 @@ fun HomeScreen(
 
         // Ranking
         item {
-            RankingHome()
+            Spacer(modifier = Modifier.height(16.dp))
+            RankingHome(state)
         }
 
         //Pomodoro title
@@ -119,7 +130,7 @@ fun HomeScreen(
             Spacer(modifier = Modifier.height(8.dp))
             Title(
                 message = CustomMessageData(
-                    title = "Your Pomodoros",
+                    title = "Your Pomodoro",
                     subTitle = "Your recent sessions"
                 ),
                 titleStyle = MaterialTheme.typography.headlineMedium
@@ -211,8 +222,7 @@ fun WelcomeUser(
  * A composable function representing the ranking section.
  */
 @Composable
-fun RankingHome() {
-    Spacer(modifier = Modifier.width(8.dp))
+fun RankingHome(state: State<HomeUIState>) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.End
@@ -229,11 +239,10 @@ fun RankingHome() {
             fontFamily = Nunito,
         )
 
-        //TODO Get the USER LEVEL and CURRENT SCORE from API
-        val levelName = "dreamer"
-        val currentScore = 85
-        //TODO Calculate the next level score using the level name
-        val nextLevelScore = 255
+
+        val levelName = getRankingName(state.value.user?.totalScore ?: 0)
+        val currentScore = state.value.user?.totalScore ?: 0
+        val nextLevelScore = getScoreRange(levelName)
 
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(

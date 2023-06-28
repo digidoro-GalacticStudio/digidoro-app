@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.TextSelectionColors
@@ -20,13 +21,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -38,10 +42,14 @@ import com.galacticstudio.digidoro.ui.theme.Gray60
 /**
  * A composable function that represents a password text field with an optional leading icon.
  *
- * @param placeholder The placeholder text to be displayed when the text field is empty.
- * @param leadingIcon The leading icon to be displayed in the text field.
- * @param modifier The modifier to be applied to the text field.
+ * @param value The current value of the password text field.
+ * @param placeholder The placeholder text to be displayed when the password text field is empty.
+ * @param leadingIcon The leading icon to be displayed before the password text field. (optional)
+ * @param modifier The modifier to be applied to the password text field.
+ * @param isError Whether the password text field should display an error state.
+ * @param onTextFieldChanged The callback function to be called when the password text field value changes.
  */
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun PasswordTextField(
     value: String,
@@ -52,6 +60,7 @@ fun PasswordTextField(
     onTextFieldChanged: (String) -> Unit
 ) {
     var showPassword by remember { mutableStateOf(false) }
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     val borderWidth = LocalDensity.current.run { 2.toDp() }
     val borderRadius = LocalDensity.current.run { 18.toDp() }
@@ -116,9 +125,16 @@ fun PasswordTextField(
                     )
                 }
             },
+            maxLines = 1,
             textStyle = MaterialTheme.typography.titleSmall,
             isError = isError,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Password,
+                imeAction = ImeAction.Done
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = { keyboardController?.hide() }
+            ),
             visualTransformation = if (showPassword) {
                 VisualTransformation.None
             } else {
@@ -130,10 +146,10 @@ fun PasswordTextField(
                     ColorFilter.tint(Gray60)
                 }
 
-                if (!showPassword) {
+                if (showPassword) {
                     IconButton(onClick = { showPassword = false }) {
                         Image(
-                            painter = painterResource(R.drawable.visibility_icom),
+                            painter = painterResource(R.drawable.visibility_off_icon),
                             contentDescription = null,
                             colorFilter = colorFilter,
                             modifier = Modifier.size(25.dp)
@@ -142,7 +158,7 @@ fun PasswordTextField(
                 } else {
                     IconButton(onClick = { showPassword = true }) {
                         Image(
-                            painter = painterResource(R.drawable.visibility_off_icon),
+                            painter = painterResource(R.drawable.visibility_icom),
                             contentDescription = null,
                             colorFilter = colorFilter,
                             modifier = Modifier.size(25.dp)
