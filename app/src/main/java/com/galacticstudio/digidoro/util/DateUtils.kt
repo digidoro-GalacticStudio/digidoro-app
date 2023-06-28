@@ -28,6 +28,14 @@ class DateUtils {
             return localDate.format(outputFormatter)
         }
 
+        fun convertDateFormat(inputDate: String): String {
+            val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+            val outputFormat = SimpleDateFormat("MM-dd-yyyy", Locale.getDefault())
+
+            val date = inputFormat.parse(inputDate)
+            return outputFormat.format(date)
+        }
+
         fun convertISO8601ToDate(dateString: String): Date {
             val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
             return dateFormat.parse(dateString)
