@@ -15,19 +15,13 @@ import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.galacticstudio.digidoro.R
 import com.galacticstudio.digidoro.ui.theme.DigidoroTheme
 import com.galacticstudio.digidoro.util.shadowWithBorder
 
@@ -41,7 +35,7 @@ data class TodoMessageData(
 
 @Preview(showSystemUi = true)
 @Composable
-fun todoItemPreview(){
+fun TodoItemPreview(){
     DigidoroTheme() {
         TodoItem(TodoMessageData("Tarea a realizar mada faka", "Hoy", "8:00AM"))
     }
@@ -57,20 +51,24 @@ fun todoItemPreview(){
 @Composable
 fun TodoItem(
     message: TodoMessageData,
-    done: Boolean = false,
+    status: Boolean = false,
     colorTheme: Color = MaterialTheme.colorScheme.secondary,
-    onClick: ()-> Unit = fun(){}){
-    var isChecked by remember { mutableStateOf(value = done) }
+    stateHandler: () -> Unit = fun(){},
+    ForceRebuild: () -> Unit = fun(){},
+    onClick: ()-> Unit = fun(){})
+    {
+//    var isChecked by remember { mutableStateOf(value = done) }
 
     Box(modifier = Modifier.clickable {
-        onClick
+        onClick()
     }){
 
         TodoInformation(
             message = message,
-            done = isChecked,
+            done = status,
             colorTheme = colorTheme,
-            stateHandler = { isChecked = !isChecked },
+            stateHandler = stateHandler,
+            ForceRebuild = { ForceRebuild() }
         )
 
     }
@@ -89,7 +87,8 @@ fun TodoInformation(
     done: Boolean,
     colorTheme: Color,
     modifier: Modifier = Modifier,
-    stateHandler: ()-> Unit
+    stateHandler: ()-> Unit,
+    ForceRebuild: ()-> Unit = fun(){}
 ){
     Box(
         modifier = Modifier
@@ -128,6 +127,7 @@ fun TodoInformation(
                     ),
                     onCheckedChange = {
                         stateHandler()
+                        ForceRebuild()
                     })
                 Text(
                     text = message.mainMessage,
