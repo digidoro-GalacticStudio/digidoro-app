@@ -58,7 +58,6 @@ fun TodoItem(
     status: Boolean = false,
     colorTheme: Color = MaterialTheme.colorScheme.secondary,
     stateHandler: () -> Unit = fun() {},
-    ForceRebuild: () -> Unit = fun() {},
     onClick: () -> Unit = fun() {},
 ) {
 //    var isChecked by remember { mutableStateOf(value = done) }
@@ -72,7 +71,6 @@ fun TodoItem(
             done = status,
             colorTheme = colorTheme,
             stateHandler = stateHandler,
-            ForceRebuild = { ForceRebuild() },
             isLoading = isLoading,
         )
 
@@ -94,7 +92,6 @@ fun TodoInformation(
     colorTheme: Color,
     modifier: Modifier = Modifier,
     stateHandler: () -> Unit,
-    ForceRebuild: () -> Unit = fun() {},
 
     ) {
     Box(
@@ -136,7 +133,6 @@ fun TodoInformation(
                     ),
                     onCheckedChange = {
                         stateHandler()
-                        ForceRebuild()
                     })
                 Text(
                     text = message.mainMessage,

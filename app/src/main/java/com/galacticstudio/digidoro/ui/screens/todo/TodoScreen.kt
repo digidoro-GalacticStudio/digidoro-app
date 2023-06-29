@@ -128,17 +128,34 @@ fun TodoScreen(
         }
     }
 
-//    LaunchedEffect(key1 = context){
-//        itemTodoViewModel.responseEvents.collect{
-//                event ->
-//            when(event){
-//                is ItemTodoResponseState.Success ->{
-//                    todoViewModel.onEvent(TodosEvent.Rebuild)
-//                }
-//                else -> {}
-//            }
-//        }
-//    }
+    LaunchedEffect(key1 = context){
+        itemTodoViewModel.responseEvents.collect{
+                event ->
+            when(event){
+
+                is ItemTodoResponseState.Error -> {
+                    Toast.makeText(
+                        context,
+                        "An error has occurred ${event.exception}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                is ItemTodoResponseState.ErrorWithMessage -> {
+                    Toast.makeText(
+                        context,
+                        event.message,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                is ItemTodoResponseState.Success ->{
+                    todoViewModel.onEvent(TodosEvent.Rebuild)
+                }
+                else -> {}
+            }
+        }
+    }
 
 //    variables and functions to use
     var isCreateTodoFloatingVisible by remember {
@@ -193,11 +210,6 @@ fun TodoScreen(
     ) { contentPadding ->
         Box(modifier = Modifier.padding(contentPadding)) {
             //static element
-            //checking loading
-//            val isLoading = todoViewModel.state.value.isLoading
-//            if(isLoading)
-//                TodoStaticBody(){}
-//            else
             TodoStaticBody(
                 todoViewModel = todoViewModel,
                 itemTodoViewModel = itemTodoViewModel

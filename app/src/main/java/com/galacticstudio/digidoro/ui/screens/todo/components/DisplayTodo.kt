@@ -52,8 +52,7 @@ fun DisplayTodo(
                 ),
                 colorTheme = Color(android.graphics.Color.parseColor(item.theme)),
                 status = item.state,
-                ForceRebuild = { todoViewModel.onEvent(TodosEvent.Rebuild) },
-                stateHandler = { itemViewModel.onEvent(ItemTodoEvent.ToggleComplete(item.id)) },
+                stateHandler = {itemViewModel.onEvent(ItemTodoEvent.ToggleComplete(item.id))},
                 isLoading = todoViewModel.state.value.isLoading,
             ){
                 //TODO: Allow item.description on view

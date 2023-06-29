@@ -1,12 +1,9 @@
 package com.galacticstudio.digidoro.ui.screens.todo.item
 
-import android.text.Editable.Factory
-import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.vector.addPathNodes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -16,11 +13,9 @@ import com.galacticstudio.digidoro.RetrofitApplication
 import com.galacticstudio.digidoro.domain.usecase.todo.AddTodo
 import com.galacticstudio.digidoro.network.ApiResponse
 import com.galacticstudio.digidoro.repository.TodoRepository
-import com.galacticstudio.digidoro.ui.screens.noteitem.NoteItemEvent
-import com.galacticstudio.digidoro.ui.screens.noteitem.NoteItemResponseState
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.Date
@@ -226,16 +221,16 @@ class ItemTodoViewModel(
     }
 
     private fun toggleComplete(id: String){
-        Log.d("id mine", "my id ${_state.value.id}")
+
         executeOperation(
             operation  = {
                 todoRepository.toggleTodoState(
                     _state.value.id
                 )
             },
-            onSuccess = {
+            onSuccess = { response ->
                 _state.value = _state.value.copy(
-                state = !_state.value.state
+                    state = response.data.state
                 )
             }
         )
