@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -118,42 +119,42 @@ fun HomeScreen(
         }
 
         //Pomodoro title
-        item {
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Text(
-                text = "What did we leave off on?",
-                style = MaterialTheme.typography.bodyMedium,
-                fontFamily = Nunito,
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-            Title(
-                message = CustomMessageData(
-                    title = "Your Pomodoro",
-                    subTitle = "Your recent sessions"
-                ),
-                titleStyle = MaterialTheme.typography.headlineMedium
-            )
-            Spacer(modifier = Modifier.height(24.dp))
-        }
-
-        //Pomodoro List
-        item {
-            LazyRow(
-                state = rememberLazyListState()
-            ) {
-                itemsIndexed(pomodoroList) { index, pomodoro ->
-                    PomodoroCard(
-                        message = pomodoro.name,
-                        sectionText = "Pomodoro ${index + 1}",
-                        colorTheme = Color(android.graphics.Color.parseColor(pomodoro.theme)),
-                        onClick = {}
-                    )
-                    Spacer(modifier = Modifier.width(16.dp))
-                }
-            }
-        }
+//        item {
+//            Spacer(modifier = Modifier.height(24.dp))
+//
+//            Text(
+//                text = "What did we leave off on?",
+//                style = MaterialTheme.typography.bodyMedium,
+//                fontFamily = Nunito,
+//            )
+//
+//            Spacer(modifier = Modifier.height(8.dp))
+//            Title(
+//                message = CustomMessageData(
+//                    title = "Your Pomodoro",
+//                    subTitle = "Your recent sessions"
+//                ),
+//                titleStyle = MaterialTheme.typography.headlineMedium
+//            )
+//            Spacer(modifier = Modifier.height(24.dp))
+//        }
+//
+//        //Pomodoro List
+//        item {
+//            LazyRow(
+//                state = rememberLazyListState()
+//            ) {
+//                itemsIndexed(pomodoroList) { index, pomodoro ->
+//                    PomodoroCard(
+//                        message = pomodoro.name,
+//                        sectionText = "Pomodoro ${index + 1}",
+//                        colorTheme = Color(android.graphics.Color.parseColor(pomodoro.theme)),
+//                        onClick = {}
+//                    )
+//                    Spacer(modifier = Modifier.width(16.dp))
+//                }
+//            }
+//        }
 
         //Activities title
         item {
@@ -168,18 +169,29 @@ fun HomeScreen(
             Spacer(modifier = Modifier.height(24.dp))
         }
 
-        //Activities list
-        itemsIndexed(todoList) { _, todo ->
-            val (text, formattedDate) = DateUtils.formatDateWithTime(todo.createdAt)
-            TodoCard(
-                message = todo.title,
-                boldSubtitle = text,
-                normalSubtitle = formattedDate,
-                colorTheme = Color(android.graphics.Color.parseColor(todo.theme)),
-                onClick = {}
-            )
-            Spacer(modifier = Modifier.height(16.dp))
+        if (state.value.todos.isEmpty()) {
+            item {
+                Text(
+                    "You don't have any pending activities.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(top=10.dp)
+                )
+            }
+        } else {
+            //Activities list
+            itemsIndexed(state.value.todos) { _, todo ->
+                val (text, formattedDate) = DateUtils.formatDateWithTime(todo.createdAt)
+                TodoCard(
+                    message = todo.title,
+                    boldSubtitle = text,
+                    normalSubtitle = formattedDate,
+                    colorTheme = Color(android.graphics.Color.parseColor(todo.theme)),
+                    onClick = {}
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+            }
         }
+
     }
 }
 

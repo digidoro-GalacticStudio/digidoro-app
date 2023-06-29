@@ -92,7 +92,7 @@ fun AccountScreen(
         }
 
         OptionComposable(
-            title = "Cerrar sesión",
+            title = "Logout",
             icon = R.drawable.arrow_back,
             description = "Logout",
             backgroundColor = MaterialTheme.colorScheme.secondary,

@@ -2,16 +2,28 @@ package com.galacticstudio.digidoro.navigation
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.NavigationDrawerItemDefaults
+import androidx.compose.material3.NavigationRail
+import androidx.compose.material3.NavigationRailItem
+import androidx.compose.material3.NavigationRailItemDefaults
+import androidx.compose.material3.PermanentDrawerSheet
+import androidx.compose.material3.PermanentNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -22,6 +34,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -33,6 +46,7 @@ import com.galacticstudio.digidoro.R
 import com.galacticstudio.digidoro.navigation.navgraph.SetupNavGraph
 import com.galacticstudio.digidoro.ui.screens.noteslist.components.ActionsBottomBar
 import com.galacticstudio.digidoro.ui.theme.Gray30
+import com.galacticstudio.digidoro.util.WindowSize
 import com.galacticstudio.digidoro.util.dropShadow
 
 @Preview(name = "Full Preview", showSystemUi = true)
@@ -72,11 +86,11 @@ sealed class ItemsMenu(
         "note_screen"
     )
 
-    object PomosItem : ItemsMenu(
-        R.drawable.pomo,
-        "pomos",
-        "pomodoro_screen"
-    )
+//    object PomosItem : ItemsMenu(
+//        R.drawable.pomo,
+//        "pomos",
+//        "pomodoro_screen"
+//    )
 
     object AccountItem : ItemsMenu(
         R.drawable.manage_account_icon,
@@ -124,6 +138,8 @@ fun AppScaffold(
 
     val selectionBarState = rememberSaveable { (mutableStateOf(false)) }
 
+    val screenSize = LocalConfiguration.current.screenWidthDp.dp
+
     Scaffold(
         bottomBar = {
             AnimatedVisibility(
@@ -140,7 +156,7 @@ fun AppScaffold(
             }
 
             AnimatedVisibility(
-                !selectionBarState.value,
+                !selectionBarState.value && (screenSize < WindowSize.COMPACT),
                 enter = slideInVertically(initialOffsetY = { it }),
                 exit = slideOutVertically(targetOffsetY = { it }),
             ) {
@@ -151,6 +167,47 @@ fun AppScaffold(
             }
         },
     ) {
+
+        if (screenSize > WindowSize.MEDIUM) {
+            PermanentNavigationBar(
+                navController,
+                bottomBarState
+            ) {
+                AppContent(
+                    navController = navController,
+                    modeState,
+                    startDestination,
+                    selectionBarState,
+                )
+            }
+        } else if ((screenSize > WindowSize.COMPACT) && (screenSize < WindowSize.MEDIUM)) {
+            NavigationBarRail(navController, bottomBarState) {
+                AppContent(
+                    navController = navController,
+                    modeState,
+                    startDestination,
+                    selectionBarState,
+                )
+            }
+        } else {
+            AppContent(
+                navController = navController,
+                modeState,
+                startDestination,
+                selectionBarState,
+            )
+        }
+    }
+}
+
+@Composable
+fun AppContent(
+    navController: NavHostController,
+    modeState: SelectionModeAppState,
+    startDestination: String,
+    selectionBarState: MutableState<Boolean>,
+) {
+    Surface {
         SetupNavGraph(
             navController = navController,
             startDestination = startDestination,
@@ -173,7 +230,7 @@ class SelectionModeAppState(
     var onDuplicateClick: () -> Unit,
     var onRemoveClick: () -> Unit,
     var onMoveFolderClick: () -> Unit,
-) {}
+)
 
 @SuppressLint("RememberReturnType")
 @Composable
@@ -193,6 +250,13 @@ fun rememberSelectionModeAppState(
     )
 }
 
+val navigationItems = listOf(
+    ItemsMenu.HomeItem,
+    ItemsMenu.TodoItem,
+    ItemsMenu.NotesItem,
+    ItemsMenu.AccountItem
+)
+
 /**
  * A composable function that displays the bottom navigation bar.
  *
@@ -203,14 +267,6 @@ fun BottomBarNavigation(
     navController: NavHostController,
     bottomBarState: MutableState<Boolean>
 ) {
-    val navigationItems = listOf(
-        ItemsMenu.HomeItem,
-        ItemsMenu.TodoItem,
-        ItemsMenu.NotesItem,
-        ItemsMenu.PomosItem,
-        ItemsMenu.AccountItem
-    )
-
     val navBackStackEntry by navController.currentBackStackEntryAsState()
 
     AnimatedVisibility(
@@ -256,4 +312,100 @@ fun BottomBarNavigation(
             }
         }
     )
+}
+
+@Composable
+fun NavigationBarRail(
+    navController: NavHostController,
+    bottomBarState: MutableState<Boolean>,
+    content: @Composable () -> Unit,
+) {
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+
+    Row {
+        AnimatedVisibility(
+            bottomBarState.value,
+            enter = slideInHorizontally(initialOffsetX = { -it }),
+            exit = slideOutHorizontally(targetOffsetX = { -it }),
+        ) {
+
+            Surface(
+                modifier = Modifier
+                    .dropShadow(
+                        color = MaterialTheme.colorScheme.onPrimary.copy(0.25f),
+                        blurRadius = 4.dp
+                    )
+            ) {
+                NavigationRail {
+                    navigationItems.forEach { item ->
+                        val selectedRoute = item.route == navBackStackEntry?.destination?.route
+
+                        NavigationRailItem(
+                            modifier = Modifier.padding(top = 10.dp),
+                            icon = {
+                                Icon(
+                                    painter = painterResource(id = item.icon),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(23.dp)
+                                )
+                            },
+                            label = { Text(item.title) },
+                            selected = selectedRoute,
+                            onClick = {
+                                navController.navigate(item.route)
+                            },
+                            colors = NavigationRailItemDefaults.colors(
+                                selectedIconColor = Gray30,
+                                selectedTextColor = MaterialTheme.colorScheme.onPrimary,
+                                unselectedIconColor = MaterialTheme.colorScheme.onPrimary,
+                                unselectedTextColor = MaterialTheme.colorScheme.onPrimary,
+                            )
+                        )
+                    }
+                }
+            }
+        }
+
+        content()
+    }
+}
+
+@Composable
+fun PermanentNavigationBar(
+    navController: NavHostController,
+    bottomBarState: MutableState<Boolean>,
+    content: @Composable () -> Unit,
+) {
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+
+    PermanentNavigationDrawer(
+        drawerContent = {
+            PermanentDrawerSheet() {
+                navigationItems.forEach { item ->
+                    val selectedRoute = item.route == navBackStackEntry?.destination?.route
+                    NavigationDrawerItem(
+                        modifier = Modifier.padding(top = 10.dp),
+                        icon = {
+                            Icon(
+                                painter = painterResource(id = item.icon),
+                                contentDescription = null,
+                                modifier = Modifier.size(23.dp)
+                            )
+                        },
+                        label = { Text(item.title) },
+                        selected = selectedRoute,
+                        onClick = { navController.navigate(item.route) },
+                        colors = NavigationDrawerItemDefaults.colors(
+                            selectedIconColor = Gray30,
+                            selectedTextColor = MaterialTheme.colorScheme.onPrimary,
+                            unselectedIconColor = MaterialTheme.colorScheme.onPrimary,
+                            unselectedTextColor = MaterialTheme.colorScheme.onPrimary,
+                        )
+                    )
+                }
+            }
+        }
+    ) {
+        content()
+    }
 }

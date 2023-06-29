@@ -53,14 +53,19 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavDestination
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.galacticstudio.digidoro.R
 import com.galacticstudio.digidoro.RetrofitApplication
@@ -84,6 +89,7 @@ import com.galacticstudio.digidoro.ui.shared.titles.CustomMessageData
 import com.galacticstudio.digidoro.ui.shared.titles.Title
 import com.galacticstudio.digidoro.ui.theme.DigidoroTheme
 import com.galacticstudio.digidoro.util.DateUtils
+import com.galacticstudio.digidoro.util.WindowSize
 import com.galacticstudio.digidoro.util.shimmerEffect
 import java.util.Date
 
@@ -154,6 +160,8 @@ fun NotesListScreen(
     val app: RetrofitApplication = LocalContext.current.applicationContext as RetrofitApplication
     val context = LocalContext.current
 
+    val screenSize = LocalConfiguration.current.screenWidthDp.dp
+
     // Custom component to handle back events
     BackHandler(enabled = isSelectionMode.value) {
         if (isSelectionMode.value) {
@@ -162,6 +170,17 @@ fun NotesListScreen(
             selectedCard.value = null
         } else {
             backDispatcher?.onBackPressed()
+        }
+    }
+
+    val currentBackStackEntry by navController.currentBackStackEntryAsState()
+    val previousDestination = remember { mutableStateOf<NavDestination?>(null) }
+
+    LaunchedEffect(currentBackStackEntry?.destination) {
+        if (currentBackStackEntry?.destination != previousDestination.value) {
+            isSelectionMode.value = false
+            onSelectionChange(false)
+            selectedCard.value = null
         }
     }
 
@@ -175,12 +194,13 @@ fun NotesListScreen(
                 } else {
                     openMoveToTrashDialog.value = true
                 }
-                isSelectionMode.value = false
             },
             {
                 //Duplicate Note event
                 notesViewModel.onEvent(NotesEvent.DuplicateNote(selectedCard.value))
                 isSelectionMode.value = false
+                onSelectionChange(false)
+                selectedCard.value = null
             },
             {
                 // Move to another folder event
@@ -247,6 +267,7 @@ fun NotesListScreen(
         }
     }
 
+    val topOffSet = if (screenSize < WindowSize.COMPACT) (-85).dp else (-5).dp
     Scaffold(
         modifier = Modifier.zIndex(10f),
         floatingActionButton = {
@@ -263,7 +284,7 @@ fun NotesListScreen(
                     },
                     containerColor = MaterialTheme.colorScheme.tertiary,
                     modifier = Modifier
-                        .offset(y = (-85).dp)
+                        .offset(y = topOffSet)
                         .clip(CircleShape)
                 ) {
                     Icon(
@@ -313,6 +334,11 @@ fun NotesListScreen(
             MoveToFolderBottomSheet(
                 notesViewModel = notesViewModel,
                 openMoveToFolderDialog = openMoveToFolderDialog,
+                onSuccessClick = {
+                    isSelectionMode.value = false
+                    onSelectionChange(false)
+                    selectedCard.value = null
+                }
             )
         },
     )
@@ -324,6 +350,9 @@ fun NotesListScreen(
         onConfirmClick = {
             notesViewModel.onEvent(NotesEvent.DeleteNote(selectedCard.value?.id ?: ""))
             openDeleteDialog.value = false
+            isSelectionMode.value = false
+            onSelectionChange(false)
+            selectedCard.value = null
         },
         onDismissClick = {
             openDeleteDialog.value = false
@@ -338,6 +367,9 @@ fun NotesListScreen(
         onConfirmClick = {
             notesViewModel.onEvent(NotesEvent.ToggleTrash(selectedCard.value?.id ?: ""))
             openMoveToTrashDialog.value = false
+            isSelectionMode.value = false
+            onSelectionChange(false)
+            selectedCard.value = null
         },
         onDismissClick = {
             openMoveToTrashDialog.value = false
@@ -398,34 +430,18 @@ fun NotesListContent(
     )
 
     val contentPadding = PaddingValues(start = 24.dp, top = 24.dp, end = 24.dp, bottom = 120.dp)
-    val cols = 2
 
-    var search by remember { mutableStateOf("") }
+    val screenWidth = LocalConfiguration.current.screenWidthDp.dp // Get the screen width in dp
+    val availableWidth = screenWidth - (16.dp * 2) // Subtract the left and right padding
+    val numColumns = (availableWidth / 128.dp).toInt() // Calculate the number of available columns
 
     LazyVerticalGrid(
-        columns = GridCells.Fixed(cols),
+        columns = GridCells.Adaptive(minSize = 150.dp),
         modifier = Modifier.fillMaxWidth(),
         contentPadding = contentPadding,
     ) {
-        item(span = { GridItemSpan(cols) }) {
+        item(span = { GridItemSpan(numColumns) }) {
             HeaderNoteList()
-        }
-
-        item(span = { GridItemSpan(cols) }) {
-            Box(modifier = Modifier.padding(bottom = 32.dp)) {
-                SearchBarItem(
-                    search = search,
-                    hintText = "Seach",
-                    onValueChange = { search = it },
-                    onSearchClick = { /* TODO */ }
-                ) {
-                    Icon(
-                        imageVector = androidx.compose.material.icons.Icons.Default.Search,
-                        contentDescription = null,
-                        modifier = Modifier.Companion.size(24.dp)
-                    )
-                }
-            }
         }
 
         itemsIndexed(actionNotesList) { _, dataAction ->
@@ -438,11 +454,11 @@ fun NotesListContent(
             )
         }
 
-        item(span = { GridItemSpan(cols) }) {
+        item(span = { GridItemSpan(numColumns) }) {
             FolderList(app, notesViewModel, folderViewModel)
         }
 
-        item(span = { GridItemSpan(cols) }) {
+        item(span = { GridItemSpan(numColumns) }) {
             val message = when (notesViewModel.resultsMode.value) {
                 is NoteResultsMode.AllNotes -> {
                     CustomMessageData(
@@ -477,7 +493,7 @@ fun NotesListContent(
             TitleNoteList(message.title, message.subTitle)
         }
 
-        item(span = { GridItemSpan(cols) }) {
+        item(span = { GridItemSpan(numColumns) }) {
             ShortNoteItems(
                 icon = painterResource(R.drawable.last_modification_icon),
                 noteOrder = state.noteOrder
@@ -505,7 +521,7 @@ fun NotesListContent(
         } else {
             val notes = notesViewModel.state.value.notes
             if (notes.isEmpty()) {
-                item(span = { GridItemSpan(cols) }) {
+                item(span = { GridItemSpan(numColumns) }) {
                     val noNotesMessage = when (notesViewModel.resultsMode.value) {
                         is NoteResultsMode.AllNotes -> "You haven't created any notes yet. Start creating your notes now."
                         is NoteResultsMode.TrashNotes -> "You don't have any notes in the recycle bin."
@@ -544,7 +560,6 @@ fun NotesListContent(
                             if (isSelectionMode.value) CardState.DESELECTED
                             else CardState.NORMAL,
                         onLongNoteClick = {
-                            Log.d("MyErrors", "cLICKO AL ITEN")
                             selectedCard.value = dataNote
                             isSelectionMode.value = true
                             onLongNoteClick()
@@ -587,7 +602,7 @@ fun HeaderNoteList() {
         Title(
             message = CustomMessageData(
                 title = "Your notes",
-                subTitle = "## notes"
+                subTitle = "Organize and manage your notes with ease"
             ),
             alignment = Alignment.CenterHorizontally
         )

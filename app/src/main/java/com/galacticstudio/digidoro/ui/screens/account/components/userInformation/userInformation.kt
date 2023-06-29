@@ -77,7 +77,7 @@ fun Title() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Perfil",
+            text = "Profile",
             style = MaterialTheme.typography.displaySmall,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(vertical = 6.dp)
@@ -85,7 +85,7 @@ fun Title() {
 
         Row() {
             Text(
-                text = "Tu",
+                text = "Your",
                 style = MaterialTheme.typography.labelLarge,
                 fontWeight = FontWeight.Bold
             )
@@ -96,7 +96,7 @@ fun Title() {
                 color = AzureBlue10
             )
             Text(
-                text = "en tus manos",
+                text = "in your hands",
                 style = MaterialTheme.typography.labelLarge,
                 fontWeight = FontWeight.Bold,
             )

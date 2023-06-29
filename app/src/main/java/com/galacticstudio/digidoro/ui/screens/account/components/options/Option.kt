@@ -96,27 +96,20 @@ fun OptionsComposable(
             navController.navigate(Screen.EditUser.route)
         }
         OptionComposable(
-            title = "Your Achievements",
-            icon = R.drawable.medal_icon,
-            description = "Achievements icon"
-        ){
-
-        }
-        OptionComposable(
             title = "Check Your Ranking",
             icon = R.drawable.partner_exchange_icon,
             description = "Ranking icon"
         ){
             navController.navigate(Screen.Ranking.route)
         }
-        OptionComposable(
-            title = "Create Your Pomodoros",
-            icon = R.drawable.pomo,
-            description = "Pomodoro icon"
-
-        ){
-            navController.navigate(Screen.Pomodoro.route)
-        }
+//        OptionComposable(
+//            title = "Create Your Pomodoros",
+//            icon = R.drawable.pomo,
+//            description = "Pomodoro icon"
+//
+//        ){
+//            navController.navigate(Screen.Pomodoro.route)
+//        }
         OptionComposable(
             title = "Upgrade to Pro+",
             icon = R.drawable.fire_icon,
