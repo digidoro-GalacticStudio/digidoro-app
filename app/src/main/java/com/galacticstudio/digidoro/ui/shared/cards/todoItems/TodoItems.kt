@@ -17,11 +17,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.galacticstudio.digidoro.ui.theme.DigidoroTheme
+import com.galacticstudio.digidoro.util.shadowWithBorder
 import com.galacticstudio.digidoro.util.shimmerEffect
 
 //corner
@@ -96,8 +98,17 @@ fun TodoInformation(
     ) {
     Box(
         modifier = Modifier
-            .shimmerEffect(12.dp)
-            .then(modifier)
+            .let {
+                if (!isLoading) {
+                    it.shadowWithBorder(
+                        cornerRadius = cornerRadius,
+                        shadowOffset = Offset(15.0f, 15.0f),
+                        shadowColor = if (done) MaterialTheme.colorScheme.secondary else colorTheme
+                    )
+                } else {
+                    it.then(modifier)
+                }
+            }
     ) {
         Column(
             modifier = Modifier
