@@ -32,12 +32,12 @@ import java.util.Locale
 @Composable
 fun DisplayTodo(
     todoList: List<TodoModel>,
-    itemViewModel: ItemTodoViewModel = viewModel(factory = ItemTodoViewModel.Factory),
-    todoViewModel: TodoViewModel = viewModel(factory = TodoViewModel.Factory),
+    itemViewModel: ItemTodoViewModel,
+    todoViewModel: TodoViewModel,
     onClick: () -> Unit
 ){
     LazyColumn(
-        modifier = Modifier.heightIn(100.dp, 270.dp),
+        modifier = Modifier.heightIn(120.dp, 270.dp),
         contentPadding = PaddingValues(16.dp),
         state = rememberLazyListState()
     ){
@@ -53,7 +53,8 @@ fun DisplayTodo(
                 colorTheme = Color(android.graphics.Color.parseColor(item.theme)),
                 status = item.state,
                 ForceRebuild = { todoViewModel.onEvent(TodosEvent.Rebuild) },
-                stateHandler = { itemViewModel.onEvent(ItemTodoEvent.ToggleComplete(item.id)) }
+                stateHandler = { itemViewModel.onEvent(ItemTodoEvent.ToggleComplete(item.id)) },
+                isLoading = todoViewModel.state.value.isLoading,
             ){
                 //TODO: Allow item.description on view
                 itemViewModel.onElementClick(

@@ -17,16 +17,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.galacticstudio.digidoro.ui.theme.DigidoroTheme
-import com.galacticstudio.digidoro.util.shadowWithBorder
+import com.galacticstudio.digidoro.util.shimmerEffect
 
 //corner
 val cornerRadius = 5.dp
+
 data class TodoMessageData(
     val mainMessage: String,
     val messageBold: String,
@@ -35,9 +35,12 @@ data class TodoMessageData(
 
 @Preview(showSystemUi = true)
 @Composable
-fun TodoItemPreview(){
+fun TodoItemPreview() {
     DigidoroTheme() {
-        TodoItem(TodoMessageData("Tarea a realizar mada faka", "Hoy", "8:00AM"))
+//        TodoItem(
+//            TodoMessageData("Tarea a realizar mada faka", "Hoy", "8:00AM"),
+//            isLoading = todoViewModel.state.value.isLoading
+//        )
     }
 }
 
@@ -51,24 +54,26 @@ fun TodoItemPreview(){
 @Composable
 fun TodoItem(
     message: TodoMessageData,
+    isLoading: Boolean,
     status: Boolean = false,
     colorTheme: Color = MaterialTheme.colorScheme.secondary,
-    stateHandler: () -> Unit = fun(){},
-    ForceRebuild: () -> Unit = fun(){},
-    onClick: ()-> Unit = fun(){})
-    {
+    stateHandler: () -> Unit = fun() {},
+    ForceRebuild: () -> Unit = fun() {},
+    onClick: () -> Unit = fun() {},
+) {
 //    var isChecked by remember { mutableStateOf(value = done) }
 
     Box(modifier = Modifier.clickable {
         onClick()
-    }){
+    }) {
 
         TodoInformation(
             message = message,
             done = status,
             colorTheme = colorTheme,
             stateHandler = stateHandler,
-            ForceRebuild = { ForceRebuild() }
+            ForceRebuild = { ForceRebuild() },
+            isLoading = isLoading,
         )
 
     }
@@ -85,33 +90,37 @@ fun TodoItem(
 fun TodoInformation(
     message: TodoMessageData,
     done: Boolean,
+    isLoading: Boolean,
     colorTheme: Color,
     modifier: Modifier = Modifier,
-    stateHandler: ()-> Unit,
-    ForceRebuild: ()-> Unit = fun(){}
-){
+    stateHandler: () -> Unit,
+    ForceRebuild: () -> Unit = fun() {},
+
+    ) {
     Box(
         modifier = Modifier
-            .shadowWithBorder(
-                cornerRadius = cornerRadius,
-                shadowOffset = Offset(15.0f, 15.0f),
-                shadowColor = if (done) MaterialTheme.colorScheme.secondary else colorTheme
-            )
+            .shimmerEffect(12.dp)
             .then(modifier)
-    ){
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .border(
-                    1.dp,
-                    MaterialTheme.colorScheme.secondary,
-                    RoundedCornerShape(cornerRadius)
-                )
-                .background(
-                    MaterialTheme.colorScheme.background,
-                    RoundedCornerShape(cornerRadius)
-                )
-
+                .let {
+                    if (isLoading) {
+                        it.shimmerEffect(12.dp)
+                    } else {
+                        it
+                            .border(
+                                width = 1.dp,
+                                color = MaterialTheme.colorScheme.secondary,
+                                shape = RoundedCornerShape(cornerRadius)
+                            )
+                            .background(
+                                color = MaterialTheme.colorScheme.background,
+                                shape = RoundedCornerShape(cornerRadius)
+                            )
+                    }
+                }
         ) {
             Row(
                 modifier = Modifier
@@ -121,9 +130,9 @@ fun TodoInformation(
                 Checkbox(
                     checked = done,
                     colors = CheckboxDefaults.colors(
-                        checkedColor =  MaterialTheme.colorScheme.secondary,
-                        uncheckedColor = MaterialTheme.colorScheme.secondary,
-                        checkmarkColor = MaterialTheme.colorScheme.primary
+                        checkedColor = if (!isLoading) MaterialTheme.colorScheme.secondary else Color.Transparent,
+                        uncheckedColor = if (!isLoading) MaterialTheme.colorScheme.secondary else Color.Transparent,
+                        checkmarkColor = if (!isLoading) MaterialTheme.colorScheme.primary else Color.Transparent
                     ),
                     onCheckedChange = {
                         stateHandler()
@@ -131,7 +140,9 @@ fun TodoInformation(
                     })
                 Text(
                     text = message.mainMessage,
-                    color = if(done == false) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = if (isLoading) Color.Transparent else
+                        if (!done) MaterialTheme.colorScheme.secondary else
+                            MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.labelLarge,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -144,13 +155,13 @@ fun TodoInformation(
             ) {
                 Text(
                     text = message.messageBold + ", ",
-                    color = MaterialTheme.colorScheme.secondary,
+                    color = if (!isLoading) MaterialTheme.colorScheme.secondary else Color.Transparent,
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold,
                 )
                 Text(
                     text = message.messageNoBold,
-                    color = MaterialTheme.colorScheme.secondary,
+                    color = if (!isLoading) MaterialTheme.colorScheme.secondary else Color.Transparent,
                     style = MaterialTheme.typography.labelSmall,
                 )
             }
