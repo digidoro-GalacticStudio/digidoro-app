@@ -476,10 +476,6 @@ fun DropDownNoteMenu(
         )
         DottedDivider(color = MaterialTheme.colorScheme.onPrimary.copy(0.8f))
         DropdownMenuItem(
-            text = { Text("Folders", color = MaterialTheme.colorScheme.onPrimary) },
-            onClick = { openFolderBottomSheet = true }
-        )
-        DropdownMenuItem(
             text = { Text("Tags", color = MaterialTheme.colorScheme.onPrimary) },
             onClick = { openTagBottomSheet.value = true }
         )

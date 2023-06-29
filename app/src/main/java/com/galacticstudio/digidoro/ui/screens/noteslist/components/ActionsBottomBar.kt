@@ -4,11 +4,14 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -19,6 +22,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -35,17 +39,17 @@ sealed class ActionsMenu(
 ) {
     object FolderItem : ActionsMenu(
         R.drawable.folder_icon,
-        "move to folder",
+        "Move to folder",
     )
 
     object RemoveItem : ActionsMenu(
         R.drawable.delete_icon,
-        "remove",
+        "Remove",
     )
 
     object DuplicateItem : ActionsMenu(
         R.drawable.add_icon,
-        "duplicate note",
+        "Duplicate note",
     )
 }
 
@@ -68,11 +72,18 @@ fun ActionsBottomBar(
         enter = slideInVertically(initialOffsetY = { it }),
         exit = slideOutVertically(targetOffsetY = { it }),
     ) {
+        Column(
+            modifier=Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ){
+
+
         Surface(
             modifier = Modifier
                 .zIndex(Float.MAX_VALUE)
                 .padding(bottom = 0.dp, start = 9.dp, end = 9.dp)
                 .height(80.dp)
+                .widthIn(0.dp, 400.dp)
                 .offset(y = (-10).dp)
                 .dropShadow(
                     color = MaterialTheme.colorScheme.onPrimary.copy(0.4f),
@@ -122,6 +133,7 @@ fun ActionsBottomBar(
                     )
                 }
             }
+        }
         }
     }
 }

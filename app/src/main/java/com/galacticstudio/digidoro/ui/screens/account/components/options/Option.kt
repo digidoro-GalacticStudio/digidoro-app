@@ -96,13 +96,6 @@ fun OptionsComposable(
             navController.navigate(Screen.EditUser.route)
         }
         OptionComposable(
-            title = "Your Achievements",
-            icon = R.drawable.medal_icon,
-            description = "Achievements icon"
-        ){
-
-        }
-        OptionComposable(
             title = "Check Your Ranking",
             icon = R.drawable.partner_exchange_icon,
             description = "Ranking icon"

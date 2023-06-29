@@ -53,7 +53,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -84,6 +87,7 @@ import com.galacticstudio.digidoro.ui.shared.titles.CustomMessageData
 import com.galacticstudio.digidoro.ui.shared.titles.Title
 import com.galacticstudio.digidoro.ui.theme.DigidoroTheme
 import com.galacticstudio.digidoro.util.DateUtils
+import com.galacticstudio.digidoro.util.WindowSize
 import com.galacticstudio.digidoro.util.shimmerEffect
 import java.util.Date
 
@@ -153,6 +157,8 @@ fun NotesListScreen(
     val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     val app: RetrofitApplication = LocalContext.current.applicationContext as RetrofitApplication
     val context = LocalContext.current
+
+    val screenSize = LocalConfiguration.current.screenWidthDp.dp
 
     // Custom component to handle back events
     BackHandler(enabled = isSelectionMode.value) {
@@ -247,6 +253,7 @@ fun NotesListScreen(
         }
     }
 
+    val topOffSet = if (screenSize < WindowSize.COMPACT) (-85).dp else (-5).dp
     Scaffold(
         modifier = Modifier.zIndex(10f),
         floatingActionButton = {
@@ -263,7 +270,7 @@ fun NotesListScreen(
                     },
                     containerColor = MaterialTheme.colorScheme.tertiary,
                     modifier = Modifier
-                        .offset(y = (-85).dp)
+                        .offset(y = topOffSet)
                         .clip(CircleShape)
                 ) {
                     Icon(
@@ -398,34 +405,18 @@ fun NotesListContent(
     )
 
     val contentPadding = PaddingValues(start = 24.dp, top = 24.dp, end = 24.dp, bottom = 120.dp)
-    val cols = 2
 
-    var search by remember { mutableStateOf("") }
+    val screenWidth = LocalConfiguration.current.screenWidthDp.dp // Get the screen width in dp
+    val availableWidth = screenWidth - (16.dp * 2) // Subtract the left and right padding
+    val numColumns = (availableWidth / 128.dp).toInt() // Calculate the number of available columns
 
     LazyVerticalGrid(
-        columns = GridCells.Fixed(cols),
+        columns = GridCells.Adaptive(minSize = 150.dp),
         modifier = Modifier.fillMaxWidth(),
         contentPadding = contentPadding,
     ) {
-        item(span = { GridItemSpan(cols) }) {
+        item(span = { GridItemSpan(numColumns) }) {
             HeaderNoteList()
-        }
-
-        item(span = { GridItemSpan(cols) }) {
-            Box(modifier = Modifier.padding(bottom = 32.dp)) {
-                SearchBarItem(
-                    search = search,
-                    hintText = "Seach",
-                    onValueChange = { search = it },
-                    onSearchClick = { /* TODO */ }
-                ) {
-                    Icon(
-                        imageVector = androidx.compose.material.icons.Icons.Default.Search,
-                        contentDescription = null,
-                        modifier = Modifier.Companion.size(24.dp)
-                    )
-                }
-            }
         }
 
         itemsIndexed(actionNotesList) { _, dataAction ->
@@ -438,11 +429,11 @@ fun NotesListContent(
             )
         }
 
-        item(span = { GridItemSpan(cols) }) {
+        item(span = { GridItemSpan(numColumns) }) {
             FolderList(app, notesViewModel, folderViewModel)
         }
 
-        item(span = { GridItemSpan(cols) }) {
+        item(span = { GridItemSpan(numColumns) }) {
             val message = when (notesViewModel.resultsMode.value) {
                 is NoteResultsMode.AllNotes -> {
                     CustomMessageData(
@@ -477,7 +468,7 @@ fun NotesListContent(
             TitleNoteList(message.title, message.subTitle)
         }
 
-        item(span = { GridItemSpan(cols) }) {
+        item(span = { GridItemSpan(numColumns) }) {
             ShortNoteItems(
                 icon = painterResource(R.drawable.last_modification_icon),
                 noteOrder = state.noteOrder
@@ -505,7 +496,7 @@ fun NotesListContent(
         } else {
             val notes = notesViewModel.state.value.notes
             if (notes.isEmpty()) {
-                item(span = { GridItemSpan(cols) }) {
+                item(span = { GridItemSpan(numColumns) }) {
                     val noNotesMessage = when (notesViewModel.resultsMode.value) {
                         is NoteResultsMode.AllNotes -> "You haven't created any notes yet. Start creating your notes now."
                         is NoteResultsMode.TrashNotes -> "You don't have any notes in the recycle bin."
@@ -587,7 +578,7 @@ fun HeaderNoteList() {
         Title(
             message = CustomMessageData(
                 title = "Your notes",
-                subTitle = "## notes"
+                subTitle = "Organize and manage your notes with ease"
             ),
             alignment = Alignment.CenterHorizontally
         )

@@ -36,6 +36,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
@@ -56,6 +57,7 @@ import com.galacticstudio.digidoro.ui.shared.floatingCards.todo.TodoUpdateFloati
 import com.galacticstudio.digidoro.ui.shared.titles.CustomMessageData
 import com.galacticstudio.digidoro.ui.shared.titles.Title
 import com.galacticstudio.digidoro.ui.theme.DigidoroTheme
+import com.galacticstudio.digidoro.util.WindowSize
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -135,8 +137,12 @@ fun TodoScreen(
     fun UpdateTodoFloatingVisibleHandler (){ isUpdateTodoFloatingVisible = true}
     fun UpdateTodoFloatingHideHandler (){ isUpdateTodoFloatingVisible = false}
 
+    val screenSize = LocalConfiguration.current.screenWidthDp.dp
+
+    val topPadding = if (screenSize < WindowSize.COMPACT) 80.dp else 5.dp
+    val buttonPosition = if (screenSize < WindowSize.COMPACT) FabPosition.Center else FabPosition.End
     Scaffold(
-        floatingActionButtonPosition = FabPosition.Center,
+        floatingActionButtonPosition = buttonPosition,
         floatingActionButton = {
 
             //floating elements
@@ -144,7 +150,7 @@ fun TodoScreen(
                 onClick = { CreateTodoFloatingVisibleHandler() },
                 containerColor = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier
-                    .padding(bottom = 80.dp)
+                    .padding(bottom = topPadding)
                     .clip(CircleShape)
                     .width(68.dp)
                     .height(68.dp)
