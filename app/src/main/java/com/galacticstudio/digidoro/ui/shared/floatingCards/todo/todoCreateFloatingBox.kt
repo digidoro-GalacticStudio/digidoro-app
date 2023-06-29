@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -36,6 +37,7 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.galacticstudio.digidoro.RetrofitApplication
 import com.galacticstudio.digidoro.ui.screens.todo.item.ItemTodoEvent
 import com.galacticstudio.digidoro.ui.screens.todo.list.TodosEvent
 import com.galacticstudio.digidoro.ui.screens.todo.list.viewmodel.TodoViewModel
@@ -61,16 +63,17 @@ fun TodoCreateFloatingBox(
     modifier: Modifier = Modifier,
     itemViewModel: ItemTodoViewModel = viewModel(factory = ItemTodoViewModel.Factory),
     todosViewModel: TodoViewModel = viewModel(factory = TodoViewModel.Factory),
-    FloatingTodoHideHandler: ()-> Unit,
-
-    ){
+    FloatingTodoHideHandler: () -> Unit,
+) {
+    val app: RetrofitApplication = LocalContext.current.applicationContext as RetrofitApplication
     val cornerRadius = 5.dp
-    val day = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault()).format(Calendar.getInstance().time)
+    val day =
+        SimpleDateFormat("yyyy/MM/dd", Locale.getDefault()).format(Calendar.getInstance().time)
     Box(
         modifier = modifier
             .wrapContentWidth()
             .fillMaxHeight()
-    ){
+    ) {
         Box(
             modifier = Modifier
                 .padding(4.dp)
@@ -87,12 +90,12 @@ fun TodoCreateFloatingBox(
                 .background(MaterialTheme.colorScheme.primary)
                 .padding(10.dp)
                 .wrapContentWidth()
-        ){
+        ) {
             Column(Modifier.wrapContentWidth()) {
                 TitleCard(
                     placeHolder = "Nombra tu task",
-                    value =  itemViewModel.state.value.title
-                ){
+                    value = itemViewModel.state.value.title
+                ) {
                     itemViewModel.onEvent(ItemTodoEvent.titleChanged(it))
                 }
                 GrayInput(
@@ -100,9 +103,9 @@ fun TodoCreateFloatingBox(
                     placeHolder = day,
                     fieldWidth = 100.dp,
                     type = TextFieldType.DATE,
-                    modifier = Modifier.selectable(true, false, null, fun(){})
+                    modifier = Modifier.selectable(true, false, null, fun() {})
                 )
-                Column () {
+                Column() {
                     Text(
                         text = "Color",
                         style = MaterialTheme.typography.titleLarge,
@@ -111,8 +114,13 @@ fun TodoCreateFloatingBox(
                     //TODO Update
                     ColorBox(
                         selectedColor = Color(android.graphics.Color.parseColor("#${itemViewModel.state.value.theme}")),
-                        onColorChange = {itemViewModel.onEvent(
-                            ItemTodoEvent.themeChanged(ColorCustomUtils.convertColorToString(it)))})
+                        onColorChange = {
+                            itemViewModel.onEvent(
+                                ItemTodoEvent.themeChanged(ColorCustomUtils.convertColorToString(it))
+                            )
+                        },
+                        isUserPremium = app.getRoles().contains("premium")
+                    )
                 }
                 Spacer(modifier = Modifier.height(14.dp))
                 TodoCreateControler(
@@ -134,7 +142,7 @@ fun TodoCreateControler(
     FloatingTodoHideHandler: () -> Unit,
     ForceRebuildHanlder: () -> Unit,
     CreateTodoHandler: () -> Unit
-){
+) {
     Row(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -149,7 +157,7 @@ fun TodoCreateControler(
         ButtonControl(
             text = "Guardar",
             contentColor = MaterialTheme.colorScheme.secondary,
-            backgroundColor =  colorResource(id = R.color.gray_text_color),
+            backgroundColor = colorResource(id = R.color.gray_text_color),
             borderColor = MaterialTheme.colorScheme.secondary,
             onClick = {
                 CreateTodoHandler()

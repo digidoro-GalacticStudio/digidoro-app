@@ -10,17 +10,22 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.galacticstudio.digidoro.RetrofitApplication
 import com.galacticstudio.digidoro.network.ApiResponse
 import com.galacticstudio.digidoro.repository.RankingRepository
+import com.galacticstudio.digidoro.repository.TodoRepository
 import com.galacticstudio.digidoro.ui.screens.home.HomeResponseState
 import com.galacticstudio.digidoro.ui.screens.home.HomeUIEvent
 import com.galacticstudio.digidoro.ui.screens.home.HomeUIState
 import com.galacticstudio.digidoro.ui.screens.ranking.mapper.UserRankingMapper.mapToUserRankingModel
+import com.galacticstudio.digidoro.ui.screens.todo.components.TodosResponseState
+import com.galacticstudio.digidoro.ui.screens.todo.list.viewmodel.OrderType
+import com.galacticstudio.digidoro.ui.screens.todo.list.viewmodel.TodoViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
-    private val rankingRepository: RankingRepository
+    private val rankingRepository: RankingRepository,
+    private val todoRepository: TodoRepository
 ) : ViewModel() {
     // The current state of the login form
     private val _state = mutableStateOf(HomeUIState())
@@ -44,6 +49,7 @@ class HomeViewModel(
 
             is HomeUIEvent.Rebuild -> {
                 getOwnRanking()
+                getAllTodo()
             }
         }
     }
@@ -60,6 +66,24 @@ class HomeViewModel(
             onSuccess = { response ->
                 val user = response.data.data
                 _state.value = _state.value.copy(user = mapToUserRankingModel(user))
+            }
+        )
+    }
+
+    private fun getAllTodo() {
+        executeOperation(
+            operation = {
+                todoRepository.getAllTodo(
+                    sortBy = "createdAt",
+                    order = "asc",
+                    page = 1,
+                    limit = 10,
+                )
+            },
+            onSuccess = { response ->
+                _state.value = _state.value.copy(
+                    todos = response.data,
+                )
             }
         )
     }
@@ -95,6 +119,7 @@ class HomeViewModel(
                 // Create a new instance of RankingViewModel with dependencies.
                 HomeViewModel(
                     rankingRepository = app.rankingRepository,
+                    todoRepository = app.todoRepository,
                 )
             }
         }

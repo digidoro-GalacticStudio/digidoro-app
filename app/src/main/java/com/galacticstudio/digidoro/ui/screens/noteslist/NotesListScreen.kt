@@ -63,7 +63,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavDestination
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.galacticstudio.digidoro.R
 import com.galacticstudio.digidoro.RetrofitApplication
@@ -171,6 +173,17 @@ fun NotesListScreen(
         }
     }
 
+    val currentBackStackEntry by navController.currentBackStackEntryAsState()
+    val previousDestination = remember { mutableStateOf<NavDestination?>(null) }
+
+    LaunchedEffect(currentBackStackEntry?.destination) {
+        if (currentBackStackEntry?.destination != previousDestination.value) {
+            isSelectionMode.value = false
+            onSelectionChange(false)
+            selectedCard.value = null
+        }
+    }
+
     LaunchedEffect(Unit) {
         selectionMode(
             isSelectionMode,
@@ -182,11 +195,15 @@ fun NotesListScreen(
                     openMoveToTrashDialog.value = true
                 }
                 isSelectionMode.value = false
+                onSelectionChange(false)
+                selectedCard.value = null
             },
             {
                 //Duplicate Note event
                 notesViewModel.onEvent(NotesEvent.DuplicateNote(selectedCard.value))
                 isSelectionMode.value = false
+                onSelectionChange(false)
+                selectedCard.value = null
             },
             {
                 // Move to another folder event

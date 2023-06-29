@@ -164,11 +164,11 @@ fun NoteItemScreen(
                         is ActionType.UpdateNote -> "Note updated"
                     }
 
-                    Toast.makeText(
-                        context,
-                        actionMessage,
-                        Toast.LENGTH_LONG
-                    ).show()
+//                    Toast.makeText(
+//                        context,
+//                        actionMessage,
+//                        Toast.LENGTH_LONG
+//                    ).show()
                 }
 
                 else -> {}
