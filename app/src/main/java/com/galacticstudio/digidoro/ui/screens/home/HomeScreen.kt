@@ -169,26 +169,29 @@ fun HomeScreen(
             Spacer(modifier = Modifier.height(24.dp))
         }
 
-        item {
-            Text(
-                "You don't have any pending activities.",
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(top=10.dp)
-            )
+        if (state.value.todos.isEmpty()) {
+            item {
+                Text(
+                    "You don't have any pending activities.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(top=10.dp)
+                )
+            }
+        } else {
+            //Activities list
+            itemsIndexed(state.value.todos) { _, todo ->
+                val (text, formattedDate) = DateUtils.formatDateWithTime(todo.createdAt)
+                TodoCard(
+                    message = todo.title,
+                    boldSubtitle = text,
+                    normalSubtitle = formattedDate,
+                    colorTheme = Color(android.graphics.Color.parseColor(todo.theme)),
+                    onClick = {}
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+            }
         }
 
-        //Activities list
-        itemsIndexed(state.value.todos) { _, todo ->
-            val (text, formattedDate) = DateUtils.formatDateWithTime(todo.createdAt)
-            TodoCard(
-                message = todo.title,
-                boldSubtitle = text,
-                normalSubtitle = formattedDate,
-                colorTheme = Color(android.graphics.Color.parseColor(todo.theme)),
-                onClick = {}
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-        }
     }
 }
 

@@ -48,6 +48,7 @@ import com.galacticstudio.digidoro.ui.screens.noteslist.viewmodel.NotesViewModel
 fun MoveToFolderBottomSheet(
     notesViewModel: NotesViewModel,
     openMoveToFolderDialog: MutableState<Boolean>,
+    onSuccessClick: () -> Unit,
 ) {
     val emptyFolderModel = FolderModel(
         id = "-1",
@@ -134,6 +135,7 @@ fun MoveToFolderBottomSheet(
                 onClick = {
                     notesViewModel.onEvent(NotesEvent.MoveToAnotherFolder)
                     openMoveToFolderDialog.value = false
+                    onSuccessClick()
                 }
             ) {
                 Text(

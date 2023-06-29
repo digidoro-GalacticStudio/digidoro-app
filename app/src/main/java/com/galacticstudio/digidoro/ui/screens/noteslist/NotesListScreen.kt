@@ -194,9 +194,6 @@ fun NotesListScreen(
                 } else {
                     openMoveToTrashDialog.value = true
                 }
-                isSelectionMode.value = false
-                onSelectionChange(false)
-                selectedCard.value = null
             },
             {
                 //Duplicate Note event
@@ -337,6 +334,11 @@ fun NotesListScreen(
             MoveToFolderBottomSheet(
                 notesViewModel = notesViewModel,
                 openMoveToFolderDialog = openMoveToFolderDialog,
+                onSuccessClick = {
+                    isSelectionMode.value = false
+                    onSelectionChange(false)
+                    selectedCard.value = null
+                }
             )
         },
     )
@@ -348,6 +350,9 @@ fun NotesListScreen(
         onConfirmClick = {
             notesViewModel.onEvent(NotesEvent.DeleteNote(selectedCard.value?.id ?: ""))
             openDeleteDialog.value = false
+            isSelectionMode.value = false
+            onSelectionChange(false)
+            selectedCard.value = null
         },
         onDismissClick = {
             openDeleteDialog.value = false
@@ -362,6 +367,9 @@ fun NotesListScreen(
         onConfirmClick = {
             notesViewModel.onEvent(NotesEvent.ToggleTrash(selectedCard.value?.id ?: ""))
             openMoveToTrashDialog.value = false
+            isSelectionMode.value = false
+            onSelectionChange(false)
+            selectedCard.value = null
         },
         onDismissClick = {
             openMoveToTrashDialog.value = false
@@ -552,7 +560,6 @@ fun NotesListContent(
                             if (isSelectionMode.value) CardState.DESELECTED
                             else CardState.NORMAL,
                         onLongNoteClick = {
-                            Log.d("MyErrors", "cLICKO AL ITEN")
                             selectedCard.value = dataNote
                             isSelectionMode.value = true
                             onLongNoteClick()

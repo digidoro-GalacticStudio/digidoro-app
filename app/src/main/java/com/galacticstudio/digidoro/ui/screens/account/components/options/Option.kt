@@ -102,14 +102,14 @@ fun OptionsComposable(
         ){
             navController.navigate(Screen.Ranking.route)
         }
-        OptionComposable(
-            title = "Create Your Pomodoros",
-            icon = R.drawable.pomo,
-            description = "Pomodoro icon"
-
-        ){
-            navController.navigate(Screen.Pomodoro.route)
-        }
+//        OptionComposable(
+//            title = "Create Your Pomodoros",
+//            icon = R.drawable.pomo,
+//            description = "Pomodoro icon"
+//
+//        ){
+//            navController.navigate(Screen.Pomodoro.route)
+//        }
         OptionComposable(
             title = "Upgrade to Pro+",
             icon = R.drawable.fire_icon,
