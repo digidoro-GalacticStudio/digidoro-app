@@ -1,5 +1,6 @@
 package com.galacticstudio.digidoro.ui.screens.todo.list.viewmodel
 
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -121,7 +122,7 @@ class TodoViewModel(
 
     //display todos marked as complete
     private fun doneFilter(list: List<TodoModel>): MutableList<TodoModel>{
-        return list.filter { item -> item.state == true }.toMutableList()
+        return list.filter { item -> item.state }.toMutableList()
     }
 
 

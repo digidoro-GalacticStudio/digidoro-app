@@ -47,9 +47,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.galacticstudio.digidoro.R
+import com.galacticstudio.digidoro.data.TodoModel
 import com.galacticstudio.digidoro.ui.screens.todo.list.TodosEvent
 import com.galacticstudio.digidoro.ui.screens.todo.components.DisplayTodo
 import com.galacticstudio.digidoro.ui.screens.todo.components.TodosResponseState
+import com.galacticstudio.digidoro.ui.screens.todo.item.ItemTodoResponseState
 import com.galacticstudio.digidoro.ui.screens.todo.item.ItemTodoViewModel
 import com.galacticstudio.digidoro.ui.screens.todo.list.viewmodel.TodoViewModel
 import com.galacticstudio.digidoro.ui.shared.floatingCards.todo.TodoCreateFloatingBox
@@ -59,6 +61,7 @@ import com.galacticstudio.digidoro.ui.shared.titles.Title
 import com.galacticstudio.digidoro.ui.theme.DigidoroTheme
 import com.galacticstudio.digidoro.util.WindowSize
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -69,33 +72,33 @@ data class DateFormatData(
 
 @Preview(showSystemUi = true)
 @Composable
-fun TodoScreenPreview(){
+fun TodoScreenPreview() {
     DigidoroTheme {
         val navController = rememberNavController()
         TodoScreen(navController = navController)
     }
 }
+
 /**
  * A composable function representing Todo Screen.
-*/
+ */
 @Composable
 fun TodoScreen(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
     todoViewModel: TodoViewModel = viewModel(factory = TodoViewModel.Factory),
     itemTodoViewModel: ItemTodoViewModel = viewModel(factory = ItemTodoViewModel.Factory)
-){
+) {
     val state = todoViewModel.state.value
     val context = LocalContext.current
 
-    LaunchedEffect(Unit){
+    LaunchedEffect(Unit) {
         todoViewModel.onEvent(TodosEvent.Rebuild)
     }
 
-    LaunchedEffect(key1 = context){
-        todoViewModel.responseEvent.collect{
-            event ->
-            when(event){
+    LaunchedEffect(key1 = context) {
+        todoViewModel.responseEvent.collect { event ->
+            when (event) {
                 is TodosResponseState.Error -> {
                     Toast.makeText(
                         context,
@@ -104,7 +107,7 @@ fun TodoScreen(
                     ).show()
                 }
 
-                is TodosResponseState.ErrorWithMessage ->{
+                is TodosResponseState.ErrorWithMessage -> {
                     Toast.makeText(
                         context,
                         event.message,
@@ -112,12 +115,42 @@ fun TodoScreen(
                     ).show()
                 }
 
-                is TodosResponseState.Success ->{
+                is TodosResponseState.Success -> {
                     Toast.makeText(
                         context,
                         "Todos retrieved successfully",
                         Toast.LENGTH_SHORT
                     ).show()
+                }
+
+                else -> {}
+            }
+        }
+    }
+
+    LaunchedEffect(key1 = context){
+        itemTodoViewModel.responseEvents.collect{
+                event ->
+            when(event){
+
+                is ItemTodoResponseState.Error -> {
+                    Toast.makeText(
+                        context,
+                        "An error has occurred ${event.exception}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                is ItemTodoResponseState.ErrorWithMessage -> {
+                    Toast.makeText(
+                        context,
+                        event.message,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                is ItemTodoResponseState.Success ->{
+                    todoViewModel.onEvent(TodosEvent.Rebuild)
                 }
                 else -> {}
             }
@@ -132,15 +165,27 @@ fun TodoScreen(
         mutableStateOf(false)
     }
 
-    fun CreateTodoFloatingVisibleHandler (){ isCreateTodoFloatingVisible = true}
-    fun CreateTodoFloatingHideHandler (){ isCreateTodoFloatingVisible = false}
-    fun UpdateTodoFloatingVisibleHandler (){ isUpdateTodoFloatingVisible = true}
-    fun UpdateTodoFloatingHideHandler (){ isUpdateTodoFloatingVisible = false}
+    fun CreateTodoFloatingVisibleHandler() {
+        isCreateTodoFloatingVisible = true
+    }
+
+    fun CreateTodoFloatingHideHandler() {
+        isCreateTodoFloatingVisible = false
+    }
+
+    fun UpdateTodoFloatingVisibleHandler() {
+        isUpdateTodoFloatingVisible = true
+    }
+
+    fun UpdateTodoFloatingHideHandler() {
+        isUpdateTodoFloatingVisible = false
+    }
 
     val screenSize = LocalConfiguration.current.screenWidthDp.dp
 
     val topPadding = if (screenSize < WindowSize.COMPACT) 80.dp else 5.dp
-    val buttonPosition = if (screenSize < WindowSize.COMPACT) FabPosition.Center else FabPosition.End
+    val buttonPosition =
+        if (screenSize < WindowSize.COMPACT) FabPosition.Center else FabPosition.End
     Scaffold(
         floatingActionButtonPosition = buttonPosition,
         floatingActionButton = {
@@ -162,52 +207,47 @@ fun TodoScreen(
                 )
             }
         },
-    ){
-        contentPadding ->
+    ) { contentPadding ->
         Box(modifier = Modifier.padding(contentPadding)) {
             //static element
-            //checking loading
-            val isLoading = todoViewModel.state.value.isLoading
-            if(isLoading)
-                TodoStaticBody(){}
-            else 
-                TodoStaticBody(
-                    todoViewModel = todoViewModel,
-                    itemTodoViewModel = itemTodoViewModel
-                ){
-                    UpdateTodoFloatingVisibleHandler()
-                }
+            TodoStaticBody(
+                todoViewModel = todoViewModel,
+                itemTodoViewModel = itemTodoViewModel
+            ) {
+                UpdateTodoFloatingVisibleHandler()
+            }
 
             //floating no scrollable element
-            if(isCreateTodoFloatingVisible)
-                Box(modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
+            if (isCreateTodoFloatingVisible)
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
                 )
 
 
-            AnimatedBox(visibility = isCreateTodoFloatingVisible){
+            AnimatedBox(visibility = isCreateTodoFloatingVisible) {
                 TodoCreateFloatingBox(
                     modifier = Modifier
                         .offset(x = 0.dp, y = 90.dp),
                     itemViewModel = itemTodoViewModel,
                     todosViewModel = todoViewModel
-                ){
+                ) {
                     CreateTodoFloatingHideHandler()
                     itemTodoViewModel.onExit()
                 }
             }
 
-                AnimatedBox(visibility = isUpdateTodoFloatingVisible) {
-                    TodoUpdateFloatingBox(
-                        modifier = Modifier
-                            .offset(x = 0.dp, y = 90.dp),
-                        itemViewModel = itemTodoViewModel
-                    ){
-                        UpdateTodoFloatingHideHandler()
-                        itemTodoViewModel.onExit()
-                    }
+            AnimatedBox(visibility = isUpdateTodoFloatingVisible) {
+                TodoUpdateFloatingBox(
+                    modifier = Modifier
+                        .offset(x = 0.dp, y = 90.dp),
+                    itemViewModel = itemTodoViewModel
+                ) {
+                    UpdateTodoFloatingHideHandler()
+                    itemTodoViewModel.onExit()
                 }
+            }
         }
     }
 }
@@ -215,8 +255,8 @@ fun TodoScreen(
 @Composable
 fun AnimatedBox(
     visibility: Boolean,
-    content: @Composable() ()-> Unit,
-    ){
+    content: @Composable() () -> Unit,
+) {
     val density = LocalDensity.current
 
     //animated floating card
@@ -241,13 +281,24 @@ fun AnimatedBox(
 @Composable
 fun TodoStaticBody(
     modifier: Modifier = Modifier,
-    todoViewModel: TodoViewModel = viewModel(factory = TodoViewModel.Factory),
-    itemTodoViewModel: ItemTodoViewModel = viewModel(factory = ItemTodoViewModel.Factory),
-    onClick: ()-> Unit
-    ){
+    todoViewModel: TodoViewModel,
+    itemTodoViewModel: ItemTodoViewModel,
+    onClick: () -> Unit
+) {
     //const
     val dateFormatter = SimpleDateFormat("EEE. MMMM dd", Locale.getDefault())
     val currentDate = dateFormatter.format(Date())
+
+    val emptyTodo: TodoModel = TodoModel(
+        id = "",
+        title = "",
+        description = "",
+        theme = "#FFFFFF",
+        createdAt = Calendar.getInstance().time,
+        state = false,
+        reminder = Calendar.getInstance().time
+    )
+
 
     Column(
         modifier
@@ -269,18 +320,30 @@ fun TodoStaticBody(
             color = MaterialTheme.colorScheme.secondary,
             fontSize = 24.sp
         )
-        Spacer(modifier = Modifier
-            .height(2.dp)
-            .fillMaxWidth()
-            .padding(end = 16.dp)
-            .background(MaterialTheme.colorScheme.secondary))
+        Spacer(
+            modifier = Modifier
+                .height(2.dp)
+                .fillMaxWidth()
+                .padding(end = 16.dp)
+                .background(MaterialTheme.colorScheme.secondary)
+        )
 
-        DisplayTodo(
-            todoList = todoViewModel.state.value.todayTodos,
-            itemViewModel = itemTodoViewModel,
-            todoViewModel = todoViewModel
-        ){
-            onClick()
+        val isLoading = todoViewModel.state.value.isLoading
+
+        if (isLoading && todoViewModel.state.value.todayTodos.isEmpty()) {
+            DisplayTodo(
+                todoList = listOf(emptyTodo),
+                itemViewModel = itemTodoViewModel,
+                todoViewModel = todoViewModel
+            ) {}
+        } else {
+            DisplayTodo(
+                todoList = todoViewModel.state.value.todayTodos,
+                itemViewModel = itemTodoViewModel,
+                todoViewModel = todoViewModel
+            ) {
+                onClick()
+            }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -290,26 +353,45 @@ fun TodoStaticBody(
         )
         Spacer(modifier = Modifier.height(16.dp))
 
-        DisplayTodo(
-            todoList = todoViewModel.state.value.notTodayTodos,
-            itemViewModel = itemTodoViewModel,
-            todoViewModel = todoViewModel
-        ){
-            onClick()
+        if (isLoading && todoViewModel.state.value.notTodayTodos.isEmpty()) {
+            DisplayTodo(
+                todoList = listOf(emptyTodo),
+                itemViewModel = itemTodoViewModel,
+                todoViewModel = todoViewModel
+            ) {}
+        } else {
+            DisplayTodo(
+                todoList = todoViewModel.state.value.notTodayTodos,
+                itemViewModel = itemTodoViewModel,
+                todoViewModel = todoViewModel
+            ) {
+                onClick()
+            }
         }
+
 
         Spacer(modifier = Modifier.height(24.dp))
         Title(
             message = CustomMessageData("¡Lo lograste!", "Mira tus tareas completadas"),
             alignment = Alignment.CenterHorizontally
         )
-        DisplayTodo(
-            todoList = todoViewModel.state.value.doneTodos,
-            itemViewModel = itemTodoViewModel,
-            todoViewModel = todoViewModel
-        ){
-            onClick()
+
+        if (isLoading && todoViewModel.state.value.doneTodos.isEmpty()) {
+            DisplayTodo(
+                todoList = listOf(emptyTodo),
+                itemViewModel = itemTodoViewModel,
+                todoViewModel = todoViewModel
+            ) {}
+        } else {
+            DisplayTodo(
+                todoList = todoViewModel.state.value.doneTodos,
+                itemViewModel = itemTodoViewModel,
+                todoViewModel = todoViewModel
+            ) {
+                onClick()
+            }
         }
+
     }
 }
 
