@@ -1,7 +1,7 @@
 package com.galacticstudio.digidoro.ui.screens.home
 
-import com.galacticstudio.digidoro.data.TodoModel
-import com.galacticstudio.digidoro.data.UserRankingModel
+import com.galacticstudio.digidoro.data.api.TodoModel
+import com.galacticstudio.digidoro.data.api.UserRankingModel
 
 data class HomeUIState(
     val username: String = "",

@@ -17,7 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.galacticstudio.digidoro.RetrofitApplication
+import com.galacticstudio.digidoro.Application
 import com.galacticstudio.digidoro.ui.screens.noteitem.NoteItemEvent
 import com.galacticstudio.digidoro.ui.screens.noteitem.viewmodel.NoteItemViewModel
 import com.galacticstudio.digidoro.ui.shared.floatingCards.floatingElementCard.ColorBox
@@ -32,7 +32,7 @@ fun ColorBottomSheetContent(
     noteItemViewModel: NoteItemViewModel,
     onBottomSheetChanged: (Boolean) -> Unit
 ) {
-    val app: RetrofitApplication = LocalContext.current.applicationContext as RetrofitApplication
+    val app: Application = LocalContext.current.applicationContext as Application
 
     Column(
         modifier = Modifier

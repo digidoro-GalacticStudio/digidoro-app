@@ -1,6 +1,5 @@
 package com.galacticstudio.digidoro.ui.screens.account
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -24,20 +23,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.galacticstudio.digidoro.R
-import com.galacticstudio.digidoro.RetrofitApplication
+import com.galacticstudio.digidoro.Application
 import com.galacticstudio.digidoro.navigation.HOME_GRAPH_ROUTE
-import com.galacticstudio.digidoro.navigation.ROOT_GRAPH_ROUTE
 import com.galacticstudio.digidoro.ui.screens.account.components.options.OptionComposable
 import com.galacticstudio.digidoro.ui.screens.account.components.options.OptionsComposable
 import com.galacticstudio.digidoro.ui.screens.account.components.userInformation.UserInformation
-import com.galacticstudio.digidoro.ui.screens.edituser.EditUserFormEvent
 import com.galacticstudio.digidoro.ui.screens.ranking.RankingUIEvent
 import com.galacticstudio.digidoro.ui.screens.ranking.mapper.UserRankingMapper
 import com.galacticstudio.digidoro.ui.screens.ranking.viewmodel.RankingViewModel
-import com.galacticstudio.digidoro.ui.shared.button.VerticalDivider
 import com.galacticstudio.digidoro.ui.theme.DigidoroTheme
 
 
@@ -56,7 +51,7 @@ fun AccountScreen(
     rankingViewModel: RankingViewModel = viewModel(factory = RankingViewModel.Factory),
 ) {
     // Retrieve the application instance from the current context
-    val app: RetrofitApplication = LocalContext.current.applicationContext as RetrofitApplication
+    val app: Application = LocalContext.current.applicationContext as Application
 
     val state = rankingViewModel.state
 

@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.LinearProgressIndicator
@@ -43,16 +42,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.galacticstudio.digidoro.R
-import com.galacticstudio.digidoro.RetrofitApplication
-import com.galacticstudio.digidoro.data.pomodoroList
-import com.galacticstudio.digidoro.data.todoList
+import com.galacticstudio.digidoro.Application
 import com.galacticstudio.digidoro.network.retrofit.RetrofitInstance
 import com.galacticstudio.digidoro.ui.screens.home.viewmodel.HomeViewModel
-import com.galacticstudio.digidoro.ui.screens.ranking.RankingUIEvent
 import com.galacticstudio.digidoro.ui.screens.ranking.mapper.UserRankingMapper.getRankingName
 import com.galacticstudio.digidoro.ui.screens.ranking.mapper.UserRankingMapper.getScoreRange
-import com.galacticstudio.digidoro.ui.screens.ranking.viewmodel.RankingViewModel
-import com.galacticstudio.digidoro.ui.shared.cards.pomodoroCard.PomodoroCard
 import com.galacticstudio.digidoro.ui.shared.cards.todocard.TodoCard
 import com.galacticstudio.digidoro.ui.shared.titles.CustomMessageData
 import com.galacticstudio.digidoro.ui.shared.titles.Title
@@ -86,7 +80,7 @@ fun HomeScreen(
     navController: NavHostController = rememberNavController(),
     homeViewModel: HomeViewModel = viewModel(factory = HomeViewModel.Factory),
 ) {
-    val app: RetrofitApplication = LocalContext.current.applicationContext as RetrofitApplication
+    val app: Application = LocalContext.current.applicationContext as Application
     val state = homeViewModel.state // Retrieves the current state from the HomeViewModel.
 
     val username = remember { mutableStateOf(app.getUsername()) }

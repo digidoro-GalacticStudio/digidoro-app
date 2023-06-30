@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.galacticstudio.digidoro.RetrofitApplication
+import com.galacticstudio.digidoro.Application
 import com.galacticstudio.digidoro.network.ApiResponse
 import com.galacticstudio.digidoro.repository.RankingRepository
 import com.galacticstudio.digidoro.repository.TodoRepository
@@ -15,9 +15,6 @@ import com.galacticstudio.digidoro.ui.screens.home.HomeResponseState
 import com.galacticstudio.digidoro.ui.screens.home.HomeUIEvent
 import com.galacticstudio.digidoro.ui.screens.home.HomeUIState
 import com.galacticstudio.digidoro.ui.screens.ranking.mapper.UserRankingMapper.mapToUserRankingModel
-import com.galacticstudio.digidoro.ui.screens.todo.components.TodosResponseState
-import com.galacticstudio.digidoro.ui.screens.todo.list.viewmodel.OrderType
-import com.galacticstudio.digidoro.ui.screens.todo.list.viewmodel.TodoViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -115,7 +112,7 @@ class HomeViewModel(
         val Factory = viewModelFactory {
             initializer {
                 val app =
-                    this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as RetrofitApplication
+                    this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as Application
                 // Create a new instance of RankingViewModel with dependencies.
                 HomeViewModel(
                     rankingRepository = app.rankingRepository,

@@ -1,51 +1,67 @@
 package com.galacticstudio.digidoro.data
 
-import androidx.compose.ui.graphics.Color
+import com.galacticstudio.digidoro.data.api.NoteModel
+import com.galacticstudio.digidoro.data.api.PomodoroModel
+import com.galacticstudio.digidoro.data.api.TagModel
+import com.galacticstudio.digidoro.data.api.TodoModel
+import com.galacticstudio.digidoro.data.api.UserModel
 import java.util.Calendar
 
 val pomodoroList = mutableListOf<PomodoroModel>().apply {
-    add(PomodoroModel(
+    add(
+        PomodoroModel(
         name = "Estudiar para Análisis de Sistemas",
         theme = "#8CC6E7",
-    ))
-    add(PomodoroModel(
+    )
+    )
+    add(
+        PomodoroModel(
         name = "Estudiar para Análisis de Sistemas",
         theme = "#C7B9FF",
-    ))
-    add(PomodoroModel(
+    )
+    )
+    add(
+        PomodoroModel(
         name = "Estudiar para Análisis de Sistemas",
         theme = "#FFC700",
-    ))
+    )
+    )
 }
 
 
 val todoList = mutableListOf<TodoModel>().apply {
     val calendar = Calendar.getInstance()
 
-    add(TodoModel(
+    add(
+        TodoModel(
         title = "Lorem Ipsu",
         theme = "#E15A51",
         description = "",
         createdAt = calendar.time,
-        ))
+        )
+    )
 
     calendar.add(Calendar.DAY_OF_YEAR, 2)
-    add(TodoModel(
+    add(
+        TodoModel(
         title = "Lorem Ipsu",
         description = "",
         theme = "#E15A51",
         createdAt = calendar.time
-    ))
+    )
+    )
 
 
     calendar.add(Calendar.DAY_OF_YEAR, 23)
-    add(TodoModel(
+    add(
+        TodoModel(
         title = "Lorem Ipsu",
         description = "",
         theme = "#85E0A3",
         state = true,
         createdAt = calendar.time
-    ))
+    )
+    )
 }
 
 val itemNotesList = listOf(

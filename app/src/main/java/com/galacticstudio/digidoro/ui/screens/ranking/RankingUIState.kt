@@ -1,6 +1,6 @@
 package com.galacticstudio.digidoro.ui.screens.ranking
 
-import com.galacticstudio.digidoro.data.UserRankingModel
+import com.galacticstudio.digidoro.data.api.UserRankingModel
 import com.galacticstudio.digidoro.ui.shared.button.ToggleButtonOptionType
 
 data class RankingUIState (

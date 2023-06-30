@@ -47,7 +47,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.galacticstudio.digidoro.R
-import com.galacticstudio.digidoro.data.TodoModel
+import com.galacticstudio.digidoro.data.api.TodoModel
 import com.galacticstudio.digidoro.ui.screens.todo.list.TodosEvent
 import com.galacticstudio.digidoro.ui.screens.todo.components.DisplayTodo
 import com.galacticstudio.digidoro.ui.screens.todo.components.TodosResponseState

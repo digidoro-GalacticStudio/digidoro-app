@@ -2,7 +2,6 @@ package com.galacticstudio.digidoro.ui.screens.noteslist
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
@@ -30,7 +29,6 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -55,8 +53,6 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -68,8 +64,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.galacticstudio.digidoro.R
-import com.galacticstudio.digidoro.RetrofitApplication
-import com.galacticstudio.digidoro.data.NoteModel
+import com.galacticstudio.digidoro.Application
+import com.galacticstudio.digidoro.data.api.NoteModel
 import com.galacticstudio.digidoro.domain.util.NoteOrder
 import com.galacticstudio.digidoro.domain.util.OrderType
 import com.galacticstudio.digidoro.navigation.Screen
@@ -84,7 +80,6 @@ import com.galacticstudio.digidoro.ui.screens.noteslist.viewmodel.FolderViewMode
 import com.galacticstudio.digidoro.ui.screens.noteslist.viewmodel.NotesViewModel
 import com.galacticstudio.digidoro.ui.shared.dialogs.ExitConfirmationDialog
 import com.galacticstudio.digidoro.ui.shared.floatingCards.BottomSheetLayout
-import com.galacticstudio.digidoro.ui.shared.textfield.SearchBarItem
 import com.galacticstudio.digidoro.ui.shared.titles.CustomMessageData
 import com.galacticstudio.digidoro.ui.shared.titles.Title
 import com.galacticstudio.digidoro.ui.theme.DigidoroTheme
@@ -157,7 +152,7 @@ fun NotesListScreen(
     val openMoveToFolderDialog = remember { mutableStateOf(false) }
 
     val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
-    val app: RetrofitApplication = LocalContext.current.applicationContext as RetrofitApplication
+    val app: Application = LocalContext.current.applicationContext as Application
     val context = LocalContext.current
 
     val screenSize = LocalConfiguration.current.screenWidthDp.dp
@@ -387,7 +382,7 @@ fun NotesListContent(
     selectedCard: MutableState<NoteModel?>,
     onLongNoteClick: () -> Unit
 ) {
-    val app: RetrofitApplication = LocalContext.current.applicationContext as RetrofitApplication
+    val app: Application = LocalContext.current.applicationContext as Application
     val state = notesViewModel.state.value
 
     val actionNotesList = listOf(
@@ -738,7 +733,7 @@ fun ShortNoteItems(
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun FolderList(
-    app: RetrofitApplication,
+    app: Application,
     notesViewModel: NotesViewModel,
     folderViewModel: FolderViewModel
 ) {

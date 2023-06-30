@@ -9,7 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.galacticstudio.digidoro.RetrofitApplication
+import com.galacticstudio.digidoro.Application
 import com.galacticstudio.digidoro.domain.usecase.todo.AddTodo
 import com.galacticstudio.digidoro.network.ApiResponse
 import com.galacticstudio.digidoro.repository.TodoRepository
@@ -261,7 +261,7 @@ class ItemTodoViewModel(
     companion object{
         val Factory = viewModelFactory {
             initializer {
-                val app = this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as RetrofitApplication
+                val app = this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as Application
 
                 ItemTodoViewModel(
                     addTodo = AddTodo(),

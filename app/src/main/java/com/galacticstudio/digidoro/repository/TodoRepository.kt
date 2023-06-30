@@ -1,19 +1,13 @@
 package com.galacticstudio.digidoro.repository
 
-import com.galacticstudio.digidoro.data.TodoModel
+import com.galacticstudio.digidoro.data.api.TodoModel
 import com.galacticstudio.digidoro.network.ApiResponse
 import com.galacticstudio.digidoro.network.dto.todo.RequestTodo
-import com.galacticstudio.digidoro.network.dto.todo.ResponseTodo
-import com.galacticstudio.digidoro.network.dto.todo.TodoData
 import com.galacticstudio.digidoro.network.dto.todo.toTodoModel
 import com.galacticstudio.digidoro.network.dto.todo.toTodosModel
 import com.galacticstudio.digidoro.network.service.TodoService
 import com.galacticstudio.digidoro.repository.utils.handleApiCall
 import com.galacticstudio.digidoro.util.DateUtils
-import com.google.gson.Gson
-import retrofit2.HttpException
-import java.io.IOException
-import java.util.Calendar
 import java.util.Date
 
 
