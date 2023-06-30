@@ -28,9 +28,9 @@ fun TimerBlock(time:Int){
                 .shadowWithCorner(
                     cornerRadius = cornerRadius,
                     shadowOffset = Offset(15.0f, 15.0f),
-                    shadowColor = colorResource(id = R.color.secondary_color)
+                    shadowColor = MaterialTheme.colorScheme.onPrimary
                 )
-                .border(1.dp, colorResource(id = R.color.secondary_color), RoundedCornerShape(cornerRadius))
+                .border(1.dp, MaterialTheme.colorScheme.onPrimary, RoundedCornerShape(cornerRadius))
                 .background(MaterialTheme.colorScheme.background, RoundedCornerShape(cornerRadius))
                 .padding(horizontal = 10.dp, vertical = 6.dp)
         ){

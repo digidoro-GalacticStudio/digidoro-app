@@ -63,7 +63,7 @@ fun PomodoroDialog(
         ) {
             Column(
                 modifier = Modifier
-                    .padding(16.dp)
+                    .padding(10.dp)
             ) {
                 TitleCard(
                     placeHolder = "Name your Pomo.",
@@ -75,7 +75,7 @@ fun PomodoroDialog(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text =  "Number of sessions",
+                    text = "Number of sessions",
                     style = MaterialTheme.typography.bodyLarge,
                     fontFamily = Nunito,
                     fontWeight = FontWeight.W800,
@@ -89,7 +89,8 @@ fun PomodoroDialog(
                         type = TextFieldType.NUMBER,
                         leadingIcon = null,
                         isError = false,
-                    ) {
+
+                        ) {
 //                    loginViewModel.onEvent(LoginFormEvent.PasswordChanged(it))
                         number.value = it
                     }
@@ -98,7 +99,7 @@ fun PomodoroDialog(
 //                ErrorMessage(state.passwordError)
 
                 Text(
-                    text =  "Color",
+                    text = "Color",
                     style = MaterialTheme.typography.bodyLarge,
                     fontFamily = Nunito,
                     fontWeight = FontWeight.W800,
@@ -107,13 +108,14 @@ fun PomodoroDialog(
                 ColorBox(
 //                    selectedColor = Color(android.graphics.Color.parseColor("#${itemViewModel.state.value.theme}")),
                     selectedColor = Color.Red,
-                    onColorChange = {
+                    spacedBy = 0.dp,
+                    isUserPremium = app.getRoles().contains("premium")
+                ) {
 //                        itemViewModel.onEvent(
 //                            ItemTodoEvent.themeChanged(ColorCustomUtils.convertColorToString(it))
 //                        )
-                    },
-                    isUserPremium = app.getRoles().contains("premium")
-                )
+                }
+                Spacer(modifier = Modifier.height(16.dp))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -130,7 +132,7 @@ fun PomodoroDialog(
                     ButtonControl(
                         text = "Save",
                         contentColor = MaterialTheme.colorScheme.secondary,
-                        backgroundColor = MaterialTheme.colorScheme.secondary.copy(0.2f),
+                        backgroundColor = MaterialTheme.colorScheme.secondary.copy(0.07f),
                         borderColor = MaterialTheme.colorScheme.secondary,
                     ) {
                         onDismissRequest()

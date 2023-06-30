@@ -4,26 +4,18 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.TextSelectionColors
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
-import com.galacticstudio.digidoro.R
-import com.galacticstudio.digidoro.ui.theme.DigidoroTheme
-import com.galacticstudio.digidoro.ui.theme.Gray60
+import androidx.compose.ui.unit.dp
+import com.galacticstudio.digidoro.util.bottomBorder
 
 /**
  * Function that works us Title field for elements created in the app
@@ -58,7 +50,8 @@ fun TitleCard(
                     )
                 },
                 modifier = Modifier
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .bottomBorder(1.5.dp, MaterialTheme.colorScheme.onPrimary),
                 colors = TextFieldDefaults.colors(
                     cursorColor = MaterialTheme.colorScheme.onPrimary,
                     unfocusedIndicatorColor = Color.Transparent,
