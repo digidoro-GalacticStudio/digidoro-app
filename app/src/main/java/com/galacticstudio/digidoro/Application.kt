@@ -3,6 +3,7 @@ package com.galacticstudio.digidoro
 import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
+import com.galacticstudio.digidoro.data.db.DigidoroDataBase
 import com.galacticstudio.digidoro.network.retrofit.RetrofitInstance
 import com.galacticstudio.digidoro.repository.CredentialsRepository
 import com.galacticstudio.digidoro.repository.FavoriteNoteRepository
@@ -13,6 +14,10 @@ import com.galacticstudio.digidoro.repository.TodoRepository
 import com.galacticstudio.digidoro.repository.UserRepository
 
 class Application : Application() {
+
+    private val database: DigidoroDataBase by lazy {
+        DigidoroDataBase.getInstance(this)
+    }
 
     private val prefs: SharedPreferences by lazy {
         getSharedPreferences("Retrofit", Context.MODE_PRIVATE)
@@ -62,7 +67,7 @@ class Application : Application() {
     }
 
     val notesRepository: NoteRepository by lazy {
-        NoteRepository(getNoteAPIService())
+        NoteRepository(getNoteAPIService(), database.noteDao())
     }
 
     val favoriteNotesRepository: FavoriteNoteRepository by lazy {

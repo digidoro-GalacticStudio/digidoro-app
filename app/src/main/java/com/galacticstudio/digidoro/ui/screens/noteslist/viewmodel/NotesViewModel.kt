@@ -1,9 +1,11 @@
 package com.galacticstudio.digidoro.ui.screens.noteslist.viewmodel
 
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Path.Companion.combine
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
@@ -33,6 +35,7 @@ import com.galacticstudio.digidoro.ui.screens.noteslist.NotesState
 import com.galacticstudio.digidoro.util.DateUtils.Companion.convertISO8601ToDate
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
@@ -172,48 +175,88 @@ class NotesViewModel(
                 is OrderType.Descending -> "desc"
             }
 
-            val response = when (_resultsMode.value) {
-                is NoteResultsMode.AllNotes -> noteRepository.getAllNotes(
-                    sortBy,
-                    order,
-                    isTrashed = false
-                )
+            val apiNotesResponse = noteRepository.getAllNotesFromApi(sortBy, order, isTrashed = false)
+            val dbNotes = noteRepository.getAllNotesFromDatabase().firstOrNull()
 
-                is NoteResultsMode.FavoriteNotes -> favoriteNoteRepository.getAllFavoriteNotes(
-                    populateFields = "notes_id"
-                )
-
-                is NoteResultsMode.TrashNotes -> noteRepository.getAllNotes(
-                    sortBy,
-                    order,
-                    isTrashed = true
-                )
-
-                is NoteResultsMode.FolderNotes -> noteRepository.getAllNotes(
-                    sortBy,
-                    order,
-                    isTrashed = false
-                ) //noteRepository.getFolderNotes(sortBy, order)
-            }
-
-            when (response) {
-                is ApiResponse.Error -> {
-                    sendResponseEvent(NotesResponseState.Error(response.exception))
-                }
-
-                is ApiResponse.ErrorWithMessage -> {
-                    sendResponseEvent(NotesResponseState.ErrorWithMessage(response.message))
-                }
-
+            when (apiNotesResponse) {
                 is ApiResponse.Success -> {
+                    // Oget notas from database
+                    val notesFromDatabase = dbNotes?.map { it._id }
+
+                    // get the notes from API
+                    val notesFromApi = apiNotesResponse.data
+
+                    val notes = mutableListOf<NoteData>()
+
+                    notesFromApi.forEach { noteData ->
+                        val matchingNoteId = notesFromDatabase?.find { it == noteData.id }
+                        if (matchingNoteId == null) {
+                            notes.add(noteData)
+                        }
+                    }
+
+                    noteRepository.syncNotes(notesFromApi)
+                    Log.d("MyErrors", "Sync")
+
                     _state.value = _state.value.copy(
-                        notes = mapToNoteModels(response.data),
+                        notes = mapToNoteModels(notes),
                         noteOrder = noteOrder,
                         isLoading = false,
                     )
                     sendResponseEvent(NotesResponseState.Success)
                 }
+
+                is ApiResponse.Error -> {
+                    sendResponseEvent(NotesResponseState.Error(apiNotesResponse.exception))
+                }
+
+                is ApiResponse.ErrorWithMessage -> {
+                    sendResponseEvent(NotesResponseState.ErrorWithMessage(apiNotesResponse.message))
+                }
             }
+
+//            val response = when (_resultsMode.value) {
+//                is NoteResultsMode.AllNotes -> noteRepository.getAllNotes(
+//                    sortBy,
+//                    order,
+//                    isTrashed = false
+//                )
+//
+//                is NoteResultsMode.FavoriteNotes -> favoriteNoteRepository.getAllFavoriteNotes(
+//                    populateFields = "notes_id"
+//                )
+//
+//                is NoteResultsMode.TrashNotes -> noteRepository.getAllNotes(
+//                    sortBy,
+//                    order,
+//                    isTrashed = true
+//                )
+//
+//                is NoteResultsMode.FolderNotes -> noteRepository.getAllNotes(
+//                    sortBy,
+//                    order,
+//                    isTrashed = false
+//                ) //noteRepository.getFolderNotes(sortBy, order)
+//            }
+
+//            when (response) {
+//                is ApiResponse.Error -> {
+//                    sendResponseEvent(NotesResponseState.Error(response.exception))
+//                }
+//
+//                is ApiResponse.ErrorWithMessage -> {
+//                    sendResponseEvent(NotesResponseState.ErrorWithMessage(response.message))
+//                }
+//
+//                is ApiResponse.Success -> {
+//                    _state.value = _state.value.copy(
+//                        notes = mapToNoteModels(response.data),
+//                        noteOrder = noteOrder,
+//                        isLoading = false,
+//                    )
+//                    sendResponseEvent(NotesResponseState.Success)
+//                }
+//            }
         }
     }
 

@@ -203,7 +203,7 @@ class NoteItemViewModel(
 
     private fun getNoteById(noteId: String) {
         executeOperation(
-            operation = { noteRepository.getNoteById(noteId) },
+            operation = { noteRepository.getNoteByIdFromApi(noteId) },
             onSuccess = { response ->
                 val note = mapToNoteModel(response.data)
                 _state.value = _state.value.copy(

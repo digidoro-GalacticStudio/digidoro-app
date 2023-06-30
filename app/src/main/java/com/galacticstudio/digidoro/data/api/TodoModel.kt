@@ -9,7 +9,9 @@ data class TodoModel(
     val title: String,
     val description: String,
     val theme: String,
+    val user_id: String = "",
     val createdAt: Date = Calendar.getInstance().time,
+    val updatedAt: Date = Calendar.getInstance().time,
     val state: Boolean = false,
     val reminder: Date = Calendar.getInstance().time
 )

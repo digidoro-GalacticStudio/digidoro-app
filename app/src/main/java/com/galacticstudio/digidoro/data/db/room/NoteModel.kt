@@ -2,10 +2,11 @@ package com.galacticstudio.digidoro.data.db.room
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-
+import androidx.room.TypeConverters
 
 @Entity(tableName = "note")
-data class NoteModel(
+@TypeConverters(StringListConverter::class)
+data class NoteEntity(
     @PrimaryKey
     val _id: String,
     val user_id: String,

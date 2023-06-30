@@ -17,7 +17,8 @@ interface FavoriteNoteDao {
     @Query("SELECT * FROM favoritenotes")
     fun pagingSource(): List<FavoriteNotesModel>
 
-    @Query("UPDATE favoritenotes SET  = :note WHERE id = :id")
-    suspend fun updateFavoriteNoteById(id: String, note: String)
+    // Error here
+//    @Query("UPDATE favoritenotes SET  = :note WHERE id = :id")
+//    suspend fun updateFavoriteNoteById(id: String, note: String)
 
 }
