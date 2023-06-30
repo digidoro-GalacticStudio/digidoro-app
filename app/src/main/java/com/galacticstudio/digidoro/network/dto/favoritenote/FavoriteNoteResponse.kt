@@ -36,3 +36,10 @@ data class ToggleFavoriteNote(
     @SerializedName("user_id") val userId: String,
     @SerializedName("notes_id") val notesId: List<String>,
 )
+
+//Responses for FavoriteNoteDao Room DataBase
+data class FavoriteNoteDao(
+    val _id: String,
+    val user_id: String,
+    val notes_id: List<String>
+)

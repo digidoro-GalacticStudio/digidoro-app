@@ -3,18 +3,25 @@ package com.galacticstudio.digidoro.data.db
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverter
+import androidx.room.TypeConverters
 import com.galacticstudio.digidoro.Application
-import com.galacticstudio.digidoro.data.db.room.FavoriteNotesModel
-import com.galacticstudio.digidoro.data.db.room.FolderModel
-import com.galacticstudio.digidoro.data.db.room.NoteModel
-import com.galacticstudio.digidoro.data.db.room.PomodoroModel
-import com.galacticstudio.digidoro.data.db.room.TodoItemModel
-import com.galacticstudio.digidoro.data.db.room.UsersModel
+import com.galacticstudio.digidoro.data.db.converters.DateConverter
+import com.galacticstudio.digidoro.data.db.converters.ListStringConverter
+import com.galacticstudio.digidoro.data.db.models.FavoriteNotesModelEntity
+import com.galacticstudio.digidoro.data.db.models.FolderModelEntity
+import com.galacticstudio.digidoro.data.db.models.NoteModelEntity
+import com.galacticstudio.digidoro.data.db.models.PomodoroModelEntity
+import com.galacticstudio.digidoro.data.db.models.TodoItemModelEntity
+import com.galacticstudio.digidoro.data.db.models.UsersModelEntity
 
 @Database(
-    entities = [UsersModel::class, TodoItemModel::class, PomodoroModel::class, NoteModel::class, FolderModel::class, FavoriteNotesModel::class],
+    entities = [UsersModelEntity::class, TodoItemModelEntity::class, PomodoroModelEntity::class, NoteModelEntity::class, FolderModelEntity::class, FavoriteNotesModelEntity::class],
     version = 1,
     exportSchema = false
+)
+@TypeConverters(
+    value = [DateConverter::class, ListStringConverter::class]
 )
 abstract class DigidoroDataBase : RoomDatabase() {
 

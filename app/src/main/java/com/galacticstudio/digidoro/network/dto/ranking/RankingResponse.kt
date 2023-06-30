@@ -33,3 +33,15 @@ data class UserInformationData(
     @SerializedName("monthly_score") val monthlyScore: Int,
     @SerializedName("total_score") val totalScore: Int
 )
+
+data class RankingData(
+    val id: String,
+    val firstname: String,
+    val username: String,
+    val profilePic: String,
+    val level: String,
+    val daily_score: Int,
+    val weekly_score: Int,
+    val monthly_score: Int,
+    val total_score: Int
+)
