@@ -86,11 +86,11 @@ sealed class ItemsMenu(
         "note_screen"
     )
 
-//    object PomosItem : ItemsMenu(
-//        R.drawable.pomo,
-//        "pomos",
-//        "pomodoro_screen"
-//    )
+    object PomodoroItem : ItemsMenu(
+        R.drawable.pomo,
+        "pomos",
+        "pomodoro_screen"
+    )
 
     object AccountItem : ItemsMenu(
         R.drawable.manage_account_icon,
@@ -254,6 +254,7 @@ val navigationItems = listOf(
     ItemsMenu.HomeItem,
     ItemsMenu.TodoItem,
     ItemsMenu.NotesItem,
+    ItemsMenu.PomodoroItem,
     ItemsMenu.AccountItem
 )
 

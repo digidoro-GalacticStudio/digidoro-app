@@ -42,20 +42,21 @@ sealed class ToggleButtonOptionType {
     object Total : ToggleButtonOptionType()
 }
 
+val options = arrayOf(
+    ToggleButtonOption(ToggleButtonOptionType.Today, "Today", null),
+    ToggleButtonOption(ToggleButtonOptionType.Weekly, "Semanal", null),
+    ToggleButtonOption(ToggleButtonOptionType.Monthly, "Mensual", null),
+)
+
 @Composable
 fun ToggleButton(
     backgroundColor: Color = AzureBlue10,
-    onButtonClick: (selectedOption: ToggleButtonOption) -> Unit = {}
+    optionList: Array<ToggleButtonOption> = options,
+    onButtonClick: (selectedOption: ToggleButtonOption) -> Unit = {},
 ) {
-    val options = arrayOf(
-        ToggleButtonOption(ToggleButtonOptionType.Today, "Today", null),
-        ToggleButtonOption(ToggleButtonOptionType.Weekly, "Semanal", null),
-        ToggleButtonOption(ToggleButtonOptionType.Monthly, "Mensual", null),
-    )
-
     ContainerToggleButton(
         backgroundColor = backgroundColor,
-        options = options,
+        options = optionList,
         type = SelectionType.SINGLE,
         modifier = Modifier.padding(end = 4.dp),
         onButtonClick = onButtonClick
@@ -63,11 +64,14 @@ fun ToggleButton(
 }
 
 @Composable
-fun VerticalDivider() {
+fun VerticalDivider(
+    color: Color
+) {
     Divider(
         modifier = Modifier
             .fillMaxHeight()
-            .width(2.dp)
+            .width(2.dp),
+        color = color.copy(0.7f)
     )
 }
 
@@ -83,7 +87,7 @@ fun ContainerToggleButton(
 
     OutlinedButton(
         onClick = { },
-        border = BorderStroke(1.dp, Color.hsl(220f, 1f, 0.75f)),
+        border = BorderStroke(1.dp, backgroundColor.copy(0.7f)),
         shape = RoundedCornerShape(50),
         colors = ButtonDefaults.outlinedButtonColors(
             contentColor = Color.Red,
@@ -139,14 +143,14 @@ fun ContainerToggleButton(
             onClick = onItemClick,
         )
 
-        VerticalDivider()
+        VerticalDivider(backgroundColor)
         middle.map { option ->
             SelectionPill(
                 option = option,
                 selected = state.contains(option.text),
                 onClick = onItemClick,
             )
-            VerticalDivider()
+            VerticalDivider(backgroundColor)
         }
 
         SelectionPill(

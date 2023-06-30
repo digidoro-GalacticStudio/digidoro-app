@@ -6,7 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.galacticstudio.digidoro.navigation.POMODORO_GRAPH_ROUTE
 import com.galacticstudio.digidoro.navigation.Screen
-import com.galacticstudio.digidoro.ui.PomodoroScreen
+import com.galacticstudio.digidoro.ui.screens.pomodoro.PomodoroScreen
 
 fun NavGraphBuilder.pomodoroNavGraph(
     navController: NavHostController
