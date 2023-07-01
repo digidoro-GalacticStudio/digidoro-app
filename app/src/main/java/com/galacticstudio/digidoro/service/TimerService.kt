@@ -130,6 +130,8 @@ class TimerService : Service() {
 
                 duration = (initialTime.toLong() * 60).seconds
                 savedDuration = (initialTime.toLong() * 60).seconds
+
+                updateTimeUnits()
             }
             TimerState.Started.name -> {
                 setStopButton()
@@ -157,6 +159,8 @@ class TimerService : Service() {
 
                     duration = (initialTime.toLong() * 60).seconds
                     savedDuration = (initialTime.toLong() * 60).seconds
+
+                    updateTimeUnits()
                 }
                 ACTION_SERVICE_START -> {
                     setStopButton()

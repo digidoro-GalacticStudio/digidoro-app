@@ -1,6 +1,5 @@
 package com.galacticstudio.digidoro.ui.screens.pomodoro
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Arrangement
@@ -33,6 +32,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.galacticstudio.digidoro.R
@@ -72,15 +72,57 @@ fun PomodoroScreen(
     val currentState by stopwatchService.currentState
 
     LaunchedEffect(Unit) {
+        pomodoroViewModel.onEvent(PomodoroUIEvent.Rebuild)
+
         snapshotFlow { minutes.toInt() to seconds.toInt() }
             .collect { (min, sec) ->
                 if (min == 0 && sec == 0) {
-                    // Do something when both minutes and seconds reach 0
-                    // For example, stop the stopwatch or navigate to another screen
                     Toast.makeText(context, "Contador llegó a cero", Toast.LENGTH_SHORT).show()
+
+                    when (pomodoroViewModel.pomodoroType.value) {
+                        PomodoroTimerState.Pomodoro -> {
+                            pomodoroViewModel.onEvent(PomodoroUIEvent.SavePomodoro)
+                        }
+                        PomodoroTimerState.ShortBreak -> {
+
+                        }
+                        PomodoroTimerState.LongBreak -> {
+
+                        }
+                    }
                 }
             }
+
+        ServiceHelper.triggerForegroundService(
+            context = context,
+            action = Service.ACTION_SERVICE_VARIABLES,
+            initialSeconds = 1,
+        )
+
+
     }
+
+    LaunchedEffect(key1 = context) {
+        // Collect the response events from the notesViewModel
+        pomodoroViewModel.responseEvents.collect { event ->
+            when (event) {
+                is PomodoroResponseState.Error -> {
+                    Toast.makeText(
+                        context,
+                        "An error has occurred ${event.exception}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                is PomodoroResponseState.ErrorWithMessage -> {
+                    Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+                }
+
+                else -> {}
+            }
+        }
+    }
+
 
     val openDialog = rememberSaveable { mutableStateOf(false) }
 
@@ -112,11 +154,43 @@ fun PomodoroScreen(
                         ToggleButtonOption(ToggleButtonOptionType.Today, "Pomo", null),
                         ToggleButtonOption(ToggleButtonOptionType.Weekly, "Short Break", null),
                         ToggleButtonOption(ToggleButtonOptionType.Monthly, "Long Break", null),
-                    )
+                    ),
+                    enabled = pomodoroViewModel.state.value.selectedPomodoro != null
                 ) { selectedOption ->
-//                    rankingViewModel.onEvent(RankingUIEvent.ResultTypeChange(selectedOption.type))
+                    if (pomodoroViewModel.state.value.selectedPomodoro == null) {
+                        Toast.makeText(context, "Select o create a new pomodoro", Toast.LENGTH_SHORT).show()
+                        return@ToggleButton
+                    }
+
+                    val type = when (selectedOption.type) {
+                        is ToggleButtonOptionType.Today -> PomodoroTimerState.Pomodoro
+                        is ToggleButtonOptionType.Weekly -> PomodoroTimerState.ShortBreak
+                        is ToggleButtonOptionType.Monthly -> PomodoroTimerState.LongBreak
+                        else -> {PomodoroTimerState.Pomodoro}
+                    }
+
+                    val minutesType = when (selectedOption.type) {
+                        is ToggleButtonOptionType.Today -> 1
+                        is ToggleButtonOptionType.Weekly -> 2
+                        is ToggleButtonOptionType.Monthly -> 3
+                        else -> {0}
+                    }
+
+                    ServiceHelper.triggerForegroundService(
+                        context = context,
+                        action = Service.ACTION_SERVICE_VARIABLES,
+                        initialSeconds = minutesType,
+                    )
+
+                    pomodoroViewModel.onEvent(PomodoroUIEvent.TypeChanged(type))
                 }
             }
+        }
+
+        item {
+            Text(
+                text = pomodoroViewModel.pomodoroType.value.toString(),
+            )
         }
 
         item {
@@ -135,7 +209,6 @@ fun PomodoroScreen(
             Spacer(modifier = Modifier.height(24.dp))
         }
 
-
         item {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -144,9 +217,11 @@ fun PomodoroScreen(
             ) {
                 IconButton(
                     onClick = {
-                        //Reset the pomodoro timer
-//                        pomodoroViewModel.resetTimer()
-//                        resetStopwatch(context)
+                        if (pomodoroViewModel.state.value.selectedPomodoro == null) {
+                            Toast.makeText(context, "Select o create a new pomodoro", Toast.LENGTH_SHORT).show()
+                            return@IconButton
+                        }
+
                         ServiceHelper.triggerForegroundService(
                             context = context, action = ACTION_SERVICE_CANCEL
                         )
@@ -162,20 +237,12 @@ fun PomodoroScreen(
                     )
                 }
 
-                var number = 0
                 IconButton(
                     onClick = {
-
-                        if (number == 0) {
-                            ServiceHelper.triggerForegroundService(
-                                context = context,
-                                action = Service.ACTION_SERVICE_VARIABLES,
-                                initialSeconds = 1,
-//                                handleActionWhenCountdownZero = handleActionWhenCountdownZero
-                            )
-                            number = 2
+                        if (pomodoroViewModel.state.value.selectedPomodoro == null) {
+                            Toast.makeText(context, "Select o create a new pomodoro", Toast.LENGTH_SHORT).show()
+                            return@IconButton
                         }
-//
 
                         ServiceHelper.triggerForegroundService(
                             context = context,
@@ -205,13 +272,18 @@ fun PomodoroScreen(
 
                 IconButton(
                     onClick = {
-                        //Skip pomodoro sessions
-//                        pomodoroViewModel.resetTimer()
-                        //TODO
+                        if (pomodoroViewModel.state.value.selectedPomodoro == null) {
+                            Toast.makeText(context, "Select o create a new pomodoro", Toast.LENGTH_SHORT).show()
+                            return@IconButton
+                        }
+
+                        if (pomodoroViewModel.pomodoroType.value == PomodoroTimerState.Pomodoro) {
+                            Toast.makeText(context, "You can only skip the breaks", Toast.LENGTH_SHORT).show()
+                            return@IconButton
+                        }
                     },
                     modifier = Modifier
                         .padding(start = 4.dp)
-
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.play_arrow_icon),
@@ -242,11 +314,37 @@ fun PomodoroScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             if (openDialog.value) {
-                PomodoroDialog {
+                PomodoroDialog(pomodoroViewModel) {
                     openDialog.value = false
                 }
             }
+        }
 
+        if (pomodoroViewModel.state.value.selectedPomodoro != null) {
+            val selectedPomodoro = pomodoroViewModel.state.value.selectedPomodoro
+
+            item {
+                Spacer(modifier = Modifier.height(24.dp))
+                Title(
+                    message = CustomMessageData(
+                        title = "Selected pomodoro",
+                        subTitle = "Start the timer and complete your sessions"
+                    ),
+                    titleStyle = MaterialTheme.typography.headlineSmall
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                TodoCard(
+                    message = selectedPomodoro?.name ?: "",
+                    boldSubtitle = "${selectedPomodoro?.sessionsCompleted} / ",
+                    normalSubtitle = selectedPomodoro?.totalSessions.toString(),
+                    colorTheme = Color(android.graphics.Color.parseColor(
+                        selectedPomodoro?.theme.toString()
+                    )
+                    ),
+                    onClick = {}
+                )
+                Spacer(modifier = Modifier.height(24.dp))
+            }
         }
 
         item {
@@ -260,16 +358,23 @@ fun PomodoroScreen(
             Spacer(modifier = Modifier.height(24.dp))
         }
 
-        itemsIndexed(todoList) { _, todo ->
-            val (text, formattedDate) = DateUtils.formatDateWithTime(todo.createdAt)
+        itemsIndexed(pomodoroViewModel.state.value.pomodoroList) { _, todo ->
             TodoCard(
-                message = todo.title,
-                boldSubtitle = text,
-                normalSubtitle = formattedDate,
+                message = todo.name,
+                boldSubtitle = "${todo.sessionsCompleted} / ",
+                normalSubtitle = todo.totalSessions.toString(),
                 colorTheme = Color(android.graphics.Color.parseColor(todo.theme)),
-                onClick = {}
+                onClick = {
+                    pomodoroViewModel.onEvent(PomodoroUIEvent.SelectedPomodoroChanged(todo))
+                }
             )
             Spacer(modifier = Modifier.height(16.dp))
         }
     }
+}
+
+enum class PomodoroTimerState {
+    Pomodoro,
+    LongBreak,
+    ShortBreak,
 }

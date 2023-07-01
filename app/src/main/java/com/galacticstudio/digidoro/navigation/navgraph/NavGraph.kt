@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.NavHostController
 import com.galacticstudio.digidoro.navigation.ROOT_GRAPH_ROUTE
 import com.galacticstudio.digidoro.service.TimerService
+import com.galacticstudio.digidoro.ui.screens.pomodoro.viewmodel.PomodoroViewModel
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -16,6 +17,7 @@ fun SetupNavGraph(
     onSelectionChange: (Boolean) -> Unit,
     startDestination: String,
     stopwatchService: TimerService,
+    pomodoroViewModel: PomodoroViewModel,
 ) {
     NavHost(
         navController = navController,
@@ -32,6 +34,7 @@ fun SetupNavGraph(
         )
         pomodoroNavGraph(
             navController = navController,
+            pomodoroViewModel = pomodoroViewModel,
             stopwatchService = stopwatchService
         )
         accountNavGraph(navController = navController)

@@ -9,11 +9,13 @@ import com.galacticstudio.digidoro.navigation.POMODORO_GRAPH_ROUTE
 import com.galacticstudio.digidoro.navigation.Screen
 import com.galacticstudio.digidoro.service.TimerService
 import com.galacticstudio.digidoro.ui.screens.pomodoro.PomodoroScreen
+import com.galacticstudio.digidoro.ui.screens.pomodoro.viewmodel.PomodoroViewModel
 
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.pomodoroNavGraph(
     navController: NavHostController,
-    stopwatchService: TimerService
+    stopwatchService: TimerService,
+    pomodoroViewModel: PomodoroViewModel
 ){
     navigation(
         startDestination = Screen.Pomodoro.route,
@@ -24,7 +26,8 @@ fun NavGraphBuilder.pomodoroNavGraph(
         ) {
             PomodoroScreen(
                 navController = navController,
-                stopwatchService = stopwatchService
+                pomodoroViewModel = pomodoroViewModel,
+                stopwatchService = stopwatchService,
             )
         }
     }

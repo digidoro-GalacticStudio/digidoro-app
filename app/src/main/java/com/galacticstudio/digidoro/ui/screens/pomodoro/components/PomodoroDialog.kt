@@ -26,21 +26,23 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.galacticstudio.digidoro.Application
+import com.galacticstudio.digidoro.ui.screens.pomodoro.PomodoroUIEvent
+import com.galacticstudio.digidoro.ui.screens.pomodoro.viewmodel.PomodoroViewModel
 import com.galacticstudio.digidoro.ui.shared.floatingCards.floatingElementCard.ButtonControl
 import com.galacticstudio.digidoro.ui.shared.floatingCards.floatingElementCard.ColorBox
 import com.galacticstudio.digidoro.ui.shared.floatingCards.floatingElementCard.TitleCard
 import com.galacticstudio.digidoro.ui.shared.textfield.TextFieldItem
 import com.galacticstudio.digidoro.ui.shared.textfield.TextFieldType
 import com.galacticstudio.digidoro.ui.theme.Nunito
+import com.galacticstudio.digidoro.util.ColorCustomUtils
 import com.galacticstudio.digidoro.util.shadowWithCorner
 
 @Composable
 fun PomodoroDialog(
-    onDismissRequest: () -> Unit
+    pomodoroViewModel: PomodoroViewModel,
+    onDismissRequest: () -> Unit,
 ) {
     val cornerRadius = 5.dp
-    val title = remember { mutableStateOf("") }
-    val number = remember { mutableStateOf("") }
     val app: Application = LocalContext.current.applicationContext as Application
 
     Dialog(onDismissRequest = onDismissRequest) {
@@ -66,10 +68,9 @@ fun PomodoroDialog(
             ) {
                 TitleCard(
                     placeHolder = "Name your Pomo.",
-                    value = title.value
+                    value = pomodoroViewModel.state.value.name
                 ) {
-                    title.value = it
-//                itemViewModel.onEvent(ItemTodoEvent.titleChanged(it))
+                    pomodoroViewModel.onEvent(PomodoroUIEvent.NameChanged(it))
                 }
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -83,15 +84,19 @@ fun PomodoroDialog(
 
                 Box(modifier = Modifier.widthIn(0.dp, 120.dp)) {
                     TextFieldItem(
-                        value = number.value,
+                        value = pomodoroViewModel.state.value.totalSessions.toString(),
                         placeholder = "#",
                         type = TextFieldType.NUMBER,
                         leadingIcon = null,
                         isError = false,
-
-                        ) {
-//                    loginViewModel.onEvent(LoginFormEvent.PasswordChanged(it))
-                        number.value = it
+                    ) {
+                        val numberString = it
+                        val totalSessions = if (numberString.isEmpty()) {
+                            0
+                        } else {
+                            numberString.toIntOrNull() ?: 0
+                        }
+                        pomodoroViewModel.onEvent(PomodoroUIEvent.TotalSessionsChanged(totalSessions))
                     }
                 }
                 Spacer(modifier = Modifier.height(16.dp))
@@ -105,14 +110,13 @@ fun PomodoroDialog(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 ColorBox(
-//                    selectedColor = Color(android.graphics.Color.parseColor("#${itemViewModel.state.value.theme}")),
-                    selectedColor = Color.Red,
+                    selectedColor = Color(android.graphics.Color.parseColor("#${pomodoroViewModel.pomodoroColor.value}")),
                     spacedBy = 0.dp,
                     isUserPremium = app.getRoles().contains("premium")
                 ) {
-//                        itemViewModel.onEvent(
-//                            ItemTodoEvent.themeChanged(ColorCustomUtils.convertColorToString(it))
-//                        )
+                    pomodoroViewModel.onEvent(
+                        PomodoroUIEvent.ThemeChanged(ColorCustomUtils.convertColorToString(it))
+                    )
                 }
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -134,6 +138,7 @@ fun PomodoroDialog(
                         backgroundColor = MaterialTheme.colorScheme.secondary.copy(0.07f),
                         borderColor = MaterialTheme.colorScheme.secondary,
                     ) {
+                        pomodoroViewModel.onEvent(PomodoroUIEvent.SavePomodoro)
                         onDismissRequest()
                     }
                 }

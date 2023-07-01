@@ -46,6 +46,7 @@ import com.galacticstudio.digidoro.R
 import com.galacticstudio.digidoro.navigation.navgraph.SetupNavGraph
 import com.galacticstudio.digidoro.service.TimerService
 import com.galacticstudio.digidoro.ui.screens.noteslist.components.ActionsBottomBar
+import com.galacticstudio.digidoro.ui.screens.pomodoro.viewmodel.PomodoroViewModel
 import com.galacticstudio.digidoro.ui.theme.Gray30
 import com.galacticstudio.digidoro.util.WindowSize
 import com.galacticstudio.digidoro.util.dropShadow
@@ -113,7 +114,8 @@ sealed class ItemsMenu(
 fun AppScaffold(
     navController: NavHostController,
     mainViewModel: MainViewModel,
-    stopwatchService: TimerService
+    stopwatchService: TimerService,
+    pomodoroViewModel: PomodoroViewModel
 ) {
     //Logged status
     val isLoggedIn = mainViewModel.hasToken()
@@ -181,7 +183,8 @@ fun AppScaffold(
                     modeState,
                     startDestination,
                     selectionBarState,
-                    stopwatchService = stopwatchService
+                    stopwatchService,
+                    pomodoroViewModel,
                 )
             }
         } else if ((screenSize > WindowSize.COMPACT) && (screenSize < WindowSize.MEDIUM)) {
@@ -192,6 +195,7 @@ fun AppScaffold(
                     startDestination,
                     selectionBarState,
                     stopwatchService,
+                    pomodoroViewModel,
                 )
             }
         } else {
@@ -201,6 +205,7 @@ fun AppScaffold(
                 startDestination,
                 selectionBarState,
                 stopwatchService,
+                pomodoroViewModel,
             )
         }
     }
@@ -214,6 +219,7 @@ fun AppContent(
     startDestination: String,
     selectionBarState: MutableState<Boolean>,
     stopwatchService: TimerService,
+    pomodoroViewModel: PomodoroViewModel,
 ) {
     Surface {
         SetupNavGraph(
@@ -228,7 +234,8 @@ fun AppContent(
             onSelectionChange = { isSelectionMode ->
                 selectionBarState.value = isSelectionMode
             },
-            stopwatchService = stopwatchService
+            stopwatchService = stopwatchService,
+            pomodoroViewModel = pomodoroViewModel,
         )
     }
 }

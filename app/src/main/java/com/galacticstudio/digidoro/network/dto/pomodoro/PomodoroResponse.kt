@@ -20,7 +20,7 @@ data class PomodoroListResponse(
 data class PomodoroData(
     @SerializedName("_id") val id: String,
     @SerializedName("user_id") val user_id: String,
-    @SerializedName("name") val title: String,
+    @SerializedName("name") val name: String,
     @SerializedName("sessions_completed") val sessionsCompleted: Int,
     @SerializedName("total_sessions") val totalSessions: Int,
     @SerializedName("theme") val theme: String,

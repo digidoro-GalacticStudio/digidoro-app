@@ -53,15 +53,14 @@ class MainActivity : ComponentActivity(), TimerListener {
         }
     }
 
+    // Get an instance of the ViewModel
+    private val pomodoroViewModel: PomodoroViewModel by viewModels {
+        PomodoroViewModel.Factory
+    }
     // Method called when 0:00 minute is reached on the stopwatch
     override fun onTimeReached() {
-        // Get an instance of the ViewModel
-        val pomodoroViewModel: PomodoroViewModel by viewModels {
-            PomodoroViewModel.Factory
-        }
-
         // Call the corresponding event in the ViewModel
-        pomodoroViewModel.onEvent(PomodoroUIEvent.SavePomodoro)
+        pomodoroViewModel.onEvent(PomodoroUIEvent.UpdatePomodoro)
 
         // Play the notification sound
         val notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
@@ -108,10 +107,10 @@ class MainActivity : ComponentActivity(), TimerListener {
                         AppScaffold(
                             navController = rememberNavController(),
                             mainViewModel = mainViewModel,
-                            stopwatchService = stopwatchService
+                            stopwatchService = stopwatchService,
+                            pomodoroViewModel = pomodoroViewModel,
                         )
                     }
-
                 }
             }
         }

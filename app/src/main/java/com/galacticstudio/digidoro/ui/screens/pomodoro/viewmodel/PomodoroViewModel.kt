@@ -11,9 +11,13 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.galacticstudio.digidoro.Application
+import com.galacticstudio.digidoro.data.PomodoroModel
 import com.galacticstudio.digidoro.network.ApiResponse
+import com.galacticstudio.digidoro.network.dto.pomodoro.PomodoroData
 import com.galacticstudio.digidoro.repository.PomodoroRepository
+import com.galacticstudio.digidoro.ui.screens.noteitem.ActionType
 import com.galacticstudio.digidoro.ui.screens.pomodoro.PomodoroResponseState
+import com.galacticstudio.digidoro.ui.screens.pomodoro.PomodoroTimerState
 import com.galacticstudio.digidoro.ui.screens.pomodoro.PomodoroUIEvent
 import com.galacticstudio.digidoro.ui.screens.pomodoro.PomodoroUIState
 import kotlinx.coroutines.channels.Channel
@@ -30,6 +34,9 @@ class PomodoroViewModel(
     private val _pomodoroColor = mutableStateOf("ffffff")
     val pomodoroColor: State<String> = _pomodoroColor
 
+    private val _pomodoroType = mutableStateOf(PomodoroTimerState.Pomodoro)
+    val pomodoroType: State<PomodoroTimerState> = _pomodoroType
+
     // The current state of the Pomodoro response from the API (nullable)
     private var apiState by mutableStateOf<PomodoroResponseState?>(PomodoroResponseState.Resume)
 
@@ -40,38 +47,112 @@ class PomodoroViewModel(
     fun onEvent(event: PomodoroUIEvent) {
         when (event) {
             is PomodoroUIEvent.SelectedPomodoroChanged -> {
-                val selectedPomodoro = event.pomodoro
-                // Handle the selected pomodoro change
+                _state.value = _state.value.copy(
+                    selectedPomodoro = event.pomodoro
+                )
             }
+
             is PomodoroUIEvent.Rebuild -> {
                 // Handle the rebuild event
+                Log.d("MyErrors", "Enter in rebuild alll")
+                getAllPomodoros()
             }
+
+            is PomodoroUIEvent.TypeChanged -> {
+                _pomodoroType.value = event.type
+            }
+
             is PomodoroUIEvent.ClearData -> {
                 // Handle the clear data event
             }
+
             is PomodoroUIEvent.NameChanged -> {
-                val name = event.name
+                _state.value = _state.value.copy(
+                    name = event.name
+                )
                 // Handle the name changed event
             }
+
             is PomodoroUIEvent.SessionsCompletedChanged -> {
-                val sessionsCompleted = event.sessionsCompleted
-                // Handle the sessions completed changed event
+                _state.value = _state.value.copy(
+                    sessionsCompleted = event.sessionsCompleted
+                )
             }
+
             is PomodoroUIEvent.TotalSessionsChanged -> {
-                val totalSessions = event.totalSessions
-                // Handle the total sessions changed event
+                _state.value = _state.value.copy(
+                    totalSessions = event.totalSessions
+                )
             }
+
             is PomodoroUIEvent.SavePomodoro -> {
-                Log.d("MyErrors", "SAVE THE POMODODO -------------")
                 // Handle the save pomodoro event
+                Log.d("MyErrors", "-avlue of sesions ${_state.value.totalSessions}")
+                addPomodoro(
+                    _state.value.name,
+                    0,
+                    _state.value.totalSessions,
+                    "#${_pomodoroColor.value}"
+                )
             }
+
             is PomodoroUIEvent.UpdatePomodoro -> {
+                Log.d("MyErrors", "------:------ ${_state.value.selectedPomodoro}")
                 // Handle the update pomodoro event
             }
+
+            is PomodoroUIEvent.ThemeChanged -> {
+                _pomodoroColor.value = event.color
+            }
+
             is PomodoroUIEvent.DeletePomodoro -> {
                 // Handle the delete pomodoro event
             }
         }
+    }
+
+    private fun getAllPomodoros() {
+        Log.d("MyErrors", "Gett alll")
+        executeOperation(
+            operation = { pomodoroRepository.getAllPomodoros() },
+            onSuccess = { response ->
+                Log.d("MyErrors", "QUe paso ? ${response}")
+                _state.value = _state.value.copy(
+                    pomodoroList = mapToPomodoroModels(response.data)
+                )
+
+            }
+        )
+    }
+
+    private fun addPomodoro(
+        name: String,
+        sessionsCompleted: Int,
+        totalSessions: Int,
+        theme: String
+    ) {
+        executeOperation(
+            operation = {
+                pomodoroRepository.createPomodoro(
+                    name,
+                    sessionsCompleted,
+                    totalSessions,
+                    theme
+                )
+            },
+            onSuccess = { response ->
+//                val idNewNote = response.data.id
+//
+//                //If I want to duplicate a note in a selected folder
+//                if (_state.value.selectedFolder != null) {
+//                    val idFolder = _state.value.selectedFolder?.id ?: ""
+//                    toggleNoteFolder(idFolder, idNewNote)
+//                }
+//
+//                rebuildUI(_resultsMode.value)
+                getAllPomodoros()
+            }
+        )
     }
 
 
@@ -102,7 +183,23 @@ class PomodoroViewModel(
             }
         }
     }
-    
+
+    private fun mapToPomodoroModels(pomodoroDataList: List<PomodoroData>): List<PomodoroModel> {
+        return pomodoroDataList.map { pomodoroData ->
+            PomodoroModel(
+                id = pomodoroData.id,
+                userId = pomodoroData.user_id,
+                name = pomodoroData.name,
+                sessionsCompleted = pomodoroData.sessionsCompleted,
+                totalSessions = pomodoroData.totalSessions,
+                theme = pomodoroData.theme,
+                createdAt = pomodoroData.createdAt,
+                updatedAt = pomodoroData.updatedAt
+            )
+        }
+    }
+
+
     companion object {
         // Factory for creating instances of PomodoroViewModel.
         val Factory = viewModelFactory {

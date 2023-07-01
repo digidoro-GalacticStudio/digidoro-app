@@ -52,6 +52,7 @@ val options = arrayOf(
 fun ToggleButton(
     backgroundColor: Color = AzureBlue10,
     optionList: Array<ToggleButtonOption> = options,
+    enabled: Boolean = true,
     onButtonClick: (selectedOption: ToggleButtonOption) -> Unit = {},
 ) {
     ContainerToggleButton(
@@ -59,6 +60,7 @@ fun ToggleButton(
         options = optionList,
         type = SelectionType.SINGLE,
         modifier = Modifier.padding(end = 4.dp),
+        enabled = enabled,
         onButtonClick = onButtonClick
     )
 }
@@ -81,6 +83,7 @@ fun ContainerToggleButton(
     options: Array<ToggleButtonOption>,
     modifier: Modifier = Modifier,
     type: SelectionType = SelectionType.SINGLE,
+    enabled: Boolean,
     onButtonClick: (selectedOption: ToggleButtonOption) -> Unit = {},
 ) {
     val state = remember { mutableStateMapOf<String, ToggleButtonOption>() }
@@ -103,24 +106,26 @@ fun ContainerToggleButton(
         }
 
         val onItemClick: (option: ToggleButtonOption) -> Unit = { option ->
-            if (type == SelectionType.SINGLE) {
-                options.forEach {
-                    val key = it.text
-                    if (key == option.text) {
+            if (enabled) {
+                if (type == SelectionType.SINGLE) {
+                    options.forEach {
+                        val key = it.text
+                        if (key == option.text) {
+                            state[key] = option
+                        } else {
+                            state.remove(key)
+                        }
+                    }
+                } else {
+                    val key = option.text
+                    if (!state.contains(key)) {
                         state[key] = option
                     } else {
                         state.remove(key)
                     }
                 }
-            } else {
-                val key = option.text
-                if (!state.contains(key)) {
-                    state[key] = option
-                } else {
-                    state.remove(key)
-                }
+                onButtonClick(option)
             }
-            onButtonClick(option)
         }
 
         if (options.size == 1) {
