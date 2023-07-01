@@ -39,7 +39,7 @@ import com.galacticstudio.digidoro.R
 import com.galacticstudio.digidoro.data.todoList
 import com.galacticstudio.digidoro.service.ServiceHelper
 import com.galacticstudio.digidoro.service.TimerService
-import com.galacticstudio.digidoro.service.StopwatchState
+import com.galacticstudio.digidoro.service.TimerState
 import com.galacticstudio.digidoro.ui.screens.pomodoro.components.PomodoroDialog
 import com.galacticstudio.digidoro.ui.screens.pomodoro.viewmodel.PomodoroViewModel
 import com.galacticstudio.digidoro.ui.shared.button.CustomButton
@@ -82,61 +82,9 @@ fun PomodoroScreen(
             }
     }
 
-//    val stopwatchState = remember { mutableStateOf(StopwatchState()) }
-//
-//    LaunchedEffect(Unit) {
-//        // Moving the service to background when the app is visible
-//        moveToBackground(context)
-//    }
-//
-//    val statusReceiver = remember {
-//        object : BroadcastReceiver() {
-//            @SuppressLint("SetTextI18n")
-//            override fun onReceive(p0: Context?, p1: Intent?) {
-//                val isRunning = p1?.getBooleanExtra(TimerService.IS_STOPWATCH_RUNNING, false)!!
-//                stopwatchState.value.isStopwatchRunning = isRunning
-//                val timeElapsed = p1.getIntExtra(TimerService.TIME_ELAPSED, 0)
-//                stopwatchState.value.timeElapsed = timeElapsed
-//            }
-//        }
-//    }
-//
-//    val timeReceiver = remember {
-//        object : BroadcastReceiver() {
-//            override fun onReceive(p0: Context?, p1: Intent?) {
-//                val timeElapsed = p1?.getIntExtra(TimerService.TIME_ELAPSED, 0)!!
-//                stopwatchState.value.timeElapsed = timeElapsed
-//            }
-//        }
-//    }
-//
-//    DisposableEffect(Unit) {
-//        val statusFilter = IntentFilter(TimerService.STOPWATCH_STATUS)
-//        context.registerReceiver(statusReceiver, statusFilter)
-//
-//        val timeFilter = IntentFilter(TimerService.STOPWATCH_TICK)
-//        context.registerReceiver(timeReceiver, timeFilter)
-//
-//        onDispose {
-//            context.unregisterReceiver(statusReceiver)
-//            context.unregisterReceiver(timeReceiver)
-//
-//            // Moving the service to foreground when the app is in background / not visible
-//            moveToForeground(context)
-//        }
-//    }
-//
-
-
     val openDialog = rememberSaveable { mutableStateOf(false) }
 
     val contentPadding = PaddingValues(start = 24.dp, top = 24.dp, end = 24.dp, bottom = 120.dp)
-
-//    val remainingTime by pomodoroViewModel.remainingTime.collectAsState()
-//    val isRunning by pomodoroViewModel.isRunning.collectAsState()
-
-    // Observe the remaining time from the ViewModel
-
 
     LazyColumn(
         modifier = Modifier.fillMaxWidth(),
@@ -152,14 +100,6 @@ fun PomodoroScreen(
             )
             Spacer(modifier = Modifier.height(24.dp))
         }
-
-
-//        item {
-//            Text(
-//                text = formatStopwatchTime(stopwatchState.value.timeElapsed),
-//                style = MaterialTheme.typography.bodyLarge
-//            )
-//        }
 
         item {
             Column(
@@ -185,17 +125,6 @@ fun PomodoroScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-//                val (minutes, seconds) = pomodoroViewModel.remainingTime.value.toFormattedTime()
-//                PomodoroTimer(
-//                    dataTime = DataTime(
-//                        minutes = remainingTime.minutes,
-//                        seconds = remainingTime.seconds
-//                    )
-//                )
-                Text(
-                    text = "This is the code $hours $minutes $seconds",
-                    style = MaterialTheme.typography.bodyLarge
-                )
                 PomodoroTimer(
                     dataTime = DataTime(
                         minutes = minutes,
@@ -233,19 +162,6 @@ fun PomodoroScreen(
                     )
                 }
 
-//                val handleActionWhenCountdownZero: ActionWhenCountdownZero = object : ActionWhenCountdownZero {
-//                    override fun run() {
-//                        Toast.makeText(context, "Contador llegó a cero", Toast.LENGTH_SHORT).show()
-//                    }
-//                }
-
-//                val handleActionWhenCountdownZero: CountdownAction = object : CountdownAction {
-//                    override fun run() {
-//                        Toast.makeText(context, "Contador llegó a cero", Toast.LENGTH_SHORT).show()
-//                    }
-//                }
-
-
                 var number = 0
                 IconButton(
                     onClick = {
@@ -263,30 +179,9 @@ fun PomodoroScreen(
 
                         ServiceHelper.triggerForegroundService(
                             context = context,
-                            action = if (currentState == StopwatchState.Started) ACTION_SERVICE_STOP
+                            action = if (currentState == TimerState.Started) ACTION_SERVICE_STOP
                             else ACTION_SERVICE_START
                         )
-
-
-                        //Play / pause pomodoro timer
-                        if (currentState == StopwatchState.Started) {
-                            Log.d("Stopwatch", "Stop     in the view")
-//                            pauseStopwatch(context)
-
-//                            ServiceHelper.triggerForegroundService(
-//                                context = context,
-//                                action = if (currentState == StopwatchState.Started) ACTION_SERVICE_STOP
-//                                else ACTION_SERVICE_START
-//                            )
-                        } else {
-                            Log.d("Stopwatch", "Start in the view")
-//                            startStopwatch(context)
-                        }
-//                        if (isRunning) {
-//                            pomodoroViewModel.pauseTimer()
-//                        } else {
-//                            pomodoroViewModel.startTimer()
-//                        }
                     },
                     modifier = Modifier
                         .padding(end = 4.dp)
@@ -295,7 +190,7 @@ fun PomodoroScreen(
                         containerColor = MaterialTheme.colorScheme.onPrimary
                     )
                 ) {
-                    val painter = if (currentState == StopwatchState.Started) {
+                    val painter = if (currentState == TimerState.Started) {
                         R.drawable.pause_icon
                     } else {
                         R.drawable.play_arrow_icon
@@ -378,83 +273,3 @@ fun PomodoroScreen(
         }
     }
 }
-
-
-//
-//@SuppressLint("DefaultLocale")
-//@Composable
-//fun formatStopwatchTime(timeElapsed: Int): String {
-//    val hours: Int = (timeElapsed / 60) / 60
-//    val minutes: Int = timeElapsed / 60
-//    val seconds: Int = timeElapsed % 60
-//    return "${"%02d".format(hours)}:${"%02d".format(minutes)}:${"%02d".format(seconds)}"
-//}
-//
-//fun startStopwatch(context: Context) {
-//    val timerService = Intent(context, TimerService::class.java)
-//    timerService.putExtra(TimerService.STOPWATCH_ACTION, TimerService.START)
-//    ContextCompat.startForegroundService(context, timerService)
-//}
-//
-//fun pauseStopwatch(context: Context) {
-//    val timerService = Intent(context, TimerService::class.java)
-//    timerService.putExtra(TimerService.STOPWATCH_ACTION, TimerService.PAUSE)
-//    context.startService(timerService)
-//}
-//
-//fun resetStopwatch(context: Context) {
-//    val timerService = Intent(context, TimerService::class.java)
-//    timerService.putExtra(TimerService.STOPWATCH_ACTION, TimerService.RESET)
-//    context.startService(timerService)
-//}
-//
-//fun moveToForeground(context: Context) {
-//    val timerService = Intent(context, TimerService::class.java)
-//    timerService.putExtra(
-//        TimerService.STOPWATCH_ACTION,
-//        TimerService.MOVE_TO_FOREGROUND
-//    )
-//    context.startService(timerService)
-//}
-//
-//fun moveToBackground(context: Context) {
-//    val timerService = Intent(context, TimerService::class.java)
-//    timerService.putExtra(
-//        TimerService.STOPWATCH_ACTION,
-//        TimerService.MOVE_TO_BACKGROUND
-//    )
-//    context.startService(timerService)
-//}
-//
-//data class StopwatchState(
-//    var isStopwatchRunning: Boolean = false,
-//    var timeElapsed: Int = 0
-//)
-
-
-//fun DataTime.toFormattedTime(): Pair<String, String> {
-//    val minutesString = minutes.toString().padStart(2, '0')
-//    val secondsString = seconds.toString().padStart(2, '0')
-//
-//    return Pair(minutesString, secondsString)
-//}
-
-//class PomodoroServiceConnection : ServiceConnection {
-//
-//    private var service: PomodoroService? = null
-//
-//    override fun onServiceConnected(name: ComponentName?, binder: IBinder?) {
-//        val pomodoroBinder = binder as PomodoroService.PomodoroBinder
-//        service = pomodoroBinder.getService()
-//        // Actualiza el estado del temporizador en tu ViewModel o donde lo necesites
-//        pomodoroViewModel.updateTimerState(service?.isRunning ?: false)
-//    }
-//
-//    override fun onServiceDisconnected(name: ComponentName?) {
-//        service = null
-//    }
-//
-//    fun getService(): PomodoroService? {
-//        return service
-//    }
-//}
