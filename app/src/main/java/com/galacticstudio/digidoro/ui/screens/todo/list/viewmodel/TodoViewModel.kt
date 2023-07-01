@@ -1,6 +1,5 @@
 package com.galacticstudio.digidoro.ui.screens.todo.list.viewmodel
 
-import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -10,7 +9,7 @@ import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.AP
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.galacticstudio.digidoro.RetrofitApplication
+import com.galacticstudio.digidoro.Application
 import com.galacticstudio.digidoro.data.TodoModel
 import com.galacticstudio.digidoro.domain.usecase.todo.AddTodo
 import com.galacticstudio.digidoro.domain.usecase.todo.DeleteTodo
@@ -142,7 +141,7 @@ class TodoViewModel(
     companion object{
         val Factory = viewModelFactory {
             initializer {
-                val app = this[APPLICATION_KEY] as RetrofitApplication
+                val app = this[APPLICATION_KEY] as Application
                 TodoViewModel(
                     todoUseCases = TodoUseCases(
                         getTodos = GetTodos(),

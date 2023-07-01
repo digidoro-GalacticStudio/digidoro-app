@@ -25,7 +25,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.galacticstudio.digidoro.RetrofitApplication
+import com.galacticstudio.digidoro.Application
 import com.galacticstudio.digidoro.ui.shared.floatingCards.floatingElementCard.ButtonControl
 import com.galacticstudio.digidoro.ui.shared.floatingCards.floatingElementCard.ColorBox
 import com.galacticstudio.digidoro.ui.shared.floatingCards.floatingElementCard.TitleCard
@@ -41,8 +41,7 @@ fun PomodoroDialog(
     val cornerRadius = 5.dp
     val title = remember { mutableStateOf("") }
     val number = remember { mutableStateOf("") }
-    val app: RetrofitApplication = LocalContext.current.applicationContext as RetrofitApplication
-
+    val app: Application = LocalContext.current.applicationContext as Application
 
     Dialog(onDismissRequest = onDismissRequest) {
         Box(

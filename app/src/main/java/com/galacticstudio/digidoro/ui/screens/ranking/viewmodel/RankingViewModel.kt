@@ -9,7 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.galacticstudio.digidoro.RetrofitApplication
+import com.galacticstudio.digidoro.Application
 import com.galacticstudio.digidoro.network.ApiResponse
 import com.galacticstudio.digidoro.repository.RankingRepository
 import com.galacticstudio.digidoro.ui.screens.ranking.RankingResponseState
@@ -116,7 +116,7 @@ class RankingViewModel(
         val Factory = viewModelFactory {
             initializer {
                 val app =
-                    this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as RetrofitApplication
+                    this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as Application
                 // Create a new instance of RankingViewModel with dependencies.
                 RankingViewModel(
                     repository = app.rankingRepository,

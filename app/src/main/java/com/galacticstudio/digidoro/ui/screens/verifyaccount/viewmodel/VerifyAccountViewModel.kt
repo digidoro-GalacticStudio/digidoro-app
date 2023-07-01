@@ -9,12 +9,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.galacticstudio.digidoro.RetrofitApplication
-import com.galacticstudio.digidoro.domain.usecase.fields.ValidateEmail
+import com.galacticstudio.digidoro.Application
 import com.galacticstudio.digidoro.domain.usecase.fields.ValidateTextField
 import com.galacticstudio.digidoro.network.ApiResponse
 import com.galacticstudio.digidoro.repository.UserRepository
-import com.galacticstudio.digidoro.ui.screens.forgotpassword.ForgotPasswordResponse
 import com.galacticstudio.digidoro.ui.screens.verifyaccount.VerifyAccountFormEvent
 import com.galacticstudio.digidoro.ui.screens.verifyaccount.VerifyAccountFormState
 import com.galacticstudio.digidoro.ui.screens.verifyaccount.VerifyAccountResponseState
@@ -116,7 +114,7 @@ class VerifyAccountViewModel(
         val Factory = viewModelFactory {
             initializer {
                 val app =
-                    this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as RetrofitApplication
+                    this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as Application
                 // Create a new instance of VerifyAccountViewModel with dependencies.
                 VerifyAccountViewModel(
                     repository = app.userRepository
