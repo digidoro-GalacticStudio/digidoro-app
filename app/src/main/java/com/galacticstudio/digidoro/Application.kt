@@ -3,6 +3,7 @@ package com.galacticstudio.digidoro
 import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
+import com.galacticstudio.digidoro.data.db.DigidoroDataBase
 import com.galacticstudio.digidoro.network.retrofit.RetrofitInstance
 import com.galacticstudio.digidoro.repository.CredentialsRepository
 import com.galacticstudio.digidoro.repository.FavoriteNoteRepository
@@ -45,6 +46,9 @@ class Application : Application() {
         getRankingService()
     }
 
+    private fun getTodoApiService() = with(RetrofitInstance){
+        getTodoService()
+    }
     fun getToken(): String = prefs.getString(USER_TOKEN, "")!!
 
     fun getRoles(): List<String> = prefs.getStringSet(USER_ROLES, emptySet())?.toList() ?: emptyList()
@@ -56,35 +60,37 @@ class Application : Application() {
         return token.isNotEmpty()
     }
 
+    private val database: DigidoroDataBase by lazy {
+        DigidoroDataBase.getInstance(this)
+    }
+
     //initialize repositories
     val credentialsRepository: CredentialsRepository by lazy {
-        CredentialsRepository(getAPIService())
+        CredentialsRepository(getAPIService(), database)
     }
 
     val notesRepository: NoteRepository by lazy {
-        NoteRepository(getNoteAPIService())
+        NoteRepository(getNoteAPIService(), database)
     }
 
     val favoriteNotesRepository: FavoriteNoteRepository by lazy {
-        FavoriteNoteRepository(getFavoriteNoteAPIService())
+        FavoriteNoteRepository(getFavoriteNoteAPIService(), database)
     }
 
     val folderRepository: FolderRepository by lazy {
-        FolderRepository(getFolderAPIService())
+        FolderRepository(getFolderAPIService(), database)
     }
 
     val userRepository: UserRepository by lazy {
-        UserRepository(getUserAPIService())
+        UserRepository(getUserAPIService(), database)
     }
 
     val rankingRepository: RankingRepository by lazy {
-        RankingRepository(getRankingAPIService())
+        RankingRepository(getRankingAPIService(), database)
     }
 
     val todoRepository: TodoRepository by lazy{
-        TodoRepository(
-            todoService = RetrofitInstance.getTodoService()
-        )
+        TodoRepository(getTodoApiService(), database)
     }
 
     fun saveAuthToken(token: String){

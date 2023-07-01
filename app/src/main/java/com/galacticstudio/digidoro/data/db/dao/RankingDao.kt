@@ -3,7 +3,6 @@ package com.galacticstudio.digidoro.data.db.dao
 import androidx.room.Dao
 import androidx.room.Query
 import com.galacticstudio.digidoro.network.dto.ranking.RankingData
-import com.galacticstudio.digidoro.network.dto.ranking.RankingResponse
 
 @Dao
 interface RankingDao {

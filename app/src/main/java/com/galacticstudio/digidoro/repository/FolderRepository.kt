@@ -1,6 +1,7 @@
 package com.galacticstudio.digidoro.repository
 
 import android.util.Log
+import com.galacticstudio.digidoro.data.db.DigidoroDataBase
 import com.galacticstudio.digidoro.network.ApiResponse
 import com.galacticstudio.digidoro.network.dto.folder.FolderData
 import com.galacticstudio.digidoro.network.dto.folder.FolderDataPopulated
@@ -13,7 +14,11 @@ import com.galacticstudio.digidoro.network.dto.note.NoteData
 import com.galacticstudio.digidoro.network.service.FolderService
 import com.galacticstudio.digidoro.repository.utils.handleApiCall
 
-class FolderRepository(private val folderService: FolderService) {
+class FolderRepository(
+    private val folderService: FolderService,
+    private val database: DigidoroDataBase
+    ) {
+    private val folderDao = database.FolderDao()
     suspend fun getAllFolders(populateFields: String? = null): ApiResponse<List<FolderDataPopulated>> {
         return handleApiCall { folderService.getAllFolders(populateFields).data }
     }

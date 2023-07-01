@@ -1,6 +1,7 @@
 package com.galacticstudio.digidoro.repository
 
 import com.galacticstudio.digidoro.data.api.TodoModel
+import com.galacticstudio.digidoro.data.db.DigidoroDataBase
 import com.galacticstudio.digidoro.network.ApiResponse
 import com.galacticstudio.digidoro.network.dto.todo.RequestTodo
 import com.galacticstudio.digidoro.network.dto.todo.toTodoModel
@@ -12,9 +13,10 @@ import java.util.Date
 
 
 class TodoRepository(
-    private val todoService: TodoService
+    private val todoService: TodoService,
+    private val database: DigidoroDataBase
 ) {
-
+    private val todoDao = database.TodoDao()
         suspend fun getAllTodo(
         sortBy: String ?= null,
         order: String ?= null,

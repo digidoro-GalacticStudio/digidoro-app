@@ -35,10 +35,10 @@ data class UserInformationData(
 )
 
 data class RankingData(
-    val id: String,
+    val _id: String,
     val firstname: String,
     val username: String,
-    val profilePic: String,
+    val profile_pic: String,
     val level: String,
     val daily_score: Int,
     val weekly_score: Int,

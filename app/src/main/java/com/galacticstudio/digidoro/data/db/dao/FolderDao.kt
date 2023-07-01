@@ -16,10 +16,10 @@ interface FolderDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOne(favoriteNote: FolderModelEntity)
 
-    @Query("SELECT * FROM favoritenotes")
-    suspend fun getAllFolder(): List<FolderData>
+    @Query("SELECT * FROM folder")
+    suspend fun getAllFolder(): List<FolderModelEntity>
 
-    @Query("SELECT * FROM favoritenotes WHERE _id = :id")
+    @Query("SELECT * FROM folder WHERE _id = :id")
     suspend fun getFolderById(id: String): FolderModelEntity
 
     //set notes by id with given notes array
