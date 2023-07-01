@@ -17,11 +17,11 @@ import com.galacticstudio.digidoro.R
 import com.galacticstudio.digidoro.ui.theme.DigidoroTheme
 import com.galacticstudio.digidoro.util.shadowWithCorner
 
-data class DataTime(val minutes: Int, val seconds: Int)
+data class DataTime(val minutes: String, val seconds: String)
 
 val cornerRadius = 10.dp
 @Composable
-fun TimerBlock(time:Int){
+fun TimerBlock(time:String){
     DigidoroTheme() {
         Box(
             modifier = Modifier
@@ -34,7 +34,7 @@ fun TimerBlock(time:Int){
                 .background(MaterialTheme.colorScheme.background, RoundedCornerShape(cornerRadius))
                 .padding(horizontal = 10.dp, vertical = 6.dp)
         ){
-            Text(text = String.format("%02d", time), style = MaterialTheme.typography.displayLarge)
+            Text(text = time, style = MaterialTheme.typography.displayLarge)
 
         }
     }

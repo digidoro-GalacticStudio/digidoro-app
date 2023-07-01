@@ -2,8 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!--permissions for INTERNET-->
+    <!-- Allows access to the internet to make requests to the API using Retrofit -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Allows running a foreground service to run the pomodoro timer and service -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <!-- Allows posting notifications to show the remaining time of the timer in the notifications -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Allows vibrating the device to provide haptic feedback to the user -->
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
         android:name=".Application"
@@ -16,6 +22,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Digidoro"
         tools:targetApi="31">
+        <service
+            android:name=".service.TimerService"
+            android:enabled="true"
+            android:exported="false"
+            />
         <activity
             android:name=".MainActivity"
             android:exported="true"

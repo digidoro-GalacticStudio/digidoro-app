@@ -2,8 +2,8 @@ package com.galacticstudio.digidoro.navigation
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
@@ -44,6 +44,7 @@ import androidx.navigation.compose.rememberNavController
 import com.galacticstudio.digidoro.ui.screens.MainViewModel
 import com.galacticstudio.digidoro.R
 import com.galacticstudio.digidoro.navigation.navgraph.SetupNavGraph
+import com.galacticstudio.digidoro.service.TimerService
 import com.galacticstudio.digidoro.ui.screens.noteslist.components.ActionsBottomBar
 import com.galacticstudio.digidoro.ui.theme.Gray30
 import com.galacticstudio.digidoro.util.WindowSize
@@ -106,11 +107,13 @@ sealed class ItemsMenu(
  * @param navController The NavHostController used for navigation.
  * @param mainViewModel The MainViewModel used for app data and state.
  */
+@OptIn(ExperimentalAnimationApi::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun AppScaffold(
     navController: NavHostController,
-    mainViewModel: MainViewModel
+    mainViewModel: MainViewModel,
+    stopwatchService: TimerService
 ) {
     //Logged status
     val isLoggedIn = mainViewModel.hasToken()
@@ -178,6 +181,7 @@ fun AppScaffold(
                     modeState,
                     startDestination,
                     selectionBarState,
+                    stopwatchService = stopwatchService
                 )
             }
         } else if ((screenSize > WindowSize.COMPACT) && (screenSize < WindowSize.MEDIUM)) {
@@ -187,6 +191,7 @@ fun AppScaffold(
                     modeState,
                     startDestination,
                     selectionBarState,
+                    stopwatchService,
                 )
             }
         } else {
@@ -195,17 +200,20 @@ fun AppScaffold(
                 modeState,
                 startDestination,
                 selectionBarState,
+                stopwatchService,
             )
         }
     }
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun AppContent(
     navController: NavHostController,
     modeState: SelectionModeAppState,
     startDestination: String,
     selectionBarState: MutableState<Boolean>,
+    stopwatchService: TimerService,
 ) {
     Surface {
         SetupNavGraph(
@@ -219,7 +227,8 @@ fun AppContent(
             },
             onSelectionChange = { isSelectionMode ->
                 selectionBarState.value = isSelectionMode
-            }
+            },
+            stopwatchService = stopwatchService
         )
     }
 }
