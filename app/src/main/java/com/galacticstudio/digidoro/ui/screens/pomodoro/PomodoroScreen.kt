@@ -1,5 +1,6 @@
 package com.galacticstudio.digidoro.ui.screens.pomodoro
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Arrangement
@@ -389,10 +390,11 @@ fun PomodoroScreen(
                 PomodoroDialog(
                     pomodoroViewModel = pomodoroViewModel,
                     onDelete = { pomodoroId ->
-                        if (pomodoroId == pomodoroViewModel.state.value.pomodoroId) {
+                        if (pomodoroId == pomodoroViewModel.state.value.selectedPomodoro?.id) {
                             ServiceHelper.triggerForegroundService(
                                 context = context, action = ACTION_SERVICE_CANCEL
                             )
+                            pomodoroViewModel.onEvent(PomodoroUIEvent.ClearAllData)
                         }
                     }
                 ) {

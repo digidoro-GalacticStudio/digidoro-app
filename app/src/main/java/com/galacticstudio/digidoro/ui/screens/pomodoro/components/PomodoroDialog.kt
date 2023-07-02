@@ -149,6 +149,7 @@ fun PomodoroDialog(
                             borderColor = MaterialTheme.colorScheme.secondary,
                         ) {
                             pomodoroViewModel.onEvent(PomodoroUIEvent.EditPomodoro)
+                            pomodoroViewModel.onEvent(PomodoroUIEvent.ClearData)
                             onDismissRequest()
                         }
                     } else {
@@ -159,6 +160,7 @@ fun PomodoroDialog(
                             borderColor = MaterialTheme.colorScheme.secondary,
                         ) {
                             pomodoroViewModel.onEvent(PomodoroUIEvent.SavePomodoro)
+                            pomodoroViewModel.onEvent(PomodoroUIEvent.ClearData)
                             onDismissRequest()
                         }
                     }

@@ -8,6 +8,7 @@ sealed class PomodoroUIEvent {
     data class EditedChanged(val edited: Boolean, val pomodoro: PomodoroModel?): PomodoroUIEvent()
     object Rebuild: PomodoroUIEvent()
     object ClearData: PomodoroUIEvent()
+    object ClearAllData: PomodoroUIEvent()
     data class NameChanged(val name: String): PomodoroUIEvent()
     data class SessionsCompletedChanged(val sessionsCompleted: Int): PomodoroUIEvent()
     data class TotalSessionsChanged(val totalSessions: Int): PomodoroUIEvent()

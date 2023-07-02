@@ -75,12 +75,26 @@ class PomodoroViewModel(
                         sessionsCompleted = pomo.sessionsCompleted,
                         totalSessions = pomo.totalSessions,
                     )
+                    _pomodoroColor.value = pomo.theme.replace("#", "")
                 }
             }
 
             is PomodoroUIEvent.ClearData -> {
                 _state.value = _state.value.copy(
-                    selectedPomodoro = null
+                    pomodoroId = "",
+                    name = "",
+                    sessionsCompleted = 0,
+                    totalSessions = 0,
+                )
+            }
+
+            is PomodoroUIEvent.ClearAllData -> {
+                _state.value = _state.value.copy(
+                    selectedPomodoro = null,
+                    pomodoroId = "",
+                    name = "",
+                    sessionsCompleted = 0,
+                    totalSessions = 0,
                 )
             }
 
@@ -198,7 +212,14 @@ class PomodoroViewModel(
                         sessionsCompleted = response.data.sessionsCompleted
                     )
                 )
-                getAllPomodoros()
+
+                if (pomodoroId == _state.value.selectedPomodoro?.id) {
+                    _state.value = _state.value.copy(
+                        selectedPomodoro = mapToPomodoroModel(response.data)
+                    )
+                }
+
+               getAllPomodoros()
             }
         )
     }
@@ -255,6 +276,19 @@ class PomodoroViewModel(
                 updatedAt = pomodoroData.updatedAt
             )
         }
+    }
+
+    private fun mapToPomodoroModel(pomodoro: PomodoroData): PomodoroModel {
+        return PomodoroModel(
+                id = pomodoro.id,
+                userId = pomodoro.user_id,
+                name = pomodoro.name,
+                sessionsCompleted = pomodoro.sessionsCompleted,
+                totalSessions = pomodoro.totalSessions,
+                theme = pomodoro.theme,
+                createdAt = pomodoro.createdAt,
+                updatedAt = pomodoro.updatedAt
+            )
     }
 
     companion object {
