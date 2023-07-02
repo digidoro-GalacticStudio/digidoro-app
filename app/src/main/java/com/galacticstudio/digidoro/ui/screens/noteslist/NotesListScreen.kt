@@ -29,6 +29,8 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -48,6 +50,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.toArgb
@@ -490,7 +493,6 @@ fun NotesListContent(
 
         item(span = { GridItemSpan(numColumns) }) {
             ShortNoteItems(
-                icon = painterResource(R.drawable.last_modification_icon),
                 noteOrder = state.noteOrder
             ) {
                 notesViewModel.onEvent(NotesEvent.Order(it))
@@ -685,14 +687,13 @@ fun NoteItemContainer(
 
 @Composable
 fun ShortNoteItems(
-    icon: Painter,
     noteOrder: NoteOrder = NoteOrder.Date(OrderType.Descending),
     onOrderChange: (NoteOrder) -> Unit,
 ) {
-    val text: String = if (noteOrder.orderType is OrderType.Ascending) {
-        "First Creation"
+    val rotate = if (noteOrder.orderType is OrderType.Ascending) {
+        180f
     } else {
-        "Last Modification"
+        0f
     }
 
     Box(
@@ -713,18 +714,19 @@ fun ShortNoteItems(
             },
         ) {
             Text(
-                text = text,
+                text = "Last Modification",
                 modifier = Modifier
                     .padding(end = 8.dp),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onPrimary.copy(0.8f)
             )
             Icon(
-                painter = icon,
+                imageVector = Icons.Default.ArrowDropDown,
                 contentDescription = "Icon",
                 modifier = Modifier
-                    .size(24.dp)
+                    .size(30.dp)
                     .padding(end = 8.dp)
+                    .rotate(rotate)
             )
         }
     }

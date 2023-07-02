@@ -1,6 +1,6 @@
 package com.galacticstudio.digidoro.ui.screens.pomodoro
 
-import com.galacticstudio.digidoro.data.PomodoroModel
+import com.galacticstudio.digidoro.data.api.PomodoroModel
 
 data class PomodoroUIState (
     //Get list

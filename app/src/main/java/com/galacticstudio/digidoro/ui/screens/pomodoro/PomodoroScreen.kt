@@ -83,7 +83,7 @@ fun PomodoroScreen(
         ServiceHelper.triggerForegroundService(
             context = context,
             action = Service.ACTION_SERVICE_VARIABLES,
-            initialMinutes = 1,
+            initialMinutes = 25,
             type = "pomodoro"
         )
 
