@@ -9,10 +9,17 @@ import retrofit2.http.GET
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface PomodoroService {
     @GET("api/pomodoro/own")
-    suspend fun getAllPomodoros(): PomodoroListResponse
+    suspend fun getAllPomodoros(
+        @Query("sortBy") sortBy: String? = null,
+        @Query("order") order: String? = null,
+        @Query("page") page: Int? = null,
+        @Query("limit") limit: Int? = null,
+        @Query("populateFields") populateFields: String? = null,
+    ): PomodoroListResponse
 
     @GET("api/pomodoro/own/{id}")
     suspend fun getPomodoroById(@Path("id") pomodoroId: String): PomodoroResponse

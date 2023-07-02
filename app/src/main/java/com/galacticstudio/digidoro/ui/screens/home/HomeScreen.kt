@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.LinearProgressIndicator
@@ -43,10 +44,14 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.galacticstudio.digidoro.R
 import com.galacticstudio.digidoro.Application
+import com.galacticstudio.digidoro.navigation.Screen
 import com.galacticstudio.digidoro.network.retrofit.RetrofitInstance
+import com.galacticstudio.digidoro.repository.PomodoroRepository
 import com.galacticstudio.digidoro.ui.screens.home.viewmodel.HomeViewModel
+import com.galacticstudio.digidoro.ui.screens.pomodoro.viewmodel.PomodoroViewModel
 import com.galacticstudio.digidoro.ui.screens.ranking.mapper.UserRankingMapper.getRankingName
 import com.galacticstudio.digidoro.ui.screens.ranking.mapper.UserRankingMapper.getScoreRange
+import com.galacticstudio.digidoro.ui.shared.cards.pomodoroCard.PomodoroCard
 import com.galacticstudio.digidoro.ui.shared.cards.todocard.TodoCard
 import com.galacticstudio.digidoro.ui.shared.titles.CustomMessageData
 import com.galacticstudio.digidoro.ui.shared.titles.Title
@@ -79,6 +84,7 @@ fun HomeScreenPreview() {
 fun HomeScreen(
     navController: NavHostController = rememberNavController(),
     homeViewModel: HomeViewModel = viewModel(factory = HomeViewModel.Factory),
+    pomodoroViewModel: PomodoroViewModel = viewModel(factory = PomodoroViewModel.Factory)
 ) {
     val app: Application = LocalContext.current.applicationContext as Application
     val state = homeViewModel.state // Retrieves the current state from the HomeViewModel.
@@ -106,51 +112,70 @@ fun HomeScreen(
             WelcomeUser(username.value)
         }
 
-        // Ranking
+        // +++++++++++
+        //   Ranking
+        // +++++++++++
         item {
             Spacer(modifier = Modifier.height(16.dp))
             RankingHome(state)
         }
 
-        //Pomodoro title
-//        item {
-//            Spacer(modifier = Modifier.height(24.dp))
-//
-//            Text(
-//                text = "What did we leave off on?",
-//                style = MaterialTheme.typography.bodyMedium,
-//                fontFamily = Nunito,
-//            )
-//
-//            Spacer(modifier = Modifier.height(8.dp))
-//            Title(
-//                message = CustomMessageData(
-//                    title = "Your Pomodoro",
-//                    subTitle = "Your recent sessions"
-//                ),
-//                titleStyle = MaterialTheme.typography.headlineMedium
-//            )
-//            Spacer(modifier = Modifier.height(24.dp))
-//        }
-//
-//        //Pomodoro List
-//        item {
-//            LazyRow(
-//                state = rememberLazyListState()
-//            ) {
-//                itemsIndexed(pomodoroList) { index, pomodoro ->
-//                    PomodoroCard(
-//                        message = pomodoro.name,
-//                        sectionText = "Pomodoro ${index + 1}",
-//                        colorTheme = Color(android.graphics.Color.parseColor(pomodoro.theme)),
-//                        onClick = {}
-//                    )
-//                    Spacer(modifier = Modifier.width(16.dp))
-//                }
-//            }
-//        }
+        // +++++++++++*****
+        //  Pomodoro title
+        // +++++++++++*****
+        item {
+            Spacer(modifier = Modifier.height(24.dp))
 
-        //Activities title
+            Text(
+                text = "What did we leave off on?",
+                style = MaterialTheme.typography.bodyMedium,
+                fontFamily = Nunito,
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+            Title(
+                message = CustomMessageData(
+                    title = "Your Pomodoro",
+                    subTitle = "Your recent sessions"
+                ),
+                titleStyle = MaterialTheme.typography.headlineMedium
+            )
+            Spacer(modifier = Modifier.height(24.dp))
+        }
+
+        // +++++++++++******
+        //   Pomodoro list
+        // +++++++++++******
+        if (state.value.pomodoros.isEmpty()) {
+            item {
+                Text(
+                    "You don't have any Pomodoro session.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(top = 10.dp)
+                )
+            }
+        } else {
+            item {
+                LazyRow(
+                    state = rememberLazyListState()
+                ) {
+                    itemsIndexed(state.value.pomodoros) { index, pomodoro ->
+                        PomodoroCard(
+                            message = pomodoro.name,
+                            sectionText = "Completed ${pomodoro.sessionsCompleted}/${pomodoro.totalSessions}",
+                            colorTheme = Color(android.graphics.Color.parseColor(pomodoro.theme)),
+                        ) {
+                            navController.navigate(Screen.Pomodoro.route)
+                        }
+                        Spacer(modifier = Modifier.width(16.dp))
+                    }
+                }
+            }
+        }
+
+        // +++++++++++****
+        //   To-do Title
+        // +++++++++++****
         item {
             Spacer(modifier = Modifier.height(32.dp))
             Title(
@@ -163,12 +188,15 @@ fun HomeScreen(
             Spacer(modifier = Modifier.height(24.dp))
         }
 
+        // +++++++++++***
+        //   To-do list
+        // +++++++++++***
         if (state.value.todos.isEmpty()) {
             item {
                 Text(
                     "You don't have any pending activities.",
                     style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(top=10.dp)
+                    modifier = Modifier.padding(top = 10.dp)
                 )
             }
         } else {
@@ -180,12 +208,12 @@ fun HomeScreen(
                     boldSubtitle = text,
                     normalSubtitle = formattedDate,
                     colorTheme = Color(android.graphics.Color.parseColor(todo.theme)),
-                    onClick = {}
-                )
+                ) {
+                    navController.navigate(Screen.Todo.route)
+                }
                 Spacer(modifier = Modifier.height(16.dp))
             }
         }
-
     }
 }
 

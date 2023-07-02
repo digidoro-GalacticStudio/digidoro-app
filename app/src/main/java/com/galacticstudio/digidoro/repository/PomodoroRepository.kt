@@ -7,8 +7,22 @@ import com.galacticstudio.digidoro.network.service.PomodoroService
 import com.galacticstudio.digidoro.repository.utils.handleApiCall
 
 class PomodoroRepository(private val pomodoroService: PomodoroService) {
-    suspend fun getAllPomodoros(): ApiResponse<List<PomodoroData>> {
-        return handleApiCall { pomodoroService.getAllPomodoros().data }
+    suspend fun getAllPomodoros(
+        sortBy: String? = null,
+        order: String? = null,
+        page: Int? = null,
+        limit: Int? = null,
+        populate: String? = null,
+    ): ApiResponse<List<PomodoroData>> {
+        return handleApiCall {
+            pomodoroService.getAllPomodoros(
+                sortBy,
+                order,
+                page,
+                limit,
+                populate
+            ).data
+        }
     }
 
     suspend fun getPomodoroById(pomodoroId: String): ApiResponse<PomodoroData> {
