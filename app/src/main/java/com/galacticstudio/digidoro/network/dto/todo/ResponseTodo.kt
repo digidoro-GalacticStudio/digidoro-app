@@ -1,6 +1,7 @@
 package com.galacticstudio.digidoro.network.dto.todo
 
 import com.galacticstudio.digidoro.data.api.TodoModel
+import com.galacticstudio.digidoro.data.db.models.TodoItemModelEntity
 import com.google.gson.annotations.SerializedName
 import java.util.Date
 
@@ -60,6 +61,25 @@ fun ResponseAllTodo.toTodosModel(): MutableList<TodoModel>{
             createdAt = element.createdAt,
             state = element.is_completed,
             reminder = element.reminder
+        )
+    }
+
+    return response.toMutableList()
+}
+
+//Convert response to todo item model entity
+fun ResponseAllTodo.toTodosModelEntity(): MutableList<TodoItemModelEntity>{
+    val response = data.mapIndexed{ _, element ->
+        TodoItemModelEntity(
+            _id = element.id,
+            user_id = element.user_id,
+            title = element.title,
+            description = element.description,
+            theme = element.theme,
+            reminder = element.reminder,
+            is_completed = element.is_completed,
+            createdAt = element.createdAt,
+            updatedAt = element.updatedAt
         )
     }
 

@@ -10,6 +10,7 @@ import com.galacticstudio.digidoro.network.dto.folder.FolderThemeRequest
 import com.galacticstudio.digidoro.network.dto.folder.SelFolderResponse
 import com.galacticstudio.digidoro.network.dto.folder.SelectedFolderResponse
 import com.galacticstudio.digidoro.network.dto.folder.ToggleNoteRequest
+import com.galacticstudio.digidoro.network.dto.folder.toFolderModelEntity
 import com.galacticstudio.digidoro.network.dto.note.NoteData
 import com.galacticstudio.digidoro.network.service.FolderService
 import com.galacticstudio.digidoro.repository.utils.handleApiCall
@@ -20,7 +21,13 @@ class FolderRepository(
     ) {
     private val folderDao = database.FolderDao()
     suspend fun getAllFolders(populateFields: String? = null): ApiResponse<List<FolderDataPopulated>> {
-        return handleApiCall { folderService.getAllFolders(populateFields).data }
+        return handleApiCall {
+            val response = folderService.getAllFolders(populateFields)
+
+            folderDao.insertAll(response.toFolderModelEntity())
+
+            response.data
+        }
     }
 
     suspend fun getAllWithoutFolders(): ApiResponse<List<NoteData>> {

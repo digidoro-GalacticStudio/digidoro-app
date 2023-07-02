@@ -5,13 +5,14 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import com.galacticstudio.digidoro.data.api.TodoModel
 import com.galacticstudio.digidoro.data.db.models.TodoItemModelEntity
 
 @Dao
 interface TodoDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(todoList: List<TodoItemModelEntity>)
+    suspend fun insertAll(todoList: MutableList<TodoItemModelEntity>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOne(todo: TodoItemModelEntity)

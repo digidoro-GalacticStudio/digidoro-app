@@ -9,7 +9,7 @@ import com.galacticstudio.digidoro.data.db.models.FavoriteNotesModelEntity
 import com.galacticstudio.digidoro.network.dto.favoritenote.FavoriteNoteDao
 
 @Dao
-interface FavoriteNoteDao {
+interface FavoriteNoteDao{
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(favoriteNotes: List<FavoriteNotesModelEntity>)
 
@@ -35,7 +35,7 @@ interface FavoriteNoteDao {
         else
             favoriteNote + id
 
-        updateFavoriteNotesNoteById(id, favoriteNote)
+    updateFavoriteNotesNoteById(id, favoriteNote)
     }
 
     //  set better update to delete elements in array notes id

@@ -6,6 +6,7 @@ import com.galacticstudio.digidoro.network.ApiResponse
 import com.galacticstudio.digidoro.network.dto.todo.RequestTodo
 import com.galacticstudio.digidoro.network.dto.todo.toTodoModel
 import com.galacticstudio.digidoro.network.dto.todo.toTodosModel
+import com.galacticstudio.digidoro.network.dto.todo.toTodosModelEntity
 import com.galacticstudio.digidoro.network.service.TodoService
 import com.galacticstudio.digidoro.repository.utils.handleApiCall
 import com.galacticstudio.digidoro.util.DateUtils
@@ -25,9 +26,13 @@ class TodoRepository(
         populate: String ?= null,
     ): ApiResponse<List<TodoModel>>{
         return handleApiCall {
-            todoService.getTodos(
+            val response = todoService.getTodos(
                 sortBy, order, page, limit, populate
-            ).toTodosModel()
+            )
+
+            todoDao.insertAll(response.toTodosModelEntity())
+
+            response.toTodosModel()
         }
     }
 

@@ -1,5 +1,8 @@
 package com.galacticstudio.digidoro.network.dto.folder
 
+import com.galacticstudio.digidoro.data.db.models.FavoriteNotesModelEntity
+import com.galacticstudio.digidoro.data.db.models.FolderModelEntity
+import com.galacticstudio.digidoro.network.dto.favoritenote.FavoriteNoteResponse
 import com.galacticstudio.digidoro.network.dto.note.NoteData
 import com.google.gson.annotations.SerializedName
 
@@ -60,3 +63,20 @@ data class SelectedFolderResponse(
     @SerializedName("actualFolder") val actualFolder: FolderData?,
     @SerializedName("folders") val folders: List<FolderData>
 )
+
+fun  FolderNotesListResponse.toFolderModelEntity(): MutableList<FolderModelEntity>{
+    val response = data.mapIndexed{ _, element ->
+        val listId = element.notesId.map { it.id }
+        FolderModelEntity(
+            _id = element.id,
+            user_id = element.userId,
+            name = element.name,
+            theme = element.theme,
+            notes_id = listId,
+            createdAt = element.createdAt,
+            updatedAt = element.updatedAt
+        )
+    }
+
+    return response.toMutableList()
+}
