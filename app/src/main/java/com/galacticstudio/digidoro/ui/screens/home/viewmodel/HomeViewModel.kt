@@ -7,17 +7,17 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.galacticstudio.digidoro.RetrofitApplication
+import com.galacticstudio.digidoro.Application
+import com.galacticstudio.digidoro.data.PomodoroModel
 import com.galacticstudio.digidoro.network.ApiResponse
+import com.galacticstudio.digidoro.network.dto.pomodoro.PomodoroData
+import com.galacticstudio.digidoro.repository.PomodoroRepository
 import com.galacticstudio.digidoro.repository.RankingRepository
 import com.galacticstudio.digidoro.repository.TodoRepository
 import com.galacticstudio.digidoro.ui.screens.home.HomeResponseState
 import com.galacticstudio.digidoro.ui.screens.home.HomeUIEvent
 import com.galacticstudio.digidoro.ui.screens.home.HomeUIState
 import com.galacticstudio.digidoro.ui.screens.ranking.mapper.UserRankingMapper.mapToUserRankingModel
-import com.galacticstudio.digidoro.ui.screens.todo.components.TodosResponseState
-import com.galacticstudio.digidoro.ui.screens.todo.list.viewmodel.OrderType
-import com.galacticstudio.digidoro.ui.screens.todo.list.viewmodel.TodoViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -25,7 +25,8 @@ import kotlinx.coroutines.launch
 
 class HomeViewModel(
     private val rankingRepository: RankingRepository,
-    private val todoRepository: TodoRepository
+    private val todoRepository: TodoRepository,
+    private val pomodoroRepository: PomodoroRepository
 ) : ViewModel() {
     // The current state of the login form
     private val _state = mutableStateOf(HomeUIState())
@@ -50,9 +51,11 @@ class HomeViewModel(
             is HomeUIEvent.Rebuild -> {
                 getOwnRanking()
                 getAllTodo()
+                getAllPomodoros()
             }
         }
     }
+
 
     private fun sendResponseEvent(event: HomeResponseState) {
         viewModelScope.launch {
@@ -75,7 +78,7 @@ class HomeViewModel(
             operation = {
                 todoRepository.getAllTodo(
                     sortBy = "createdAt",
-                    order = "asc",
+                    order = "desc",
                     page = 1,
                     limit = 10,
                 )
@@ -83,6 +86,24 @@ class HomeViewModel(
             onSuccess = { response ->
                 _state.value = _state.value.copy(
                     todos = response.data,
+                )
+            }
+        )
+    }
+
+    private fun getAllPomodoros() {
+        executeOperation(
+            operation = {
+                pomodoroRepository.getAllPomodoros(
+                    sortBy = "createdAt",
+                    order = "desc",
+                    page = 1,
+                    limit = 10,
+                )
+            },
+            onSuccess = { response ->
+                _state.value = _state.value.copy(
+                    pomodoros = mapToPomodoroModels(response.data),
                 )
             }
         )
@@ -110,16 +131,32 @@ class HomeViewModel(
         }
     }
 
+    private fun mapToPomodoroModels(pomodoroDataList: List<PomodoroData>): List<PomodoroModel> {
+        return pomodoroDataList.map { pomodoroData ->
+            PomodoroModel(
+                id = pomodoroData.id,
+                userId = pomodoroData.user_id,
+                name = pomodoroData.name,
+                sessionsCompleted = pomodoroData.sessionsCompleted,
+                totalSessions = pomodoroData.totalSessions,
+                theme = pomodoroData.theme,
+                createdAt = pomodoroData.createdAt,
+                updatedAt = pomodoroData.updatedAt
+            )
+        }
+    }
+
     companion object {
         // Factory for creating instances of RankingViewModel.
         val Factory = viewModelFactory {
             initializer {
                 val app =
-                    this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as RetrofitApplication
+                    this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as Application
                 // Create a new instance of RankingViewModel with dependencies.
                 HomeViewModel(
                     rankingRepository = app.rankingRepository,
                     todoRepository = app.todoRepository,
+                    pomodoroRepository = app.pomodoroRepository
                 )
             }
         }

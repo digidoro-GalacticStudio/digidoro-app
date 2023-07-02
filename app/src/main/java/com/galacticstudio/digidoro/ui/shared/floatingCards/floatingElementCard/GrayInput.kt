@@ -8,12 +8,15 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.selection.LocalTextSelectionColors
+import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -71,45 +74,52 @@ fun GrayInput(
             Column {
                 Text(text = label, style = MaterialTheme.typography.titleLarge)
                 Box(modifier = Modifier.height(45.dp)) {
-                    TextField(
-                        value = value,
-                        onValueChange = { value = it },
-                        textStyle = MaterialTheme.typography.labelSmall + TextStyle( textAlign = TextAlign.End) ,
-                        placeholder = {
-                            Text(
-                                placeHolder,
-                                textAlign = TextAlign.End,
-                                style = MaterialTheme.typography.labelSmall,
-                            )
-                        },
-                        modifier = modifier
-                            .width(fieldWidth)
-                            .border(
-                                1.dp,
-                                MaterialTheme.colorScheme.secondary,
-                                RoundedCornerShape(roundCorner)
-                            )
-                        ,
-                        shape = RoundedCornerShape(roundCorner),
-                        colors = TextFieldDefaults.colors(
-                            unfocusedIndicatorColor = Color.Transparent,
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurface,
-                            focusedPlaceholderColor = MaterialTheme.colorScheme.onSurface,
-                            focusedTextColor = MaterialTheme.colorScheme.secondary,
-                            unfocusedTextColor = MaterialTheme.colorScheme.secondary,
-                            unfocusedContainerColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                            focusedContainerColor = MaterialTheme.colorScheme.onPrimaryContainer
-                        ),
-                        keyboardOptions = when (type) {
-                            TextFieldType.NUMBER -> KeyboardOptions(keyboardType = KeyboardType.Number)
-                            TextFieldType.DATE -> KeyboardOptions(keyboardType = KeyboardType.Number)
-                            else -> KeyboardOptions(keyboardType = KeyboardType.Number)
-                        },
-                        maxLines = 1
-
+                    val customTextSelectionColors = TextSelectionColors(
+                        handleColor = Color(0xFF3D3F42),
+                        backgroundColor = Color(0xFF789DF1),
                     )
 
+                    CompositionLocalProvider(
+                        LocalTextSelectionColors provides customTextSelectionColors,
+                    ) {
+                        TextField(
+                            value = value,
+                            onValueChange = { value = it },
+                            textStyle = MaterialTheme.typography.labelSmall + TextStyle( textAlign = TextAlign.End) ,
+                            placeholder = {
+                                Text(
+                                    placeHolder,
+                                    textAlign = TextAlign.End,
+                                    style = MaterialTheme.typography.labelSmall,
+                                )
+                            },
+                            modifier = modifier
+                                .width(fieldWidth)
+                                .border(
+                                    1.dp,
+                                    MaterialTheme.colorScheme.secondary,
+                                    RoundedCornerShape(roundCorner)
+                                )
+                            ,
+                            shape = RoundedCornerShape(roundCorner),
+                            colors = TextFieldDefaults.colors(
+                                unfocusedIndicatorColor = Color.Transparent,
+                                focusedIndicatorColor = Color.Transparent,
+                                unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurface,
+                                focusedPlaceholderColor = MaterialTheme.colorScheme.onSurface,
+                                focusedTextColor = MaterialTheme.colorScheme.secondary,
+                                unfocusedTextColor = MaterialTheme.colorScheme.secondary,
+                                unfocusedContainerColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                                focusedContainerColor = MaterialTheme.colorScheme.onPrimaryContainer
+                            ),
+                            keyboardOptions = when (type) {
+                                TextFieldType.NUMBER -> KeyboardOptions(keyboardType = KeyboardType.Number)
+                                TextFieldType.DATE -> KeyboardOptions(keyboardType = KeyboardType.Number)
+                                else -> KeyboardOptions(keyboardType = KeyboardType.Number)
+                            },
+                            maxLines = 1
+                        )
+                    }
                 }
             }
         }

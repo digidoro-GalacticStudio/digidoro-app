@@ -1,6 +1,5 @@
 package com.galacticstudio.digidoro.ui.screens.noteitem.viewmodel
 
-import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -10,7 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.galacticstudio.digidoro.RetrofitApplication
+import com.galacticstudio.digidoro.Application
 import com.galacticstudio.digidoro.data.NoteModel
 import com.galacticstudio.digidoro.domain.usecase.note.AddNote
 import com.galacticstudio.digidoro.network.ApiResponse
@@ -27,7 +26,6 @@ import com.galacticstudio.digidoro.util.DateUtils
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 class NoteItemViewModel(
@@ -183,7 +181,7 @@ class NoteItemViewModel(
 
     private fun updateScore() {
         viewModelScope.launch {
-            rankingRepository.updateScore(2)
+            rankingRepository.updateScore(4)
         }
     }
 
@@ -322,7 +320,7 @@ class NoteItemViewModel(
         val Factory = viewModelFactory {
             initializer {
                 val app =
-                    this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as RetrofitApplication
+                    this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as Application
                 // Create a new instance of LoginViewModel with dependencies.
                 NoteItemViewModel(
                     addNote = AddNote(),

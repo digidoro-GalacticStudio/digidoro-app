@@ -8,11 +8,12 @@ import com.galacticstudio.digidoro.repository.CredentialsRepository
 import com.galacticstudio.digidoro.repository.FavoriteNoteRepository
 import com.galacticstudio.digidoro.repository.FolderRepository
 import com.galacticstudio.digidoro.repository.NoteRepository
+import com.galacticstudio.digidoro.repository.PomodoroRepository
 import com.galacticstudio.digidoro.repository.RankingRepository
 import com.galacticstudio.digidoro.repository.TodoRepository
 import com.galacticstudio.digidoro.repository.UserRepository
 
-class RetrofitApplication : Application() {
+class Application : Application() {
 
     private val prefs: SharedPreferences by lazy {
         getSharedPreferences("Retrofit", Context.MODE_PRIVATE)
@@ -43,6 +44,10 @@ class RetrofitApplication : Application() {
 
     private fun getRankingAPIService() = with(RetrofitInstance){
         getRankingService()
+    }
+
+    private fun getPomodoroAPIService() = with(RetrofitInstance){
+        getPomodoroService()
     }
 
     fun getToken(): String = prefs.getString(USER_TOKEN, "")!!
@@ -79,6 +84,10 @@ class RetrofitApplication : Application() {
 
     val rankingRepository: RankingRepository by lazy {
         RankingRepository(getRankingAPIService())
+    }
+
+    val pomodoroRepository: PomodoroRepository by lazy {
+        PomodoroRepository(getPomodoroAPIService())
     }
 
     val todoRepository: TodoRepository by lazy{

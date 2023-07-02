@@ -26,7 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.galacticstudio.digidoro.R
-import com.galacticstudio.digidoro.RetrofitApplication
+import com.galacticstudio.digidoro.Application
 import com.galacticstudio.digidoro.ui.screens.todo.item.ItemTodoEvent
 import com.galacticstudio.digidoro.ui.screens.todo.item.ItemTodoViewModel
 import com.galacticstudio.digidoro.ui.screens.todo.list.TodosEvent
@@ -66,7 +66,7 @@ fun TodoUpdateFloatingBox(
     todosViewModel: TodoViewModel = viewModel(factory = TodoViewModel.Factory),
     FloatingTodoHideHandler: () -> Unit,
 ) {
-    val app: RetrofitApplication = LocalContext.current.applicationContext as RetrofitApplication
+    val app: Application = LocalContext.current.applicationContext as Application
     val cornerRadius = 5.dp
     val day =
         SimpleDateFormat("yyyy/MM/dd", Locale.getDefault()).format(Calendar.getInstance().time)

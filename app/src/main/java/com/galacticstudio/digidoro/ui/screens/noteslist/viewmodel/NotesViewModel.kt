@@ -1,6 +1,5 @@
 package com.galacticstudio.digidoro.ui.screens.noteslist.viewmodel
 
-import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -10,7 +9,7 @@ import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.AP
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.galacticstudio.digidoro.RetrofitApplication
+import com.galacticstudio.digidoro.Application
 import com.galacticstudio.digidoro.data.FolderModel
 import com.galacticstudio.digidoro.data.FolderPopulatedModel
 import com.galacticstudio.digidoro.data.NoteModel
@@ -439,7 +438,7 @@ class NotesViewModel(
         // Factory for creating instances of LoginViewModel.
         val Factory = viewModelFactory {
             initializer {
-                val app = this[APPLICATION_KEY] as RetrofitApplication
+                val app = this[APPLICATION_KEY] as Application
                 // Create a new instance of LoginViewModel with dependencies.
                 NotesViewModel(
                     noteUseCases = NoteUseCases(

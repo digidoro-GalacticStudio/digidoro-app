@@ -22,7 +22,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextDecoration
@@ -33,10 +32,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.galacticstudio.digidoro.R
-import com.galacticstudio.digidoro.RetrofitApplication
+import com.galacticstudio.digidoro.Application
 import com.galacticstudio.digidoro.navigation.HOME_GRAPH_ROUTE
 import com.galacticstudio.digidoro.navigation.Screen
-import com.galacticstudio.digidoro.network.retrofit.RetrofitInstance
 import com.galacticstudio.digidoro.ui.screens.login.viewmodel.LoginViewModel
 import com.galacticstudio.digidoro.ui.shared.button.CustomButton
 import com.galacticstudio.digidoro.ui.shared.textfield.ErrorMessage
@@ -77,7 +75,7 @@ fun LoginScreen(
     loginViewModel: LoginViewModel = viewModel(factory = LoginViewModel.Factory),
 ) {
     // Retrieve the application instance from the current context
-    val app: RetrofitApplication = LocalContext.current.applicationContext as RetrofitApplication
+    val app: Application = LocalContext.current.applicationContext as Application
 
     val state = loginViewModel.state // Retrieves the current state from the loginViewModel.
     val context = LocalContext.current // Retrieves the current context from the LocalContext.

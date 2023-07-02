@@ -1,15 +1,21 @@
 package com.galacticstudio.digidoro.navigation.navgraph
 
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.galacticstudio.digidoro.navigation.POMODORO_GRAPH_ROUTE
 import com.galacticstudio.digidoro.navigation.Screen
-import com.galacticstudio.digidoro.ui.PomodoroScreen
+import com.galacticstudio.digidoro.service.TimerService
+import com.galacticstudio.digidoro.ui.screens.pomodoro.PomodoroScreen
+import com.galacticstudio.digidoro.ui.screens.pomodoro.viewmodel.PomodoroViewModel
 
+@OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.pomodoroNavGraph(
-    navController: NavHostController
+    navController: NavHostController,
+    stopwatchService: TimerService,
+    pomodoroViewModel: PomodoroViewModel
 ){
     navigation(
         startDestination = Screen.Pomodoro.route,
@@ -18,7 +24,11 @@ fun NavGraphBuilder.pomodoroNavGraph(
         composable(
             route = Screen.Pomodoro.route
         ) {
-            PomodoroScreen(navController = navController)
+            PomodoroScreen(
+                navController = navController,
+                pomodoroViewModel = pomodoroViewModel,
+                stopwatchService = stopwatchService,
+            )
         }
     }
 }

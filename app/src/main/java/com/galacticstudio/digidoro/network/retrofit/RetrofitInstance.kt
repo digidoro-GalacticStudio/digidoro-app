@@ -4,6 +4,7 @@ import com.galacticstudio.digidoro.network.service.AuthService
 import com.galacticstudio.digidoro.network.service.FavoriteNoteService
 import com.galacticstudio.digidoro.network.service.FolderService
 import com.galacticstudio.digidoro.network.service.NoteService
+import com.galacticstudio.digidoro.network.service.PomodoroService
 import com.galacticstudio.digidoro.network.service.RankingService
 import com.galacticstudio.digidoro.network.service.TodoService
 import com.galacticstudio.digidoro.network.service.UserService
@@ -68,6 +69,10 @@ object RetrofitInstance {
 
     fun getRankingService(): RankingService {
         return retrofit.create(RankingService::class.java)
+    }
+
+    fun getPomodoroService(): PomodoroService {
+        return retrofit.create(PomodoroService::class.java)
     }
 
     fun getTodoService(): TodoService{

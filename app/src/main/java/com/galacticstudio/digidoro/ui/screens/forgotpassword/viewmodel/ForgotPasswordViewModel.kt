@@ -5,12 +5,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.galacticstudio.digidoro.RetrofitApplication
+import com.galacticstudio.digidoro.Application
 import com.galacticstudio.digidoro.domain.usecase.fields.ValidateEmail
 import com.galacticstudio.digidoro.network.ApiResponse
 import com.galacticstudio.digidoro.repository.UserRepository
@@ -107,7 +106,7 @@ class ForgotPasswordViewModel(
         val Factory = viewModelFactory {
             initializer {
                 val app =
-                    this[APPLICATION_KEY] as RetrofitApplication
+                    this[APPLICATION_KEY] as Application
                 // Create a new instance of ForgotPasswordViewModel with dependencies.
                 ForgotPasswordViewModel(
                     repository = app.userRepository

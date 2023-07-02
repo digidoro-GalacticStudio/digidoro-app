@@ -32,7 +32,8 @@ import com.galacticstudio.digidoro.ui.theme.Nunito
 @Composable
 fun CustomButton(
     text: String,
-    onClick: () -> Unit
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
 ) {
     val shadowColor = if (isSystemInDarkTheme()) Color.White else Color.Black
 
@@ -48,19 +49,13 @@ fun CustomButton(
         shape = CircleShape,
         modifier = Modifier
             .fillMaxWidth()
-            .height(IntrinsicSize.Min),
+            .height(IntrinsicSize.Min)
+            .then(modifier),
         colors = ButtonDefaults.buttonColors(
             containerColor = colorResource(id = R.color.secondary_color),
             contentColor = Color.White
         ),
         contentPadding = PaddingValues(8.dp),
-//        elevation = ButtonDefaults.buttonElevation(
-//            defaultElevation = 5.dp,
-//            pressedElevation = 5.dp,
-//            focusedElevation = 5.dp,
-//            hoveredElevation = 5.dp,
-//            disabledElevation = 0.dp
-//        ),
         content = {
             Text(
                 text = text,

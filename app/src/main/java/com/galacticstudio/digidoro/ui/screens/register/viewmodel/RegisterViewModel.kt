@@ -9,7 +9,7 @@ import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.AP
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.galacticstudio.digidoro.RetrofitApplication
+import com.galacticstudio.digidoro.Application
 import com.galacticstudio.digidoro.domain.usecase.fields.ValidateDate
 import com.galacticstudio.digidoro.domain.usecase.fields.ValidateEmail
 import com.galacticstudio.digidoro.domain.usecase.fields.ValidatePassword
@@ -236,7 +236,7 @@ class RegisterViewModel(
         // Factory for creating instances of RegisterViewModel.
         val Factory = viewModelFactory {
             initializer {
-                val app = this[APPLICATION_KEY] as RetrofitApplication
+                val app = this[APPLICATION_KEY] as Application
                 // Create a new instance of RegisterViewModel with dependencies.
                 RegisterViewModel(
                     validateEmail = ValidateEmail(),

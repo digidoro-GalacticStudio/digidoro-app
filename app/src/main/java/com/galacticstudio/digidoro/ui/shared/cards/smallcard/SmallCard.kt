@@ -1,7 +1,9 @@
-package com.galacticstudio.digidoro.ui.shared.cards.todocard
+package com.galacticstudio.digidoro.ui.shared.cards.smallcard
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -42,28 +44,33 @@ import androidx.compose.ui.unit.sp
  * @param colorTheme The color theme of the card.
  * @param onClick The callback to be invoked when the card is clicked.
  */
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun TodoCard(
+fun SmallCard(
     message: String,
     modifier: Modifier = Modifier,
     boldSubtitle: String = "",
     normalSubtitle: String = "",
     colorTheme: Color,
     onClick: () -> Unit,
+    onLongClick: (() -> Unit)?,
 ) {
     val borderWidth = 1.5.dp
     val borderRadius = 7.dp
     val paddingCard = 18.dp
 
     Card(
-        onClick = { onClick() },
         modifier = Modifier
             .fillMaxWidth()
             .border(borderWidth, MaterialTheme.colorScheme.onPrimary, shape = RoundedCornerShape(borderRadius))
             .height(IntrinsicSize.Min)
             .clip(RoundedCornerShape(borderRadius))
-            .then(modifier),
+            .then(modifier)
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = { onLongClick?.invoke() },
+                onDoubleClick = { onLongClick?.invoke() }
+            ),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
         ),
@@ -90,7 +97,7 @@ fun TodoCard(
                     .weight(1f)
                     .padding(
                         start = paddingCard,
-                        end = paddingCard,
+                        end = 11.dp,
                         top = paddingCard,
                         bottom = 8.dp
                     )

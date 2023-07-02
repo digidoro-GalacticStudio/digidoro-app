@@ -78,7 +78,7 @@ fun PomodoroFloatingBox(){
                             modifier = Modifier.padding(vertical = 4.dp)
                         )
                         //TODO Update
-                        ColorBox(Color.White, {})
+                        ColorBox(Color.White){}
                     }
                     Spacer(modifier = Modifier.height(14.dp))
                     PomodoroControler()
