@@ -1,9 +1,12 @@
 package com.galacticstudio.digidoro.ui.shared.cards.pomodoroCard
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -54,6 +57,7 @@ fun PomodoroCard(
             .zIndex(1f)
             .padding(end = 7.dp)
             .width(140.dp)
+            .height(135.dp)
             .shadowWithBorder(
                 borderWidth = 4.dp,
                 borderColor = MaterialTheme.colorScheme.onPrimary,
@@ -61,19 +65,25 @@ fun PomodoroCard(
                 shadowColor = colorTheme,
                 shadowOffset = Offset(15f, 15f)
             )
-            .border(borderWidth, MaterialTheme.colorScheme.onPrimary, shape = RoundedCornerShape(borderRadius))
+            .border(
+                borderWidth,
+                MaterialTheme.colorScheme.onPrimary,
+                shape = RoundedCornerShape(borderRadius)
+            )
             .then(modifier),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer
         ),
     ) {
         Column(
-            modifier = Modifier.padding(
-                start = paddingValue,
-                end = paddingValue,
-                top = paddingValue,
-                bottom = 0.dp
-            )
+            modifier = Modifier
+                .padding(
+                    start = paddingValue,
+                    end = paddingValue,
+                    top = paddingValue,
+                    bottom = 0.dp
+                )
+                .fillMaxSize(),
         ) {
             Text(
                 text = message,
@@ -84,10 +94,11 @@ fun PomodoroCard(
                 fontWeight = FontWeight.W800,
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f)
             )
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxWidth()
                     .padding(vertical = 15.dp),
                 horizontalAlignment = Alignment.End,
                 verticalArrangement = Arrangement.Bottom

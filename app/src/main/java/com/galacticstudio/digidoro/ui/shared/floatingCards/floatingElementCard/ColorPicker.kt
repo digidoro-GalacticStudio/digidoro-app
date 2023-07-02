@@ -25,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.galacticstudio.digidoro.ui.theme.DigidoroTheme
 
@@ -42,7 +43,7 @@ fun ColorBoxPreview() {
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
         ) {
-            ColorBox(Color.White, {})
+            ColorBox(Color.White){}
         }
     }
 }
@@ -51,8 +52,9 @@ fun ColorBoxPreview() {
 @Composable
 fun ColorBox(
     selectedColor: Color,
-    onColorChange: (Color) -> Unit,
     isUserPremium: Boolean = false,
+    spacedBy: Dp = 5.dp,
+    onColorChange: (Color) -> Unit,
 ) {
 
     val colors = listOf(
@@ -70,7 +72,7 @@ fun ColorBox(
     )
 
     FlowRow(
-        horizontalArrangement = Arrangement.spacedBy(5.dp),
+        horizontalArrangement = Arrangement.spacedBy(spacedBy),
     ) {
         colors.forEach { colorItem ->
             ColorButton(

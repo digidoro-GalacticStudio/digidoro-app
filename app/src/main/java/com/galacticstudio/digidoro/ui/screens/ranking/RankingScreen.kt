@@ -126,9 +126,9 @@ fun RankingScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                ToggleButton() { selectedOption ->
+                ToggleButton(onButtonClick = { selectedOption ->
                     rankingViewModel.onEvent(RankingUIEvent.ResultTypeChange(selectedOption.type))
-                }
+                })
             }
             Spacer(modifier = Modifier.height(24.dp))
         }

@@ -9,6 +9,7 @@ import com.galacticstudio.digidoro.repository.CredentialsRepository
 import com.galacticstudio.digidoro.repository.FavoriteNoteRepository
 import com.galacticstudio.digidoro.repository.FolderRepository
 import com.galacticstudio.digidoro.repository.NoteRepository
+import com.galacticstudio.digidoro.repository.PomodoroRepository
 import com.galacticstudio.digidoro.repository.RankingRepository
 import com.galacticstudio.digidoro.repository.TodoRepository
 import com.galacticstudio.digidoro.repository.UserRepository
@@ -57,6 +58,11 @@ class Application : Application() {
     private fun getTodoApiService() = with(RetrofitInstance){
         getTodoService()
     }
+    
+    private fun getPomodoroAPIService() = with(RetrofitInstance){
+        getPomodoroService()
+    }
+
     fun getToken(): String = prefs.getString(USER_TOKEN, "")!!
 
     fun getRoles(): List<String> = prefs.getStringSet(USER_ROLES, emptySet())?.toList() ?: emptyList()
@@ -97,6 +103,10 @@ class Application : Application() {
 
     val rankingRepository: RankingRepository by lazy {
         RankingRepository(getRankingAPIService(), database)
+    }
+
+    val pomodoroRepository: PomodoroRepository by lazy {
+        PomodoroRepository(getPomodoroAPIService())
     }
 
     val todoRepository: TodoRepository by lazy{

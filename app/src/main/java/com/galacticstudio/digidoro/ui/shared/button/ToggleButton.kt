@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.galacticstudio.digidoro.ui.theme.AzureBlue10
 
@@ -42,32 +44,38 @@ sealed class ToggleButtonOptionType {
     object Total : ToggleButtonOptionType()
 }
 
+val options = arrayOf(
+    ToggleButtonOption(ToggleButtonOptionType.Today, "Today", null),
+    ToggleButtonOption(ToggleButtonOptionType.Weekly, "Semanal", null),
+    ToggleButtonOption(ToggleButtonOptionType.Monthly, "Mensual", null),
+)
+
 @Composable
 fun ToggleButton(
     backgroundColor: Color = AzureBlue10,
-    onButtonClick: (selectedOption: ToggleButtonOption) -> Unit = {}
+    optionList: Array<ToggleButtonOption> = options,
+    enabled: Boolean = true,
+    onButtonClick: (selectedOption: ToggleButtonOption) -> Unit = {},
 ) {
-    val options = arrayOf(
-        ToggleButtonOption(ToggleButtonOptionType.Today, "Today", null),
-        ToggleButtonOption(ToggleButtonOptionType.Weekly, "Semanal", null),
-        ToggleButtonOption(ToggleButtonOptionType.Monthly, "Mensual", null),
-    )
-
     ContainerToggleButton(
         backgroundColor = backgroundColor,
-        options = options,
+        options = optionList,
         type = SelectionType.SINGLE,
         modifier = Modifier.padding(end = 4.dp),
+        enabled = enabled,
         onButtonClick = onButtonClick
     )
 }
 
 @Composable
-fun VerticalDivider() {
+fun VerticalDivider(
+    color: Color
+) {
     Divider(
         modifier = Modifier
             .fillMaxHeight()
-            .width(2.dp)
+            .width(2.dp),
+        color = color.copy(0.7f)
     )
 }
 
@@ -77,13 +85,15 @@ fun ContainerToggleButton(
     options: Array<ToggleButtonOption>,
     modifier: Modifier = Modifier,
     type: SelectionType = SelectionType.SINGLE,
+    enabled: Boolean,
     onButtonClick: (selectedOption: ToggleButtonOption) -> Unit = {},
 ) {
     val state = remember { mutableStateMapOf<String, ToggleButtonOption>() }
+    state[options.first().text] = options.first() // Select the first option by default
 
     OutlinedButton(
         onClick = { },
-        border = BorderStroke(1.dp, Color.hsl(220f, 1f, 0.75f)),
+        border = BorderStroke(1.dp, backgroundColor.copy(0.7f)),
         shape = RoundedCornerShape(50),
         colors = ButtonDefaults.outlinedButtonColors(
             contentColor = Color.Red,
@@ -99,24 +109,26 @@ fun ContainerToggleButton(
         }
 
         val onItemClick: (option: ToggleButtonOption) -> Unit = { option ->
-            if (type == SelectionType.SINGLE) {
-                options.forEach {
-                    val key = it.text
-                    if (key == option.text) {
+            if (enabled) {
+                if (type == SelectionType.SINGLE) {
+                    options.forEach {
+                        val key = it.text
+                        if (key == option.text) {
+                            state[key] = option
+                        } else {
+                            state.remove(key)
+                        }
+                    }
+                } else {
+                    val key = option.text
+                    if (!state.contains(key)) {
                         state[key] = option
                     } else {
                         state.remove(key)
                     }
                 }
-            } else {
-                val key = option.text
-                if (!state.contains(key)) {
-                    state[key] = option
-                } else {
-                    state.remove(key)
-                }
+                onButtonClick(option)
             }
-            onButtonClick(option)
         }
 
         if (options.size == 1) {
@@ -139,14 +151,14 @@ fun ContainerToggleButton(
             onClick = onItemClick,
         )
 
-        VerticalDivider()
+        VerticalDivider(backgroundColor)
         middle.map { option ->
             SelectionPill(
                 option = option,
                 selected = state.contains(option.text),
                 onClick = onItemClick,
             )
-            VerticalDivider()
+            VerticalDivider(backgroundColor)
         }
 
         SelectionPill(
@@ -163,6 +175,12 @@ fun SelectionPill(
     selected: Boolean,
     onClick: (option: ToggleButtonOption) -> Unit = {}
 ) {
+    val textDecoration = if (selected) {
+        TextDecoration.Underline
+    } else {
+        null
+    }
+
     Button(
         onClick = { onClick(option) },
         colors = ButtonDefaults.buttonColors(
@@ -179,7 +197,8 @@ fun SelectionPill(
             Text(
                 text = option.text,
                 color = Color.White,
-                fontWeight = if (selected) FontWeight.W800 else FontWeight.W600,
+                style = MaterialTheme.typography.bodyMedium.copy(textDecoration = textDecoration),
+                fontWeight = if (selected) FontWeight.W800 else FontWeight.W500,
                 modifier = Modifier.padding(0.dp),
             )
         }

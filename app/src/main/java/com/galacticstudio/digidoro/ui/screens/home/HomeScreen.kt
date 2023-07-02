@@ -32,6 +32,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -45,9 +46,10 @@ import com.galacticstudio.digidoro.R
 import com.galacticstudio.digidoro.Application
 import com.galacticstudio.digidoro.network.retrofit.RetrofitInstance
 import com.galacticstudio.digidoro.ui.screens.home.viewmodel.HomeViewModel
-import com.galacticstudio.digidoro.ui.screens.ranking.mapper.UserRankingMapper.getRankingName
-import com.galacticstudio.digidoro.ui.screens.ranking.mapper.UserRankingMapper.getScoreRange
-import com.galacticstudio.digidoro.ui.shared.cards.todocard.TodoCard
+import com.galacticstudio.digidoro.navigation.Screen
+import com.galacticstudio.digidoro.ui.screens.pomodoro.viewmodel.PomodoroViewModel
+import com.galacticstudio.digidoro.ui.shared.cards.pomodoroCard.PomodoroCard
+import com.galacticstudio.digidoro.ui.shared.cards.smallcard.SmallCard
 import com.galacticstudio.digidoro.ui.shared.titles.CustomMessageData
 import com.galacticstudio.digidoro.ui.shared.titles.Title
 import com.galacticstudio.digidoro.ui.theme.DigidoroTheme
@@ -79,6 +81,7 @@ fun HomeScreenPreview() {
 fun HomeScreen(
     navController: NavHostController = rememberNavController(),
     homeViewModel: HomeViewModel = viewModel(factory = HomeViewModel.Factory),
+    pomodoroViewModel: PomodoroViewModel = viewModel(factory = PomodoroViewModel.Factory)
 ) {
     val app: Application = LocalContext.current.applicationContext as Application
     val state = homeViewModel.state // Retrieves the current state from the HomeViewModel.
@@ -106,86 +109,109 @@ fun HomeScreen(
             WelcomeUser(username.value)
         }
 
-        // Ranking
+        // +++++++++++
+        //   Ranking
+        // +++++++++++
         item {
             Spacer(modifier = Modifier.height(16.dp))
             RankingHome(state)
         }
 
-        //Pomodoro title
-//        item {
-//            Spacer(modifier = Modifier.height(24.dp))
-//
-//            Text(
-//                text = "What did we leave off on?",
-//                style = MaterialTheme.typography.bodyMedium,
-//                fontFamily = Nunito,
-//            )
-//
-//            Spacer(modifier = Modifier.height(8.dp))
-//            Title(
-//                message = CustomMessageData(
-//                    title = "Your Pomodoro",
-//                    subTitle = "Your recent sessions"
-//                ),
-//                titleStyle = MaterialTheme.typography.headlineMedium
-//            )
-//            Spacer(modifier = Modifier.height(24.dp))
-//        }
-//
-//        //Pomodoro List
-//        item {
-//            LazyRow(
-//                state = rememberLazyListState()
-//            ) {
-//                itemsIndexed(pomodoroList) { index, pomodoro ->
-//                    PomodoroCard(
-//                        message = pomodoro.name,
-//                        sectionText = "Pomodoro ${index + 1}",
-//                        colorTheme = Color(android.graphics.Color.parseColor(pomodoro.theme)),
-//                        onClick = {}
-//                    )
-//                    Spacer(modifier = Modifier.width(16.dp))
-//                }
-//            }
-//        }
-
-        //Activities title
+        // +++++++++++*****
+        //  Pomodoro title
+        // +++++++++++*****
         item {
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Text(
+                text = stringResource(R.string.what_did_we_leave_off),
+                style = MaterialTheme.typography.bodyMedium,
+                fontFamily = Nunito,
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
             Title(
                 message = CustomMessageData(
-                    title = "Your Activities",
-                    subTitle = "Take a look at your pending tasks."
+                    title = stringResource(R.string.your_pomodoro_title),
+                    subTitle = stringResource(R.string.your_pomodoro_sub_title)
                 ),
                 titleStyle = MaterialTheme.typography.headlineMedium
             )
             Spacer(modifier = Modifier.height(24.dp))
         }
 
+        // +++++++++++******
+        //   Pomodoro list
+        // +++++++++++******
+        if (state.value.pomodoros.isEmpty()) {
+            item {
+                Text(
+                    stringResource(R.string.no_pomodoro_session),
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(top = 10.dp)
+                )
+            }
+        } else {
+            item {
+                LazyRow(
+                    state = rememberLazyListState()
+                ) {
+                    itemsIndexed(state.value.pomodoros) { index, pomodoro ->
+                        PomodoroCard(
+                            message = pomodoro.name,
+                            sectionText = "Completed ${pomodoro.sessionsCompleted}/${pomodoro.totalSessions}",
+                            colorTheme = Color(android.graphics.Color.parseColor(pomodoro.theme)),
+                        ) {
+                            navController.navigate(Screen.Pomodoro.route)
+                        }
+                        Spacer(modifier = Modifier.width(16.dp))
+                    }
+                }
+            }
+        }
+
+        // +++++++++++****
+        //   To-do Title
+        // +++++++++++****
+        item {
+            Spacer(modifier = Modifier.height(32.dp))
+            Title(
+                message = CustomMessageData(
+                    title = stringResource(R.string.your_activities_title),
+                    subTitle = stringResource(R.string.your_activities_sub_title)
+                ),
+                titleStyle = MaterialTheme.typography.headlineMedium
+            )
+            Spacer(modifier = Modifier.height(24.dp))
+        }
+
+        // +++++++++++***
+        //   To-do list
+        // +++++++++++***
         if (state.value.todos.isEmpty()) {
             item {
                 Text(
-                    "You don't have any pending activities.",
+                    stringResource(R.string.no_pending_activities),
                     style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(top=10.dp)
+                    modifier = Modifier.padding(top = 10.dp)
                 )
             }
         } else {
             //Activities list
             itemsIndexed(state.value.todos) { _, todo ->
                 val (text, formattedDate) = DateUtils.formatDateWithTime(todo.createdAt)
-                TodoCard(
+                SmallCard(
                     message = todo.title,
                     boldSubtitle = text,
                     normalSubtitle = formattedDate,
                     colorTheme = Color(android.graphics.Color.parseColor(todo.theme)),
-                    onClick = {}
-                )
+                    onClick = { navController.navigate(Screen.Todo.route) }
+                ) {
+                    navController.navigate(Screen.Todo.route)
+                }
                 Spacer(modifier = Modifier.height(16.dp))
             }
         }
-
     }
 }
 
@@ -197,7 +223,7 @@ fun WelcomeUser(
     username: String
 ) {
     Text(
-        text = "Hello again,",
+        text = stringResource(R.string.hello_again),
         style = MaterialTheme.typography.headlineLarge,
         textAlign = TextAlign.Center,
         fontFamily = Nunito,
@@ -208,7 +234,6 @@ fun WelcomeUser(
     ) {
         Text(
             text = username,
-//            text = state.username,
             style = MaterialTheme.typography.headlineLarge,
             fontFamily = Nunito,
             fontWeight = FontWeight.W800,
@@ -244,7 +269,6 @@ fun RankingHome(state: State<HomeUIState>) {
             style = MaterialTheme.typography.bodySmall,
             fontFamily = Nunito,
         )
-
 
         val levelName = getRankingName(state.value.user?.totalScore ?: 0)
         val currentScore = state.value.user?.totalScore ?: 0

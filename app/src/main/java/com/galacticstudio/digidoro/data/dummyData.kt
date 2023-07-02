@@ -8,24 +8,20 @@ import com.galacticstudio.digidoro.data.api.UserModel
 import java.util.Calendar
 
 val pomodoroList = mutableListOf<PomodoroModel>().apply {
-    add(
-        PomodoroModel(
-        name = "Estudiar para Análisis de Sistemas",
-        theme = "#8CC6E7",
-    )
-    )
-    add(
-        PomodoroModel(
-        name = "Estudiar para Análisis de Sistemas",
-        theme = "#C7B9FF",
-    )
-    )
-    add(
-        PomodoroModel(
-        name = "Estudiar para Análisis de Sistemas",
-        theme = "#FFC700",
-    )
-    )
+
+//    add(PomodoroModel(
+//        name = "Estudiar para Análisis de Sistemas",
+//        theme = "#8CC6E7",
+//    ))
+//    add(PomodoroModel(
+//        name = "Estudiar para Análisis de Sistemas",
+//        theme = "#C7B9FF",
+//    ))
+//    add(PomodoroModel(
+//        name = "Estudiar para Análisis de Sistemas",
+//        theme = "#FFC700",
+//    ))
+
 }
 
 
