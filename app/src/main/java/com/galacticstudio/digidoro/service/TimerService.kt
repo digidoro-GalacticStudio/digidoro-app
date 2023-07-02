@@ -50,7 +50,7 @@ class TimerService : Service() {
     // Mutable state variables
     var seconds = mutableStateOf("00")
         private set
-    var minutes = mutableStateOf("20")
+    var minutes = mutableStateOf("25")
         private set
     var hours = mutableStateOf("00")
         private set

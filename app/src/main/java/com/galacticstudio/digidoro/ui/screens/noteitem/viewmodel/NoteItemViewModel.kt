@@ -181,7 +181,7 @@ class NoteItemViewModel(
 
     private fun updateScore() {
         viewModelScope.launch {
-            rankingRepository.updateScore(2)
+            rankingRepository.updateScore(4)
         }
     }
 

@@ -1,6 +1,5 @@
 package com.galacticstudio.digidoro.ui.screens.pomodoro.viewmodel
 
-import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -15,7 +14,7 @@ import com.galacticstudio.digidoro.data.PomodoroModel
 import com.galacticstudio.digidoro.network.ApiResponse
 import com.galacticstudio.digidoro.network.dto.pomodoro.PomodoroData
 import com.galacticstudio.digidoro.repository.PomodoroRepository
-import com.galacticstudio.digidoro.ui.screens.noteitem.ActionType
+import com.galacticstudio.digidoro.repository.RankingRepository
 import com.galacticstudio.digidoro.ui.screens.pomodoro.PomodoroResponseState
 import com.galacticstudio.digidoro.ui.screens.pomodoro.PomodoroTimerState
 import com.galacticstudio.digidoro.ui.screens.pomodoro.PomodoroUIEvent
@@ -27,6 +26,7 @@ import kotlinx.coroutines.launch
 
 class PomodoroViewModel(
     private val pomodoroRepository: PomodoroRepository,
+    private val rankingRepository: RankingRepository,
 ) : ViewModel() {
     private val _state = mutableStateOf(PomodoroUIState())
     val state: State<PomodoroUIState> = _state
@@ -133,6 +133,7 @@ class PomodoroViewModel(
                         it.sessionsCompleted + 1,
                         it.totalSessions,
                         it.theme,
+                        true,
                     )
                 }
             }
@@ -144,6 +145,7 @@ class PomodoroViewModel(
                     _state.value.sessionsCompleted,
                     _state.value.totalSessions,
                     "#${_pomodoroColor.value}",
+                    false,
                 )
             }
 
@@ -189,12 +191,19 @@ class PomodoroViewModel(
         )
     }
 
+    private fun updateScore() {
+        viewModelScope.launch {
+            rankingRepository.updateScore(30)
+        }
+    }
+
     private fun updatePomodoro(
         pomodoroId: String,
         name: String,
         sessionsCompleted: Int,
         totalSessions: Int,
-        theme: String
+        theme: String,
+        reward: Boolean
     ) {
         executeOperation(
             operation = {
@@ -219,7 +228,9 @@ class PomodoroViewModel(
                     )
                 }
 
-               getAllPomodoros()
+                if (reward) updateScore()
+
+                getAllPomodoros()
             }
         )
     }
@@ -280,15 +291,15 @@ class PomodoroViewModel(
 
     private fun mapToPomodoroModel(pomodoro: PomodoroData): PomodoroModel {
         return PomodoroModel(
-                id = pomodoro.id,
-                userId = pomodoro.user_id,
-                name = pomodoro.name,
-                sessionsCompleted = pomodoro.sessionsCompleted,
-                totalSessions = pomodoro.totalSessions,
-                theme = pomodoro.theme,
-                createdAt = pomodoro.createdAt,
-                updatedAt = pomodoro.updatedAt
-            )
+            id = pomodoro.id,
+            userId = pomodoro.user_id,
+            name = pomodoro.name,
+            sessionsCompleted = pomodoro.sessionsCompleted,
+            totalSessions = pomodoro.totalSessions,
+            theme = pomodoro.theme,
+            createdAt = pomodoro.createdAt,
+            updatedAt = pomodoro.updatedAt
+        )
     }
 
     companion object {
@@ -300,6 +311,7 @@ class PomodoroViewModel(
                 // Create a new instance of PomodoroViewModel with dependencies.
                 PomodoroViewModel(
                     pomodoroRepository = app.pomodoroRepository,
+                    rankingRepository = app.rankingRepository,
                 )
             }
         }

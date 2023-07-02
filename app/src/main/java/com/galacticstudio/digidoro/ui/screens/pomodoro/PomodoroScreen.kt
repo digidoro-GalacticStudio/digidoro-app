@@ -213,9 +213,9 @@ fun PomodoroScreen(
                     }
 
                     val minutesType = when (selectedOption.type) {
-                        is ToggleButtonOptionType.Today -> 1
-                        is ToggleButtonOptionType.Weekly -> 2
-                        is ToggleButtonOptionType.Monthly -> 3
+                        is ToggleButtonOptionType.Today -> 25
+                        is ToggleButtonOptionType.Weekly -> 5
+                        is ToggleButtonOptionType.Monthly -> 15
                         else -> {
                             0
                         }
