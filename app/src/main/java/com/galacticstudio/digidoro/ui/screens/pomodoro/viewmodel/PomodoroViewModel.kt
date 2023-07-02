@@ -86,8 +86,6 @@ class PomodoroViewModel(
             }
 
             is PomodoroUIEvent.SavePomodoro -> {
-                // Handle the save pomodoro event
-                Log.d("MyErrors", "-avlue of sesions ${_state.value.totalSessions}")
                 addPomodoro(
                     _state.value.name,
                     0,
@@ -98,7 +96,15 @@ class PomodoroViewModel(
 
             is PomodoroUIEvent.UpdatePomodoro -> {
                 Log.d("MyErrors", "------:------ ${_state.value.selectedPomodoro}")
-                // Handle the update pomodoro event
+                _state.value.selectedPomodoro?.let {
+                    updatePomodoro(
+                        it.id,
+                        it.name,
+                        it.sessionsCompleted + 1,
+                        it.totalSessions,
+                        it.theme,
+                    )
+                }
             }
 
             is PomodoroUIEvent.ThemeChanged -> {
@@ -110,6 +116,8 @@ class PomodoroViewModel(
             }
         }
     }
+
+
 
     private fun getAllPomodoros() {
         Log.d("MyErrors", "Gett alll")
@@ -141,20 +149,34 @@ class PomodoroViewModel(
                 )
             },
             onSuccess = { response ->
-//                val idNewNote = response.data.id
-//
-//                //If I want to duplicate a note in a selected folder
-//                if (_state.value.selectedFolder != null) {
-//                    val idFolder = _state.value.selectedFolder?.id ?: ""
-//                    toggleNoteFolder(idFolder, idNewNote)
-//                }
-//
-//                rebuildUI(_resultsMode.value)
                 getAllPomodoros()
             }
         )
     }
 
+    private fun updatePomodoro(
+        pomodoroId: String,
+        name: String,
+        sessionsCompleted: Int,
+        totalSessions: Int,
+        theme: String
+    ) {
+        Log.d("MyErrors", "tHIS IS AN UPDATE: ${totalSessions}")
+        executeOperation(
+            operation = {
+                pomodoroRepository.updatePomodoro(
+                    pomodoroId,
+                    name,
+                    sessionsCompleted,
+                    totalSessions,
+                    theme
+                )
+            },
+            onSuccess = { response ->
+                getAllPomodoros()
+            }
+        )
+    }
 
     private fun sendResponseEvent(event: PomodoroResponseState) {
         viewModelScope.launch {

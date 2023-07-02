@@ -57,6 +57,7 @@ class MainActivity : ComponentActivity(), TimerListener {
     private val pomodoroViewModel: PomodoroViewModel by viewModels {
         PomodoroViewModel.Factory
     }
+
     // Method called when 0:00 minute is reached on the stopwatch
     override fun onTimeReached() {
         // Call the corresponding event in the ViewModel
@@ -85,7 +86,7 @@ class MainActivity : ComponentActivity(), TimerListener {
     override fun onStart() {
         super.onStart()
 
-        // Bind to the StopwatchService
+        // Bind to the TimerService
         Intent(this, TimerService::class.java).also { intent ->
             bindService(intent, connection, Context.BIND_AUTO_CREATE)
         }

@@ -74,6 +74,12 @@ fun PomodoroScreen(
     LaunchedEffect(Unit) {
         pomodoroViewModel.onEvent(PomodoroUIEvent.Rebuild)
 
+        ServiceHelper.triggerForegroundService(
+            context = context,
+            action = Service.ACTION_SERVICE_VARIABLES,
+            initialSeconds = 1,
+        )
+
         snapshotFlow { minutes.toInt() to seconds.toInt() }
             .collect { (min, sec) ->
                 if (min == 0 && sec == 0) {
@@ -81,7 +87,7 @@ fun PomodoroScreen(
 
                     when (pomodoroViewModel.pomodoroType.value) {
                         PomodoroTimerState.Pomodoro -> {
-                            pomodoroViewModel.onEvent(PomodoroUIEvent.SavePomodoro)
+                            pomodoroViewModel.onEvent(PomodoroUIEvent.Rebuild)
                         }
                         PomodoroTimerState.ShortBreak -> {
 
@@ -92,14 +98,6 @@ fun PomodoroScreen(
                     }
                 }
             }
-
-        ServiceHelper.triggerForegroundService(
-            context = context,
-            action = Service.ACTION_SERVICE_VARIABLES,
-            initialSeconds = 1,
-        )
-
-
     }
 
     LaunchedEffect(key1 = context) {

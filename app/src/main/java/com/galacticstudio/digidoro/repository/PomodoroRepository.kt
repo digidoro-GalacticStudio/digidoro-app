@@ -1,6 +1,5 @@
 package com.galacticstudio.digidoro.repository
 
-import android.util.Log
 import com.galacticstudio.digidoro.network.ApiResponse
 import com.galacticstudio.digidoro.network.dto.pomodoro.PomodoroData
 import com.galacticstudio.digidoro.network.dto.pomodoro.PomodoroRequest
@@ -23,7 +22,6 @@ class PomodoroRepository(private val pomodoroService: PomodoroService) {
         theme: String
     ): ApiResponse<PomodoroData> {
         val request = PomodoroRequest(name, sessionsCompleted, totalSessions, theme)
-        Log.d("MyErrors", " totalSessions ${totalSessions}")
         return handleApiCall { pomodoroService.createPomodoro(request).data }
     }
 
