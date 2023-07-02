@@ -29,6 +29,10 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -48,12 +52,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -209,7 +215,7 @@ fun NotesListScreen(
                 } else {
                     Toast.makeText(
                         context,
-                        "You are not a PRO user. Upgrade your account to unlock PRO features",
+                        context.getString(R.string.upgrade_to_pro_message),
                         Toast.LENGTH_SHORT
                     ).show()
                 }
@@ -284,7 +290,7 @@ fun NotesListScreen(
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ad_note_icon),
-                        contentDescription = "Add note",
+                        contentDescription = stringResource(R.string.add_note_content_description),
                         tint = Color.White,
                         modifier = Modifier.size(30.dp),
                     )
@@ -339,8 +345,8 @@ fun NotesListScreen(
     )
 
     ExitConfirmationDialog(
-        title = "Delete Confirmation",
-        text = "Do you want to permanently delete this note?",
+        title = stringResource(R.string.delete_confirmation_title),
+        text = stringResource(R.string.delete_confirmation_text),
         openDialog = openDeleteDialog,
         onConfirmClick = {
             notesViewModel.onEvent(NotesEvent.DeleteNote(selectedCard.value?.id ?: ""))
@@ -356,8 +362,8 @@ fun NotesListScreen(
     )
 
     ExitConfirmationDialog(
-        title = "Move to Trash Confirmation",
-        text = "Do you want to move this note to the Trash?",
+        title = stringResource(R.string.move_to_trash_confirmation_title),
+        text = stringResource(R.string.move_to_trash_confirmation_text),
         openDialog = openMoveToTrashDialog,
         onConfirmClick = {
             notesViewModel.onEvent(NotesEvent.ToggleTrash(selectedCard.value?.id ?: ""))
@@ -387,7 +393,7 @@ fun NotesListContent(
 
     val actionNotesList = listOf(
         ActionNoteData(
-            text = "All notes",
+            text = stringResource(R.string.all_notes),
             leadingIcon = painterResource(R.drawable.email_icon),
             colorIcon = Color(0xFF4880FF),
             resultMode = NoteResultsMode.AllNotes,
@@ -396,7 +402,7 @@ fun NotesListContent(
             }
         ),
         ActionNoteData(
-            text = "Your folders",
+            text = stringResource(R.string.your_folders),
             leadingIcon = painterResource(R.drawable.email_icon),
             colorIcon = Color(0xFF202124),
             resultMode = NoteResultsMode.FolderNotes,
@@ -405,7 +411,7 @@ fun NotesListContent(
             },
         ),
         ActionNoteData(
-            text = "Your favorites",
+            text = stringResource(R.string.your_favorites),
             leadingIcon = painterResource(R.drawable.email_icon),
             colorIcon = Color(0xFFFFC700),
             resultMode = NoteResultsMode.FavoriteNotes,
@@ -414,7 +420,7 @@ fun NotesListContent(
             },
         ),
         ActionNoteData(
-            text = "Your trash bin",
+            text = stringResource(R.string.your_trash_bin),
             leadingIcon = painterResource(R.drawable.email_icon),
             colorIcon = Color(0xFFE15A51),
             resultMode = NoteResultsMode.TrashNotes,
@@ -457,31 +463,31 @@ fun NotesListContent(
             val message = when (notesViewModel.resultsMode.value) {
                 is NoteResultsMode.AllNotes -> {
                     CustomMessageData(
-                        title = "Recent notes",
-                        subTitle = "Keep your ideas at hand"
+                        title = stringResource(R.string.recent_notes),
+                        subTitle = stringResource(R.string.keep_your_ideas_at_hand)
                     )
                 }
 
                 is NoteResultsMode.TrashNotes -> {
                     CustomMessageData(
-                        title = "Trashed notes",
+                        title = stringResource(R.string.trashed_notes),
                         subTitle = ""
                     )
                 }
 
                 is NoteResultsMode.FolderNotes -> {
                     val selectedFolder =
-                        notesViewModel.state.value.selectedFolder?.name ?: "selected"
+                        notesViewModel.state.value.selectedFolder?.name ?: stringResource(R.string.selected)
                     CustomMessageData(
-                        title = "Folder notes",
-                        subTitle = "Notes in $selectedFolder folder"
+                        title = stringResource(R.string.folder_notes),
+                        subTitle = stringResource(R.string.notes_in_folder, selectedFolder)
                     )
                 }
 
                 is NoteResultsMode.FavoriteNotes -> {
                     CustomMessageData(
-                        title = "Favorite notes",
-                        subTitle = "Your favorite notes"
+                        title = stringResource(R.string.favorite_notes),
+                        subTitle = stringResource(R.string.your_favorite_notes)
                     )
                 }
             }
@@ -490,7 +496,6 @@ fun NotesListContent(
 
         item(span = { GridItemSpan(numColumns) }) {
             ShortNoteItems(
-                icon = painterResource(R.drawable.last_modification_icon),
                 noteOrder = state.noteOrder
             ) {
                 notesViewModel.onEvent(NotesEvent.Order(it))
@@ -518,15 +523,15 @@ fun NotesListContent(
             if (notes.isEmpty()) {
                 item(span = { GridItemSpan(numColumns) }) {
                     val noNotesMessage = when (notesViewModel.resultsMode.value) {
-                        is NoteResultsMode.AllNotes -> "You haven't created any notes yet. Start creating your notes now."
-                        is NoteResultsMode.TrashNotes -> "You don't have any notes in the recycle bin."
+                        is NoteResultsMode.AllNotes -> stringResource(R.string.no_notes_created)
+                        is NoteResultsMode.TrashNotes -> stringResource(R.string.no_notes_in_trash)
                         is NoteResultsMode.FolderNotes -> {
                             val selectedFolder =
-                                notesViewModel.state.value.selectedFolder?.name ?: "selected"
-                            "No notes in $selectedFolder folder."
+                                notesViewModel.state.value.selectedFolder?.name ?: stringResource(R.string.selected)
+                            stringResource(R.string.no_notes_in_selectedfolder_folder, selectedFolder)
                         }
 
-                        is NoteResultsMode.FavoriteNotes -> "You don't have any favorite notes yet. Mark some notes as favorites."
+                        is NoteResultsMode.FavoriteNotes -> stringResource(R.string.no_favorite_notes)
                     }
                     Box(modifier = Modifier.padding(24.dp)) {
                         Text(
@@ -592,12 +597,10 @@ fun HeaderNoteList() {
             .fillMaxWidth()
             .padding(top = 0.dp, bottom = 32.dp)
     ) {
-
-        //TODO Get the number of notes from API
         Title(
             message = CustomMessageData(
-                title = "Your notes",
-                subTitle = "Organize and manage your notes with ease"
+                title = stringResource(R.string.your_notes_title),
+                subTitle = stringResource(R.string.organize_notes_subtitle)
             ),
             alignment = Alignment.CenterHorizontally
         )
@@ -685,14 +688,13 @@ fun NoteItemContainer(
 
 @Composable
 fun ShortNoteItems(
-    icon: Painter,
     noteOrder: NoteOrder = NoteOrder.Date(OrderType.Descending),
     onOrderChange: (NoteOrder) -> Unit,
 ) {
-    val text: String = if (noteOrder.orderType is OrderType.Ascending) {
-        "First Creation"
+    val rotate = if (noteOrder.orderType is OrderType.Ascending) {
+        180f
     } else {
-        "Last Modification"
+        0f
     }
 
     Box(
@@ -713,18 +715,17 @@ fun ShortNoteItems(
             },
         ) {
             Text(
-                text = text,
-                modifier = Modifier
-                    .padding(end = 8.dp),
+                text = stringResource(R.string.last_modification),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onPrimary.copy(0.8f)
             )
             Icon(
-                painter = icon,
+                imageVector = Icons.Default.ArrowDropDown,
                 contentDescription = "Icon",
                 modifier = Modifier
-                    .size(24.dp)
+                    .size(30.dp)
                     .padding(end = 8.dp)
+                    .rotate(rotate)
             )
         }
     }
@@ -754,18 +755,21 @@ fun FolderList(
             .contains("premium") && notesViewModel.resultsMode.value == NoteResultsMode.FolderNotes,
     ) {
         Column {
-            TitleNoteList("Your Folders", "Organize your files efficiently")
+            TitleNoteList(
+                stringResource(R.string.your_folders_title),
+                stringResource(R.string.organize_folders_subtitle)
+            )
 
             if (notesViewModel.state.value.folders.isEmpty()) {
                 FlowRow(
                     modifier = Modifier.padding(16.dp),
                 ) {
                     Text(
-                        "You don't have any folders yet. ",
+                        stringResource(R.string.no_folders_message),
                         style = MaterialTheme.typography.bodyMedium
                     )
                     Text(
-                        "Create one here.",
+                        stringResource(R.string.create_folder_here),
                         modifier = Modifier.clickable { openFolderBottomSheet = true },
                         color = MaterialTheme.colorScheme.tertiary,
                         style = MaterialTheme.typography.bodyMedium

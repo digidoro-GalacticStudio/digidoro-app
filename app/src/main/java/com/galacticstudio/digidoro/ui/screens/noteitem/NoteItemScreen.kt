@@ -46,6 +46,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -304,7 +305,7 @@ fun NoteItemContent(
         ) {
             TransparentTextField(
                 text = state.value.message,
-                hint = "Hint",
+                hint = stringResource(R.string.change_message),
                 readOnly = isReadMode,
                 modifier = Modifier.padding(36.dp),
                 applyFillMaxHeight = true,
@@ -347,7 +348,7 @@ fun TopBarNote(
                 title = {
                     TransparentTextField(
                         text = state.value.title,
-                        hint = "Change Title",
+                        hint = stringResource(R.string.change_title),
                         singleLine = true,
                         readOnly = isReadMode,
                         textStyle = TextStyle(
@@ -393,7 +394,7 @@ fun TopBarNote(
                             onClick = { openDeleteDialog.value = true }
                         ) {
                             Text(
-                                text = "Delete",
+                                text = stringResource(R.string.delete_note),
                                 style = MaterialTheme.typography.titleMedium,
                                 color = color
                             )
@@ -466,7 +467,7 @@ fun DropDownNoteMenu(
     ) {
 
         Text(
-            text = "Configuration",
+            text = stringResource(R.string.configuration_note),
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
                 .padding(top = 8.dp, bottom = 16.dp),
@@ -476,11 +477,11 @@ fun DropDownNoteMenu(
         )
         DottedDivider(color = MaterialTheme.colorScheme.onPrimary.copy(0.8f))
         DropdownMenuItem(
-            text = { Text("Tags", color = MaterialTheme.colorScheme.onPrimary) },
+            text = { Text(stringResource(R.string.tags_note), color = MaterialTheme.colorScheme.onPrimary) },
             onClick = { openTagBottomSheet.value = true }
         )
         DropdownMenuItem(
-            text = { Text("Colors", color = MaterialTheme.colorScheme.onPrimary) },
+            text = { Text(stringResource(R.string.colors_note), color = MaterialTheme.colorScheme.onPrimary) },
             onClick = { openColorBottomSheet = true }
         )
         DottedDivider(color = MaterialTheme.colorScheme.onPrimary.copy(0.8f))
@@ -496,7 +497,7 @@ fun DropDownNoteMenu(
                     Icon(
                         painter = if (isFavorite) painterResource(R.drawable.heart_border_icon) else
                             painterResource(R.drawable.heart_fill_icon),
-                        contentDescription = "Favorite Note",
+                        contentDescription = stringResource(R.string.favorite_note),
                         modifier = Modifier.size(25.dp),
                         tint = if (isFavorite) MaterialTheme.colorScheme.onPrimary else
                             Color.Red,
@@ -511,7 +512,7 @@ fun DropDownNoteMenu(
                 text = {
                     Icon(
                         painter = painterResource(R.drawable.delete_icon),
-                        contentDescription = "Delete Note",
+                        contentDescription = stringResource(R.string.delete_note_hint),
                         modifier = Modifier.size(25.dp),
                         tint = if (isUpdated) MaterialTheme.colorScheme.onPrimary else
                             MaterialTheme.colorScheme.onPrimary.copy(0.7f),
@@ -526,12 +527,6 @@ fun DropDownNoteMenu(
         onDismissRequest = { openTagBottomSheet.value = false },
         content = { TagBottomSheetContent(noteItemViewModel, openTagBottomSheet) },
     )
-    // TODO REVIEW THIS
-//    BottomSheetLayout(
-//        openBottomSheet = openFolderBottomSheet,
-//        onDismissRequest = { openFolderBottomSheet = false },
-//        content = { FolderBottomSheetContent(openFolderBottomSheet, notesViewModel) },
-//    )
     BottomSheetLayout(
         openBottomSheet = openColorBottomSheet,
         onDismissRequest = { openColorBottomSheet = false },

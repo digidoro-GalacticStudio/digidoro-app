@@ -40,6 +40,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -202,7 +203,7 @@ fun TodoScreen(
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.add_icon),
-                    contentDescription = "Create new todo",
+                    contentDescription = stringResource(R.string.create_todo),
                     tint = MaterialTheme.colorScheme.primary
                 )
             }
@@ -310,7 +311,10 @@ fun TodoStaticBody(
         //static elements
         Spacer(modifier = Modifier.height(16.dp))
         Title(
-            message = CustomMessageData("Tus task", "Comienza tu día paso a paso"),
+            message = CustomMessageData(
+                stringResource(R.string.your_tasks_title),
+                stringResource(R.string.start_your_day_subtitle)
+            ),
             alignment = Alignment.CenterHorizontally
         )
         Spacer(modifier = Modifier.height(24.dp))
@@ -348,7 +352,10 @@ fun TodoStaticBody(
 
         Spacer(modifier = Modifier.height(16.dp))
         Title(
-            message = CustomMessageData("Falta completar", "No olvides tus actividades"),
+            message = CustomMessageData(
+                stringResource(R.string.incomplete_title),
+                stringResource(R.string.dont_forget_activities_subtitle)
+            ),
             alignment = Alignment.CenterHorizontally
         )
         Spacer(modifier = Modifier.height(16.dp))
@@ -372,7 +379,10 @@ fun TodoStaticBody(
 
         Spacer(modifier = Modifier.height(24.dp))
         Title(
-            message = CustomMessageData("¡Lo lograste!", "Mira tus tareas completadas"),
+            message = CustomMessageData(
+                stringResource(R.string.you_did_it),
+                stringResource(R.string.check_your_completed_tasks)
+            ),
             alignment = Alignment.CenterHorizontally
         )
 
