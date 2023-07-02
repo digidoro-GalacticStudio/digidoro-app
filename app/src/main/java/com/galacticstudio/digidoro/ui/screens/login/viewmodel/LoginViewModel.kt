@@ -136,7 +136,8 @@ class LoginViewModel(
                         LoginResponseState.Success(
                             response.data.token,
                             response.data.username,
-                            response.data.roles
+                            response.data.roles,
+                            response.data._id
                         )
                     )
                 }

@@ -10,6 +10,7 @@ sealed class LoginResponseState {
     data class Success(
         val token: String,
         val username: String,
-        val roles: List<String> = emptyList()
+        val roles: List<String> = emptyList(),
+        val _id: String
     ) : LoginResponseState()
 }

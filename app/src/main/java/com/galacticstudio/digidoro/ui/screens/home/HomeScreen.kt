@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.LinearProgressIndicator
@@ -45,12 +44,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.galacticstudio.digidoro.R
 import com.galacticstudio.digidoro.Application
-import com.galacticstudio.digidoro.navigation.Screen
 import com.galacticstudio.digidoro.network.retrofit.RetrofitInstance
 import com.galacticstudio.digidoro.ui.screens.home.viewmodel.HomeViewModel
+import com.galacticstudio.digidoro.navigation.Screen
 import com.galacticstudio.digidoro.ui.screens.pomodoro.viewmodel.PomodoroViewModel
-import com.galacticstudio.digidoro.ui.screens.ranking.mapper.UserRankingMapper.getRankingName
-import com.galacticstudio.digidoro.ui.screens.ranking.mapper.UserRankingMapper.getScoreRange
 import com.galacticstudio.digidoro.ui.shared.cards.pomodoroCard.PomodoroCard
 import com.galacticstudio.digidoro.ui.shared.cards.smallcard.SmallCard
 import com.galacticstudio.digidoro.ui.shared.titles.CustomMessageData

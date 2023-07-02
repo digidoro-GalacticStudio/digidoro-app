@@ -7,10 +7,10 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.galacticstudio.digidoro.Application
 
 class MainViewModel(context: Context) : ViewModel() {
-    private val retrofitApplication = context.applicationContext as Application
+    private val application = context.applicationContext as Application
 
     fun hasToken(): Boolean {
-        return retrofitApplication.hasToken()
+        return application.hasToken()
     }
 
     companion object {

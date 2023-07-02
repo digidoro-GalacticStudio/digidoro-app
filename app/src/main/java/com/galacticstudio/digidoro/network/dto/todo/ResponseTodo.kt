@@ -1,8 +1,9 @@
 package com.galacticstudio.digidoro.network.dto.todo
 
-import com.galacticstudio.digidoro.data.TodoModel
+import android.util.Log
+import com.galacticstudio.digidoro.data.api.TodoModel
+import com.galacticstudio.digidoro.data.db.models.TodoItemModelEntity
 import com.google.gson.annotations.SerializedName
-import java.util.Calendar
 import java.util.Date
 
 //data one todo
@@ -38,7 +39,7 @@ data class TodoData(
 )
 
 //Convert response to todo model
-fun ResponseTodo.toTodoModel(): TodoModel{
+fun ResponseTodo.toTodoModel(): TodoModel {
     return TodoModel(
         id = data.id,
         title = data.title,
@@ -65,4 +66,40 @@ fun ResponseAllTodo.toTodosModel(): MutableList<TodoModel>{
     }
 
     return response.toMutableList()
+}
+
+//Convert response to todo item model entity
+fun ResponseAllTodo.toTodosModelEntity(): MutableList<TodoItemModelEntity>{
+    val response = data.mapIndexed{ _, element ->
+        TodoItemModelEntity(
+            _id = element.id,
+            user_id = element.user_id,
+            title = element.title,
+            description = element.description,
+            theme = element.theme,
+            reminder = element.reminder,
+            is_completed = element.is_completed,
+            createdAt = element.createdAt,
+            updatedAt = element.updatedAt
+        )
+    }
+
+    return response.toMutableList()
+}
+
+
+//Convert response to todo s model
+fun List<TodoItemModelEntity>.toTodosModel(): MutableList<TodoModel>{
+
+   return map{element ->
+        TodoModel(
+            id = element._id,
+            title = element.title,
+            description = element.description,
+            theme = element.theme,
+            createdAt = element.createdAt,
+            state = element.is_completed,
+            reminder = element.reminder
+        )
+    }.toMutableList()
 }

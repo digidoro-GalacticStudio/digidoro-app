@@ -10,7 +10,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.galacticstudio.digidoro.Application
-import com.galacticstudio.digidoro.data.TodoModel
+import com.galacticstudio.digidoro.data.api.TodoModel
 import com.galacticstudio.digidoro.domain.usecase.todo.AddTodo
 import com.galacticstudio.digidoro.domain.usecase.todo.DeleteTodo
 import com.galacticstudio.digidoro.domain.usecase.todo.GetTodos

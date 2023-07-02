@@ -1,7 +1,5 @@
 package com.galacticstudio.digidoro.ui.screens.todo.components
 
-import com.galacticstudio.digidoro.data.TodoModel
-
 /**
  * Sealed class representing different states of the login response using the API.
  */

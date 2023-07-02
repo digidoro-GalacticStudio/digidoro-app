@@ -1,25 +1,34 @@
 package com.galacticstudio.digidoro.repository
 
-import com.galacticstudio.digidoro.data.TodoModel
+import android.content.Context
+import android.util.Log
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
+import com.galacticstudio.digidoro.Application
+import com.galacticstudio.digidoro.data.api.TodoModel
+import com.galacticstudio.digidoro.data.db.DigidoroDataBase
 import com.galacticstudio.digidoro.network.ApiResponse
 import com.galacticstudio.digidoro.network.dto.todo.RequestTodo
-import com.galacticstudio.digidoro.network.dto.todo.ResponseTodo
-import com.galacticstudio.digidoro.network.dto.todo.TodoData
 import com.galacticstudio.digidoro.network.dto.todo.toTodoModel
 import com.galacticstudio.digidoro.network.dto.todo.toTodosModel
+import com.galacticstudio.digidoro.network.dto.todo.toTodosModelEntity
 import com.galacticstudio.digidoro.network.service.TodoService
+import com.galacticstudio.digidoro.repository.utils.CheckInternetConnectivity
 import com.galacticstudio.digidoro.repository.utils.handleApiCall
 import com.galacticstudio.digidoro.util.DateUtils
-import com.google.gson.Gson
-import retrofit2.HttpException
-import java.io.IOException
-import java.util.Calendar
 import java.util.Date
 
 
 class TodoRepository(
-    private val todoService: TodoService
+    private val todoService: TodoService,
+    private val database: DigidoroDataBase,
+    private val userID: String,
+    private var context: Context
 ) {
+    private val todoDao = database.TodoDao()
+
+    // Retrieve the application instance from the current context
 
         suspend fun getAllTodo(
         sortBy: String ?= null,
@@ -29,9 +38,19 @@ class TodoRepository(
         populate: String ?= null,
     ): ApiResponse<List<TodoModel>>{
         return handleApiCall {
-            todoService.getTodos(
-                sortBy, order, page, limit, populate
-            ).toTodosModel()
+            val response = if(CheckInternetConnectivity(context = context)){
+                val apiResponse = todoService.getTodos(
+                    sortBy, order, page, limit, populate
+                )
+                todoDao.insertAll(apiResponse.toTodosModelEntity())
+
+                apiResponse.toTodosModel()
+
+            } else {
+                todoDao.getAllNote(userID).toTodosModel()
+            }
+
+            response
         }
     }
 

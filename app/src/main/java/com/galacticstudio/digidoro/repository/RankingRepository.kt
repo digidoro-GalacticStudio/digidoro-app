@@ -1,5 +1,6 @@
 package com.galacticstudio.digidoro.repository
 
+import com.galacticstudio.digidoro.data.db.DigidoroDataBase
 import com.galacticstudio.digidoro.network.ApiResponse
 import com.galacticstudio.digidoro.network.dto.ranking.RankingListResponse
 import com.galacticstudio.digidoro.network.dto.ranking.RankingRequest
@@ -8,7 +9,11 @@ import com.galacticstudio.digidoro.network.dto.ranking.UpdateScoreResponse
 import com.galacticstudio.digidoro.network.service.RankingService
 import com.galacticstudio.digidoro.repository.utils.handleApiCall
 
-class RankingRepository(private val rankingService: RankingService) {
+class RankingRepository(
+    private val rankingService: RankingService,
+    private val database: DigidoroDataBase
+) {
+    private val rankingDao = database.RankingDao()
     suspend fun getOwnRanking(): ApiResponse<RankingResponse> {
         return handleApiCall { rankingService.getOwnRanking() }
     }

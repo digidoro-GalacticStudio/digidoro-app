@@ -10,9 +10,9 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.galacticstudio.digidoro.Application
-import com.galacticstudio.digidoro.data.FolderModel
-import com.galacticstudio.digidoro.data.FolderPopulatedModel
-import com.galacticstudio.digidoro.data.NoteModel
+import com.galacticstudio.digidoro.data.api.FolderModel
+import com.galacticstudio.digidoro.data.api.FolderPopulatedModel
+import com.galacticstudio.digidoro.data.api.NoteModel
 import com.galacticstudio.digidoro.domain.usecase.note.AddNote
 import com.galacticstudio.digidoro.domain.usecase.note.DeleteNote
 import com.galacticstudio.digidoro.domain.usecase.note.GetNotes

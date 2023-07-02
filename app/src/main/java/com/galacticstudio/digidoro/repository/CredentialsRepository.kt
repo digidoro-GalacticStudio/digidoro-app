@@ -1,5 +1,7 @@
 package com.galacticstudio.digidoro.repository
 
+import android.util.Log
+import com.galacticstudio.digidoro.data.db.DigidoroDataBase
 import com.galacticstudio.digidoro.network.ApiResponse
 import com.galacticstudio.digidoro.network.dto.recoverypassword.RecoveryPasswordRequest
 import com.galacticstudio.digidoro.network.dto.login.LoginRequest
@@ -8,15 +10,19 @@ import com.galacticstudio.digidoro.network.dto.register.UserData
 import com.galacticstudio.digidoro.network.service.AuthService
 import com.galacticstudio.digidoro.repository.utils.handleApiCall
 
-class CredentialsRepository(private val api: AuthService) {
-
+class CredentialsRepository(
+    private val api: AuthService,
+    private val database: DigidoroDataBase
+    ) {
+    private val userDao = database.UserDao()
     suspend fun login(email: String, password: String): ApiResponse<LoginResponseData> {
         return handleApiCall {
             val response = api.login(LoginRequest(email, password))
             val loginResponseData = LoginResponseData(
                 token = response.data.token,
                 username = response.data.username,
-                roles = response.data.roles
+                roles = response.data.roles,
+                _id = response.data.id
             )
             loginResponseData
         }
@@ -51,6 +57,7 @@ class CredentialsRepository(private val api: AuthService) {
     data class LoginResponseData(
         val token: String,
         val username: String,
-        val roles: List<String>
+        val roles: List<String>,
+        val _id: String
     )
 }

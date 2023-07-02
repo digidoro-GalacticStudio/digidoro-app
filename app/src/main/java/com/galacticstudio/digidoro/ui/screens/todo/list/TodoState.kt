@@ -1,6 +1,6 @@
 package com.galacticstudio.digidoro.ui.screens.todo.list
 
-import com.galacticstudio.digidoro.data.TodoModel
+import com.galacticstudio.digidoro.data.api.TodoModel
 import com.galacticstudio.digidoro.ui.screens.todo.list.viewmodel.OrderType
 import com.galacticstudio.digidoro.ui.screens.todo.list.viewmodel.TodoViewModel
 

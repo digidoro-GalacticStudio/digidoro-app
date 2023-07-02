@@ -1,14 +1,20 @@
 package com.galacticstudio.digidoro.repository
 
 import android.util.Log
+import com.galacticstudio.digidoro.data.db.DigidoroDataBase
 import com.galacticstudio.digidoro.network.ApiResponse
 import com.galacticstudio.digidoro.network.dto.note.NoteData
 import com.galacticstudio.digidoro.network.dto.note.NoteRequest
 import com.galacticstudio.digidoro.network.dto.note.NoteThemeRequest
+import com.galacticstudio.digidoro.network.dto.note.toFolderModelEntity
 import com.galacticstudio.digidoro.network.service.NoteService
 import com.galacticstudio.digidoro.repository.utils.handleApiCall
 
-class NoteRepository(private val noteService: NoteService) {
+class NoteRepository(
+    private val noteService: NoteService,
+    private val database: DigidoroDataBase
+) {
+    private val noteDao = database.NoteDao()
     suspend fun getAllNotes(
         sortBy: String? = null,
         order: String? = null,
@@ -18,7 +24,11 @@ class NoteRepository(private val noteService: NoteService) {
         isTrashed: Boolean? = null,
     ): ApiResponse<List<NoteData>> {
         return handleApiCall {
-            noteService.getAllNotes(sortBy, order, page, limit, populateFields, isTrashed).data
+            val response = noteService.getAllNotes(sortBy, order, page, limit, populateFields, isTrashed)
+
+            noteDao.insertAll(response.toFolderModelEntity())
+
+            response.data
         }
     }
 

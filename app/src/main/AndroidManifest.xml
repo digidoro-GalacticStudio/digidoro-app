@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Allows to check the network state-->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <!-- Allows access to the internet to make requests to the API using Retrofit -->
     <uses-permission android:name="android.permission.INTERNET"/>
     <!-- Allows running a foreground service to run the pomodoro timer and service -->

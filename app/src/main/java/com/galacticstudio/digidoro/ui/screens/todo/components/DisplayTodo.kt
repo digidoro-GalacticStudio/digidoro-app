@@ -11,12 +11,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.galacticstudio.digidoro.data.TodoModel
+import com.galacticstudio.digidoro.data.api.TodoModel
 import com.galacticstudio.digidoro.ui.screens.todo.DateFormatData
 import com.galacticstudio.digidoro.ui.screens.todo.item.ItemTodoEvent
 import com.galacticstudio.digidoro.ui.screens.todo.item.ItemTodoViewModel
-import com.galacticstudio.digidoro.ui.screens.todo.list.TodosEvent
 import com.galacticstudio.digidoro.ui.screens.todo.list.viewmodel.TodoViewModel
 import com.galacticstudio.digidoro.ui.shared.cards.todoItems.TodoItem
 import com.galacticstudio.digidoro.ui.shared.cards.todoItems.TodoMessageData

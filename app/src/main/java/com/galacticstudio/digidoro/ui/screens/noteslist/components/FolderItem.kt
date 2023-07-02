@@ -24,10 +24,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.rememberNavController
-import com.galacticstudio.digidoro.data.FolderModel
-import com.galacticstudio.digidoro.data.FolderPopulatedModel
-import com.galacticstudio.digidoro.ui.screens.noteslist.NotesEvent
+import com.galacticstudio.digidoro.data.api.FolderPopulatedModel
 import com.galacticstudio.digidoro.ui.theme.DigidoroTheme
 
 @Preview(name = "Full Preview", showSystemUi = true)

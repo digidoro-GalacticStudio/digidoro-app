@@ -1,5 +1,8 @@
 package com.galacticstudio.digidoro.network.dto.note
 
+import com.galacticstudio.digidoro.data.db.models.FolderModelEntity
+import com.galacticstudio.digidoro.data.db.models.NoteModelEntity
+import com.galacticstudio.digidoro.network.dto.folder.FolderNotesListResponse
 import com.google.gson.annotations.SerializedName
 
 data class NoteResponse(
@@ -27,3 +30,21 @@ data class NoteData(
     @SerializedName("createdAt") val createdAt: String,
     @SerializedName("updatedAt") val updatedAt: String,
 )
+
+fun NoteListResponse.toFolderModelEntity(): MutableList<NoteModelEntity>{
+    val response = data.mapIndexed{ _, element ->
+        NoteModelEntity(
+            _id = element.id,
+            user_id = element.userId,
+            title = element.title,
+            message = element.message,
+            tags = element.tags,
+            theme = element.theme,
+            is_trashed = element.isTrashed,
+            createdAt = element.createdAt,
+            updatedAt = element.updatedAt
+        )
+    }
+
+    return response.toMutableList()
+}

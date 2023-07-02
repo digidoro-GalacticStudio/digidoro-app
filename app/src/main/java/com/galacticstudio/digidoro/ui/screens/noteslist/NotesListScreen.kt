@@ -65,7 +65,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.galacticstudio.digidoro.R
 import com.galacticstudio.digidoro.Application
-import com.galacticstudio.digidoro.data.NoteModel
+import com.galacticstudio.digidoro.data.api.NoteModel
 import com.galacticstudio.digidoro.domain.util.NoteOrder
 import com.galacticstudio.digidoro.domain.util.OrderType
 import com.galacticstudio.digidoro.navigation.Screen

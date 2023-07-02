@@ -3,6 +3,7 @@ package com.galacticstudio.digidoro
 import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
+import com.galacticstudio.digidoro.data.db.DigidoroDataBase
 import com.galacticstudio.digidoro.network.retrofit.RetrofitInstance
 import com.galacticstudio.digidoro.repository.CredentialsRepository
 import com.galacticstudio.digidoro.repository.FavoriteNoteRepository
@@ -19,10 +20,18 @@ class Application : Application() {
         getSharedPreferences("Retrofit", Context.MODE_PRIVATE)
     }
 
+    private lateinit var context: Context
+
+    override fun onCreate() {
+        super.onCreate()
+        context = applicationContext
+    }
+
     private fun getAPIService() = with(RetrofitInstance){
         setToken(getToken())
         setRoles(getRoles())
         setUsername(getUsername())
+        setId(getUserId())
         getLoginService()
     }
 
@@ -46,6 +55,10 @@ class Application : Application() {
         getRankingService()
     }
 
+    private fun getTodoApiService() = with(RetrofitInstance){
+        getTodoService()
+    }
+    
     private fun getPomodoroAPIService() = with(RetrofitInstance){
         getPomodoroService()
     }
@@ -56,34 +69,40 @@ class Application : Application() {
 
     fun getUsername(): String = prefs.getString(USERNAME, "")!!
 
+    fun getUserId(): String = prefs.getString(ID, "")!!
+
     fun hasToken(): Boolean {
         val token = getToken()
         return token.isNotEmpty()
     }
 
+    private val database: DigidoroDataBase by lazy {
+        DigidoroDataBase.getInstance(this)
+    }
+
     //initialize repositories
     val credentialsRepository: CredentialsRepository by lazy {
-        CredentialsRepository(getAPIService())
+        CredentialsRepository(getAPIService(), database)
     }
 
     val notesRepository: NoteRepository by lazy {
-        NoteRepository(getNoteAPIService())
+        NoteRepository(getNoteAPIService(), database)
     }
 
     val favoriteNotesRepository: FavoriteNoteRepository by lazy {
-        FavoriteNoteRepository(getFavoriteNoteAPIService())
+        FavoriteNoteRepository(getFavoriteNoteAPIService(), database)
     }
 
     val folderRepository: FolderRepository by lazy {
-        FolderRepository(getFolderAPIService())
+        FolderRepository(getFolderAPIService(), database)
     }
 
     val userRepository: UserRepository by lazy {
-        UserRepository(getUserAPIService())
+        UserRepository(getUserAPIService(), database)
     }
 
     val rankingRepository: RankingRepository by lazy {
-        RankingRepository(getRankingAPIService())
+        RankingRepository(getRankingAPIService(), database)
     }
 
     val pomodoroRepository: PomodoroRepository by lazy {
@@ -92,8 +111,11 @@ class Application : Application() {
 
     val todoRepository: TodoRepository by lazy{
         TodoRepository(
-            todoService = RetrofitInstance.getTodoService()
-        )
+            getTodoApiService(),
+            database,
+            getUserId(),
+            context
+            )
     }
 
     fun saveAuthToken(token: String){
@@ -126,9 +148,16 @@ class Application : Application() {
         editor.apply()
     }
 
+    fun saveId(id: String){
+        val editor = prefs.edit()
+        editor.putString(ID, id)
+        editor.apply()
+    }
+
     companion object {
         const val USER_TOKEN = "user_token"
         const val USER_ROLES = "user_roles"
         const val USERNAME = "username"
+        const val ID = "id"
     }
 }

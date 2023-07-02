@@ -37,8 +37,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.galacticstudio.digidoro.R
-import com.galacticstudio.digidoro.data.FolderModel
-import com.galacticstudio.digidoro.data.convertToFolderPopulatedModel
+import com.galacticstudio.digidoro.data.api.FolderModel
+import com.galacticstudio.digidoro.data.api.convertToFolderPopulatedModel
 import com.galacticstudio.digidoro.ui.screens.noteslist.NotesEvent
 import com.galacticstudio.digidoro.ui.screens.noteslist.NotesState
 import com.galacticstudio.digidoro.ui.screens.noteslist.components.FolderItem
