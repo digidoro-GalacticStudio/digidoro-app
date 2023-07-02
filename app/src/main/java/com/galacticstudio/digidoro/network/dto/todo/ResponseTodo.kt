@@ -1,5 +1,6 @@
 package com.galacticstudio.digidoro.network.dto.todo
 
+import android.util.Log
 import com.galacticstudio.digidoro.data.api.TodoModel
 import com.galacticstudio.digidoro.data.db.models.TodoItemModelEntity
 import com.google.gson.annotations.SerializedName
@@ -84,4 +85,21 @@ fun ResponseAllTodo.toTodosModelEntity(): MutableList<TodoItemModelEntity>{
     }
 
     return response.toMutableList()
+}
+
+
+//Convert response to todo s model
+fun List<TodoItemModelEntity>.toTodosModel(): MutableList<TodoModel>{
+
+   return map{element ->
+        TodoModel(
+            id = element._id,
+            title = element.title,
+            description = element.description,
+            theme = element.theme,
+            createdAt = element.createdAt,
+            state = element.is_completed,
+            reminder = element.reminder
+        )
+    }.toMutableList()
 }

@@ -19,10 +19,18 @@ class Application : Application() {
         getSharedPreferences("Retrofit", Context.MODE_PRIVATE)
     }
 
+    private lateinit var context: Context
+
+    override fun onCreate() {
+        super.onCreate()
+        context = applicationContext
+    }
+
     private fun getAPIService() = with(RetrofitInstance){
         setToken(getToken())
         setRoles(getRoles())
         setUsername(getUsername())
+        setId(getUserId())
         getLoginService()
     }
 
@@ -54,6 +62,8 @@ class Application : Application() {
     fun getRoles(): List<String> = prefs.getStringSet(USER_ROLES, emptySet())?.toList() ?: emptyList()
 
     fun getUsername(): String = prefs.getString(USERNAME, "")!!
+
+    fun getUserId(): String = prefs.getString(ID, "")!!
 
     fun hasToken(): Boolean {
         val token = getToken()
@@ -90,7 +100,12 @@ class Application : Application() {
     }
 
     val todoRepository: TodoRepository by lazy{
-        TodoRepository(getTodoApiService(), database)
+        TodoRepository(
+            getTodoApiService(),
+            database,
+            getUserId(),
+            context
+            )
     }
 
     fun saveAuthToken(token: String){
@@ -123,9 +138,16 @@ class Application : Application() {
         editor.apply()
     }
 
+    fun saveId(id: String){
+        val editor = prefs.edit()
+        editor.putString(ID, id)
+        editor.apply()
+    }
+
     companion object {
         const val USER_TOKEN = "user_token"
         const val USER_ROLES = "user_roles"
         const val USERNAME = "username"
+        const val ID = "id"
     }
 }

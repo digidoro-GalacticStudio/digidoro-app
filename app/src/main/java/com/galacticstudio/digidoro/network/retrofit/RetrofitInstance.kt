@@ -16,6 +16,7 @@ object RetrofitInstance {
     private var token = ""
     private var username = ""
     private var roles: List<String> = emptyList()
+    private var id = ""
 
     private val interceptor = AuthInterceptor(token)
 
@@ -32,6 +33,9 @@ object RetrofitInstance {
         interceptor.updateToken("")
     }
 
+    fun setId(id: String){
+        this.id = id
+    }
     fun setUsername(username: String) {
         this.username = username
     }

@@ -107,6 +107,7 @@ fun LoginScreen(
                     app.saveAuthToken(event.token)
                     app.saveRoles(event.roles)
                     app.saveUsername(event.username)
+                    app.saveId(event._id)
                     val tokenValue = app.getToken()
 
                     Toast.makeText(

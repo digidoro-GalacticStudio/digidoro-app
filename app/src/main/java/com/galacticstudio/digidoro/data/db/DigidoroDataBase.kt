@@ -28,7 +28,7 @@ import com.galacticstudio.digidoro.data.db.models.UsersModelEntity
 @TypeConverters(
     value = [DateConverter::class, ListStringConverter::class]
 )
-abstract class DigidoroDataBase : RoomDatabase() {
+abstract class DigidoroDataBase() : RoomDatabase() {
     abstract fun FavoriteNoteDao() : FavoriteNoteDao
     abstract fun FolderDao() : FolderDao
     abstract fun NoteDao() : NoteDao

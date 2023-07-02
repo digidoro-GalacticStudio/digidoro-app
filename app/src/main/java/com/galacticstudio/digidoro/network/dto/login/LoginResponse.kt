@@ -14,4 +14,5 @@ data class UserData(
     @SerializedName("email") val email: String,
     @SerializedName("username") val username: String,
     @SerializedName("roles") val roles: List<String>,
+    @SerializedName("id") val id: String
 )

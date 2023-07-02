@@ -17,8 +17,9 @@ interface TodoDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOne(todo: TodoItemModelEntity)
 
-    @Query("SELECT * FROM todoitem")
-    suspend fun getAllNote(): List<TodoItemModelEntity>
+    //by user
+    @Query("SELECT * FROM todoitem WHERE user_id =:id")
+    suspend fun getAllNote(id: String): List<TodoItemModelEntity>
 
     @Query("SELECT * FROM todoitem WHERE _id = :id")
     suspend fun getTodoById(id: String): TodoItemModelEntity

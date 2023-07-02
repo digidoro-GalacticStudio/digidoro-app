@@ -16,8 +16,8 @@ interface FavoriteNoteDao{
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOne(favoriteNote: FavoriteNotesModelEntity)
 
-    @Query("SELECT * FROM favoritenotes")
-    suspend fun pagingSource(): List<FavoriteNoteDao>
+    @Query("SELECT * FROM favoritenotes WHERE user_id =:id")
+    suspend fun pagingSource(id: String): List<FavoriteNoteDao>
 
     @Query("SELECT * FROM favoritenotes WHERE _id = :id")
     suspend fun getFavoriteNoteById(id: String): FavoriteNotesModelEntity
