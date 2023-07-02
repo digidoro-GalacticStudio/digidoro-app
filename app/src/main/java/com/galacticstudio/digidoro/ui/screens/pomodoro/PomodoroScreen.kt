@@ -23,7 +23,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RichTooltipState
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -37,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -53,7 +53,7 @@ import com.galacticstudio.digidoro.ui.shared.button.ToggleButtonOption
 import com.galacticstudio.digidoro.ui.shared.button.ToggleButtonOptionType
 import com.galacticstudio.digidoro.ui.shared.cards.pomodoroTimer.DataTime
 import com.galacticstudio.digidoro.ui.shared.cards.pomodoroTimer.PomodoroTimer
-import com.galacticstudio.digidoro.ui.shared.cards.todocard.TodoCard
+import com.galacticstudio.digidoro.ui.shared.cards.smallcard.SmallCard
 import com.galacticstudio.digidoro.ui.shared.titles.CustomMessageData
 import com.galacticstudio.digidoro.ui.shared.titles.Title
 import com.galacticstudio.digidoro.ui.theme.Cherry_accent
@@ -147,21 +147,21 @@ fun PomodoroScreen(
             ) {
                 Title(
                     message = CustomMessageData(
-                        title = "Your pomos",
-                        subTitle = "Customize and create your study sessions."
+                        title = stringResource(R.string.your_pomos_title),
+                        subTitle = stringResource(R.string.customize_study_sessions_subtitle)
                     ),
                     alignment = Alignment.CenterHorizontally,
                 )
 
-                IconButton(onClick = {scope.launch { tooltipState.show() }} ) {
+                IconButton(onClick = { scope.launch { tooltipState.show() } }) {
                     Icon(
                         imageVector = Icons.Outlined.Info,
-                        contentDescription = "Question",
+                        contentDescription = stringResource(R.string.question_icon_description),
                         tint = MaterialTheme.colorScheme.onPrimary,
                     )
                 }
 
-                PomodoroRichTooltip(tooltipState,scope)
+                PomodoroRichTooltip(tooltipState, scope)
             }
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -175,16 +175,28 @@ fun PomodoroScreen(
                 ToggleButton(
                     backgroundColor = Cherry_accent,
                     optionList = arrayOf(
-                        ToggleButtonOption(ToggleButtonOptionType.Today, "Pomo", null),
-                        ToggleButtonOption(ToggleButtonOptionType.Weekly, "Short Break", null),
-                        ToggleButtonOption(ToggleButtonOptionType.Monthly, "Long Break", null),
+                        ToggleButtonOption(
+                            ToggleButtonOptionType.Today,
+                            stringResource(R.string.pomo_session),
+                            null
+                        ),
+                        ToggleButtonOption(
+                            ToggleButtonOptionType.Weekly,
+                            stringResource(R.string.short_break),
+                            null
+                        ),
+                        ToggleButtonOption(
+                            ToggleButtonOptionType.Monthly,
+                            stringResource(R.string.long_break),
+                            null
+                        ),
                     ),
                     enabled = pomodoroViewModel.state.value.selectedPomodoro != null
                 ) { selectedOption ->
                     if (pomodoroViewModel.state.value.selectedPomodoro == null) {
                         Toast.makeText(
                             context,
-                            "Select a Pomodoro session.",
+                            context.getString(R.string.select_pomodoro_session),
                             Toast.LENGTH_SHORT
                         ).show()
                         return@ToggleButton
@@ -221,7 +233,7 @@ fun PomodoroScreen(
                     ServiceHelper.triggerForegroundService(
                         context = context, action = ACTION_SERVICE_CANCEL
                     )
-                    
+
                     ServiceHelper.triggerForegroundService(
                         context = context,
                         action = Service.ACTION_SERVICE_VARIABLES,
@@ -261,7 +273,7 @@ fun PomodoroScreen(
                         if (pomodoroViewModel.state.value.selectedPomodoro == null) {
                             Toast.makeText(
                                 context,
-                                "Select a Pomodoro session.",
+                                context.getString(R.string.select_pomodoro_session),
                                 Toast.LENGTH_SHORT
                             ).show()
                             return@IconButton
@@ -276,7 +288,7 @@ fun PomodoroScreen(
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.skip_next_icon),
-                        contentDescription = "reset pomodoro timer",
+                        contentDescription = stringResource(R.string.reset_pomodoro_timer),
                         modifier = Modifier.size(25.dp),
                         tint = MaterialTheme.colorScheme.onPrimary
                     )
@@ -287,7 +299,7 @@ fun PomodoroScreen(
                         if (pomodoroViewModel.state.value.selectedPomodoro == null) {
                             Toast.makeText(
                                 context,
-                                "Select a Pomodoro session.",
+                                context.getString(R.string.select_pomodoro_session),
                                 Toast.LENGTH_SHORT
                             ).show()
                             return@IconButton
@@ -313,7 +325,7 @@ fun PomodoroScreen(
                     }
                     Icon(
                         painter = painterResource(painter),
-                        contentDescription = "start pomodoro timer",
+                        contentDescription = stringResource(R.string.start_pomodoro_timer),
                         modifier = Modifier.size(40.dp),
                         tint = MaterialTheme.colorScheme.background
                     )
@@ -324,7 +336,7 @@ fun PomodoroScreen(
                         if (pomodoroViewModel.state.value.selectedPomodoro == null) {
                             Toast.makeText(
                                 context,
-                                "Select a Pomodoro session.",
+                                context.getString(R.string.select_pomodoro_session),
                                 Toast.LENGTH_SHORT
                             ).show()
                             return@IconButton
@@ -333,7 +345,7 @@ fun PomodoroScreen(
                         if (pomodoroViewModel.pomodoroType.value == PomodoroTimerState.Pomodoro) {
                             Toast.makeText(
                                 context,
-                                "You can only skip the breaks",
+                                context.getString(R.string.only_skip_breaks),
                                 Toast.LENGTH_SHORT
                             ).show()
                             return@IconButton
@@ -348,7 +360,7 @@ fun PomodoroScreen(
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.play_arrow_icon),
-                        contentDescription = "next session",
+                        contentDescription = stringResource(R.string.next_session),
                         modifier = Modifier.size(25.dp),
                         tint = MaterialTheme.colorScheme.onPrimary
                     )
@@ -364,17 +376,26 @@ fun PomodoroScreen(
             ) {
                 Box(modifier = Modifier.widthIn(0.dp, 120.dp)) {
                     CustomButton(
-                        text = "Add",
+                        text = stringResource(R.string.add),
                     ) {
+                        pomodoroViewModel.onEvent(PomodoroUIEvent.EditedChanged(false, null))
                         openDialog.value = true
                     }
                 }
-
             }
             Spacer(modifier = Modifier.height(24.dp))
 
             if (openDialog.value) {
-                PomodoroDialog(pomodoroViewModel) {
+                PomodoroDialog(
+                    pomodoroViewModel = pomodoroViewModel,
+                    onDelete = { pomodoroId ->
+                        if (pomodoroId == pomodoroViewModel.state.value.pomodoroId) {
+                            ServiceHelper.triggerForegroundService(
+                                context = context, action = ACTION_SERVICE_CANCEL
+                            )
+                        }
+                    }
+                ) {
                     openDialog.value = false
                 }
             }
@@ -387,13 +408,13 @@ fun PomodoroScreen(
                 Spacer(modifier = Modifier.height(24.dp))
                 Title(
                     message = CustomMessageData(
-                        title = "Active Pomodoro",
-                        subTitle = "Begin the timer and conquer your tasks one Pomodoro at a time."
+                        title = stringResource(R.string.active_pomodoro_title),
+                        subTitle = stringResource(R.string.active_pomodoro_sub_title)
                     ),
                     titleStyle = MaterialTheme.typography.headlineSmall
                 )
                 Spacer(modifier = Modifier.height(12.dp))
-                TodoCard(
+                SmallCard(
                     message = selectedPomodoro?.name ?: "",
                     boldSubtitle = "${selectedPomodoro?.sessionsCompleted} / ",
                     normalSubtitle = selectedPomodoro?.totalSessions.toString(),
@@ -402,7 +423,8 @@ fun PomodoroScreen(
                             selectedPomodoro?.theme.toString()
                         )
                     ),
-                    onClick = {}
+                    onClick = {},
+                    onLongClick = {}
                 )
                 Spacer(modifier = Modifier.height(24.dp))
             }
@@ -411,24 +433,44 @@ fun PomodoroScreen(
         item {
             Title(
                 message = CustomMessageData(
-                    title = "Sessions",
-                    subTitle = "View your completed study sessions."
+                    title = stringResource(R.string.sessions_title),
+                    subTitle = stringResource(R.string.sessions_sub_title)
                 ),
                 titleStyle = MaterialTheme.typography.headlineSmall
             )
             Spacer(modifier = Modifier.height(24.dp))
         }
 
-        itemsIndexed(pomodoroViewModel.state.value.pomodoroList) { _, todo ->
-            TodoCard(
-                message = todo.name,
-                boldSubtitle = "${todo.sessionsCompleted} / ",
-                normalSubtitle = todo.totalSessions.toString(),
-                colorTheme = Color(android.graphics.Color.parseColor(todo.theme)),
-                onClick = {
-                    pomodoroViewModel.onEvent(PomodoroUIEvent.SelectedPomodoroChanged(todo))
+        itemsIndexed(pomodoroViewModel.state.value.pomodoroList) { _, pomodoro ->
+            val selected = pomodoro.id == pomodoroViewModel.state.value.selectedPomodoro?.id
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.TopEnd
+            ) {
+                SmallCard(
+                    message = pomodoro.name,
+                    boldSubtitle = "${pomodoro.sessionsCompleted} / ",
+                    normalSubtitle = pomodoro.totalSessions.toString(),
+                    colorTheme = Color(android.graphics.Color.parseColor(pomodoro.theme)),
+                    onClick = {
+                        pomodoroViewModel.onEvent(PomodoroUIEvent.SelectedPomodoroChanged(pomodoro))
+                    },
+                    onLongClick = {
+                        pomodoroViewModel.onEvent(PomodoroUIEvent.EditedChanged(true, pomodoro))
+                        openDialog.value = true
+                    }
+                )
+                if (selected) {
+                    Icon(
+                        painter = painterResource(R.drawable.checkbox_marked_icon),
+                        contentDescription = null,
+                        tint = Cherry_accent.copy(0.6f),
+                        modifier = Modifier
+                            .padding(horizontal = 6.dp, vertical = 6.dp)
+                            .size(25.dp)
+                    )
                 }
-            )
+            }
             Spacer(modifier = Modifier.height(16.dp))
         }
     }

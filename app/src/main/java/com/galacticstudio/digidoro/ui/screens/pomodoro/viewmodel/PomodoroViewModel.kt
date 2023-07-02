@@ -34,6 +34,9 @@ class PomodoroViewModel(
     private val _pomodoroColor = mutableStateOf("ffffff")
     val pomodoroColor: State<String> = _pomodoroColor
 
+    private val _editedMode = mutableStateOf(false)
+    val editedMode: State<Boolean> = _editedMode
+
     private val _pomodoroType = mutableStateOf(PomodoroTimerState.Pomodoro)
     val pomodoroType: State<PomodoroTimerState> = _pomodoroType
 
@@ -60,8 +63,25 @@ class PomodoroViewModel(
                 _pomodoroType.value = event.type
             }
 
+            is PomodoroUIEvent.EditedChanged -> {
+                _editedMode.value = event.edited
+
+                if (event.pomodoro != null) {
+                    val pomo = event.pomodoro
+
+                    _state.value = _state.value.copy(
+                        pomodoroId = pomo.id,
+                        name = pomo.name,
+                        sessionsCompleted = pomo.sessionsCompleted,
+                        totalSessions = pomo.totalSessions,
+                    )
+                }
+            }
+
             is PomodoroUIEvent.ClearData -> {
-                // Handle the clear data event
+                _state.value = _state.value.copy(
+                    selectedPomodoro = null
+                )
             }
 
             is PomodoroUIEvent.NameChanged -> {
@@ -103,17 +123,25 @@ class PomodoroViewModel(
                 }
             }
 
+            is PomodoroUIEvent.EditPomodoro -> {
+                updatePomodoro(
+                    _state.value.pomodoroId,
+                    _state.value.name,
+                    _state.value.sessionsCompleted,
+                    _state.value.totalSessions,
+                    "#${_pomodoroColor.value}",
+                )
+            }
+
             is PomodoroUIEvent.ThemeChanged -> {
                 _pomodoroColor.value = event.color
             }
 
             is PomodoroUIEvent.DeletePomodoro -> {
-                // Handle the delete pomodoro event
+                deletePomodoro(_state.value.pomodoroId)
             }
         }
     }
-
-
 
     private fun getAllPomodoros() {
         executeOperation(
@@ -122,7 +150,6 @@ class PomodoroViewModel(
                 _state.value = _state.value.copy(
                     pomodoroList = mapToPomodoroModels(response.data)
                 )
-
             }
         )
     }
@@ -176,6 +203,17 @@ class PomodoroViewModel(
         )
     }
 
+    private fun deletePomodoro(pomodoroId: String) {
+        executeOperation(
+            operation = {
+                pomodoroRepository.deletePomodoro(pomodoroId)
+            },
+            onSuccess = {
+                getAllPomodoros()
+            }
+        )
+    }
+
     private fun sendResponseEvent(event: PomodoroResponseState) {
         viewModelScope.launch {
             responseEventChannel.send(event)
@@ -218,7 +256,6 @@ class PomodoroViewModel(
             )
         }
     }
-
 
     companion object {
         // Factory for creating instances of PomodoroViewModel.

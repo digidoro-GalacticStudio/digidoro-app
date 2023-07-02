@@ -5,6 +5,7 @@ import com.galacticstudio.digidoro.data.PomodoroModel
 sealed class PomodoroUIEvent {
     data class SelectedPomodoroChanged(val pomodoro: PomodoroModel): PomodoroUIEvent()
     data class TypeChanged(val type: PomodoroTimerState): PomodoroUIEvent()
+    data class EditedChanged(val edited: Boolean, val pomodoro: PomodoroModel?): PomodoroUIEvent()
     object Rebuild: PomodoroUIEvent()
     object ClearData: PomodoroUIEvent()
     data class NameChanged(val name: String): PomodoroUIEvent()
@@ -13,5 +14,6 @@ sealed class PomodoroUIEvent {
     data class ThemeChanged(val color: String): PomodoroUIEvent()
     object SavePomodoro: PomodoroUIEvent()
     object UpdatePomodoro: PomodoroUIEvent()
+    object EditPomodoro: PomodoroUIEvent()
     object DeletePomodoro: PomodoroUIEvent()
 }

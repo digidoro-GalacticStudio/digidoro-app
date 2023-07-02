@@ -16,8 +16,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -40,6 +38,7 @@ import com.galacticstudio.digidoro.util.shadowWithCorner
 @Composable
 fun PomodoroDialog(
     pomodoroViewModel: PomodoroViewModel,
+    onDelete: (String) -> Unit,
     onDismissRequest: () -> Unit,
 ) {
     val cornerRadius = 5.dp
@@ -132,14 +131,36 @@ fun PomodoroDialog(
                     ) {
                         onDismissRequest()
                     }
-                    ButtonControl(
-                        text = "Save",
-                        contentColor = MaterialTheme.colorScheme.secondary,
-                        backgroundColor = MaterialTheme.colorScheme.secondary.copy(0.07f),
-                        borderColor = MaterialTheme.colorScheme.secondary,
-                    ) {
-                        pomodoroViewModel.onEvent(PomodoroUIEvent.SavePomodoro)
-                        onDismissRequest()
+                    if (pomodoroViewModel.editedMode.value) {
+                        ButtonControl(
+                            text = "Delete",
+                            contentColor = MaterialTheme.colorScheme.secondary,
+                            backgroundColor = MaterialTheme.colorScheme.secondary.copy(0.07f),
+                            borderColor = MaterialTheme.colorScheme.secondary,
+                        ) {
+                            onDelete(pomodoroViewModel.state.value.pomodoroId)
+                            pomodoroViewModel.onEvent(PomodoroUIEvent.DeletePomodoro)
+                            onDismissRequest()
+                        }
+                        ButtonControl(
+                            text = "Update",
+                            contentColor = MaterialTheme.colorScheme.secondary,
+                            backgroundColor = MaterialTheme.colorScheme.secondary.copy(0.07f),
+                            borderColor = MaterialTheme.colorScheme.secondary,
+                        ) {
+                            pomodoroViewModel.onEvent(PomodoroUIEvent.EditPomodoro)
+                            onDismissRequest()
+                        }
+                    } else {
+                        ButtonControl(
+                            text = "Save",
+                            contentColor = MaterialTheme.colorScheme.secondary,
+                            backgroundColor = MaterialTheme.colorScheme.secondary.copy(0.07f),
+                            borderColor = MaterialTheme.colorScheme.secondary,
+                        ) {
+                            pomodoroViewModel.onEvent(PomodoroUIEvent.SavePomodoro)
+                            onDismissRequest()
+                        }
                     }
                 }
             }

@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.galacticstudio.digidoro.ui.theme.AzureBlue10
 
@@ -87,6 +89,7 @@ fun ContainerToggleButton(
     onButtonClick: (selectedOption: ToggleButtonOption) -> Unit = {},
 ) {
     val state = remember { mutableStateMapOf<String, ToggleButtonOption>() }
+    state[options.first().text] = options.first() // Select the first option by default
 
     OutlinedButton(
         onClick = { },
@@ -172,6 +175,12 @@ fun SelectionPill(
     selected: Boolean,
     onClick: (option: ToggleButtonOption) -> Unit = {}
 ) {
+    val textDecoration = if (selected) {
+        TextDecoration.Underline
+    } else {
+        null
+    }
+
     Button(
         onClick = { onClick(option) },
         colors = ButtonDefaults.buttonColors(
@@ -188,7 +197,8 @@ fun SelectionPill(
             Text(
                 text = option.text,
                 color = Color.White,
-                fontWeight = if (selected) FontWeight.W800 else FontWeight.W600,
+                style = MaterialTheme.typography.bodyMedium.copy(textDecoration = textDecoration),
+                fontWeight = if (selected) FontWeight.W800 else FontWeight.W500,
                 modifier = Modifier.padding(0.dp),
             )
         }

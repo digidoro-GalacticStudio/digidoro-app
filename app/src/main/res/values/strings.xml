@@ -5,6 +5,34 @@
     <string name="ranking_screen_statement">Stay up to date with your productivity.</string>
     <string name="ranking_screen_subtitle">Scores</string>
     <string name="ranking_screen_score">Stay up to date with other users</string>
+    <!-- START POMODORO SCREEN -->
     <string name="pomodoro_tooltip">The Pomodoro Technique is a time management method that helps improve productivity and focus. It involves working in short time intervals, called \'pomodoros\', followed by brief breaks. Plan your tasks, set a 25-minute timer, and focus on your task during that time. Then, take a short 5-minute break. Repeat this cycle several times, and then take a longer 15-minute break. This technique helps maintain concentration and increase productivity.</string>
     <string name="pomodoro_title_tooltip">What is the Pomodoro Technique?</string>
+    <string name="your_pomos_title">Your pomos</string>
+    <string name="customize_study_sessions_subtitle">Customize and create your study sessions.</string>
+    <string name="question_icon_description">Question</string>
+    <string name="pomo_session">Pomo</string>
+    <string name="short_break">Short Break</string>
+    <string name="long_break">Long Break</string>
+    <string name="select_pomodoro_session">Select a Pomodoro session.</string>
+    <string name="reset_pomodoro_timer">reset pomodoro timer</string>
+    <string name="start_pomodoro_timer">start pomodoro timer</string>
+    <string name="only_skip_breaks">You can only skip the breaks</string>
+    <string name="next_session">next session</string>
+    <string name="add">Add</string>
+    <!-- END POMODORO SCREEN -->
+    <!-- START HOME SCREEN -->
+    <string name="active_pomodoro_title">Active Pomodoro</string>
+    <string name="active_pomodoro_sub_title">Begin the timer and conquer your tasks one Pomodoro at a time.</string>
+    <string name="sessions_sub_title">View your completed study sessions.</string>
+    <string name="sessions_title">Sessions</string>
+    <string name="what_did_we_leave_off">What did we leave off on?</string>
+    <string name="your_pomodoro_title">Your Pomodoro</string>
+    <string name="your_pomodoro_sub_title">Your recent sessions</string>
+    <string name="no_pomodoro_session">You don\'t have any Pomodoro session.</string>
+    <string name="your_activities_title">Your Activities</string>
+    <string name="your_activities_sub_title">Take a look at your pending tasks.</string>
+    <string name="no_pending_activities">You don\'t have any pending activities.</string>
+    <string name="hello_again">Hello again,</string>
+    <!-- END HOME SCREEN -->
 </resources>

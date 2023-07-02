@@ -7,6 +7,7 @@ data class PomodoroUIState (
     val pomodoroList: List<PomodoroModel> = emptyList(),
     val selectedPomodoro: PomodoroModel? = null,
     //Create a new one
+    val pomodoroId: String = "",
     val name: String = "",
     val nameError: String? = null,
     val sessionsCompleted: Int = 0,
