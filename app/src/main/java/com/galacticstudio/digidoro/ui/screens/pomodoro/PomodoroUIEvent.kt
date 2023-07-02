@@ -1,6 +1,6 @@
 package com.galacticstudio.digidoro.ui.screens.pomodoro
 
-import com.galacticstudio.digidoro.data.PomodoroModel
+import com.galacticstudio.digidoro.data.api.PomodoroModel
 
 sealed class PomodoroUIEvent {
     data class SelectedPomodoroChanged(val pomodoro: PomodoroModel): PomodoroUIEvent()
