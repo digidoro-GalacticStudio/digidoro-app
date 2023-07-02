@@ -28,6 +28,7 @@ import com.galacticstudio.digidoro.navigation.AppScaffold
 import com.galacticstudio.digidoro.service.TimerListener
 import com.galacticstudio.digidoro.service.TimerService
 import com.galacticstudio.digidoro.ui.screens.MainViewModel
+import com.galacticstudio.digidoro.ui.screens.pomodoro.PomodoroTimerState
 import com.galacticstudio.digidoro.ui.screens.pomodoro.PomodoroUIEvent
 import com.galacticstudio.digidoro.ui.screens.pomodoro.viewmodel.PomodoroViewModel
 import com.galacticstudio.digidoro.ui.theme.DigidoroTheme
@@ -61,7 +62,9 @@ class MainActivity : ComponentActivity(), TimerListener {
     // Method called when 0:00 minute is reached on the stopwatch
     override fun onTimeReached() {
         // Call the corresponding event in the ViewModel
-        pomodoroViewModel.onEvent(PomodoroUIEvent.UpdatePomodoro)
+        if (pomodoroViewModel.pomodoroType.value == PomodoroTimerState.Pomodoro) {
+            pomodoroViewModel.onEvent(PomodoroUIEvent.UpdatePomodoro)
+        }
 
         // Play the notification sound
         val notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
@@ -98,6 +101,8 @@ class MainActivity : ComponentActivity(), TimerListener {
             val mainViewModel: MainViewModel by viewModels {
                 MainViewModel.Factory(applicationContext)
             }
+
+            val controller =  rememberNavController()
 
             DigidoroTheme {
                 Surface(

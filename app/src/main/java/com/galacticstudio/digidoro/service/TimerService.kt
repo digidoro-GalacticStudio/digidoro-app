@@ -226,15 +226,15 @@ class TimerService : Service() {
                 stopTimer()
 
                 updateTitleNotification("Finished")
+                timerListener?.onTimeReached()
 
                 when (type) {
                     "pomodoro" -> {
-                        timerListener?.onTimeReached()
                         updateNotification("You've completed your Pomodoro session. Take a short break and recharge!")
                     }
 
                     "short_break" -> {
-                        updateNotification(" Start a new Pomodoro session and keep up the momentum.")
+                        updateNotification("Start a new Pomodoro session and keep up the momentum.")
                     }
 
                     "long_break" -> {
@@ -337,9 +337,9 @@ class TimerService : Service() {
 
     private fun updateTitleNotification(action: String) {
         val title = when (type) {
-            "pomodoro" -> "Pomodoro - $action"
-            "short_break" -> "Short Break - $action"
-            "long_break" -> "Long Break - $action"
+            "pomodoro" -> "Pomodoro session - $action"
+            "short_break" -> "Short break of the Pomodoro - $action"
+            "long_break" -> "Long break of the Pomodoro - $action"
             else -> {"Pomodoro - $action"}
         }
 

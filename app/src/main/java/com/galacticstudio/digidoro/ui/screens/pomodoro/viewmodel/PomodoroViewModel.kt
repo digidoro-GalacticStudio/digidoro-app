@@ -166,6 +166,11 @@ class PomodoroViewModel(
                 )
             },
             onSuccess = { response ->
+                _state.value = _state.value.copy(
+                    selectedPomodoro = _state.value.selectedPomodoro?.copy(
+                        sessionsCompleted = response.data.sessionsCompleted
+                    )
+                )
                 getAllPomodoros()
             }
         )

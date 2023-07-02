@@ -184,7 +184,7 @@ fun PomodoroScreen(
                     if (pomodoroViewModel.state.value.selectedPomodoro == null) {
                         Toast.makeText(
                             context,
-                            "Select o create a new pomodoro",
+                            "Select a Pomodoro session.",
                             Toast.LENGTH_SHORT
                         ).show()
                         return@ToggleButton
@@ -261,7 +261,7 @@ fun PomodoroScreen(
                         if (pomodoroViewModel.state.value.selectedPomodoro == null) {
                             Toast.makeText(
                                 context,
-                                "Select o create a new pomodoro",
+                                "Select a Pomodoro session.",
                                 Toast.LENGTH_SHORT
                             ).show()
                             return@IconButton
@@ -287,7 +287,7 @@ fun PomodoroScreen(
                         if (pomodoroViewModel.state.value.selectedPomodoro == null) {
                             Toast.makeText(
                                 context,
-                                "Select o create a new pomodoro",
+                                "Select a Pomodoro session.",
                                 Toast.LENGTH_SHORT
                             ).show()
                             return@IconButton
@@ -324,7 +324,7 @@ fun PomodoroScreen(
                         if (pomodoroViewModel.state.value.selectedPomodoro == null) {
                             Toast.makeText(
                                 context,
-                                "Select o create a new pomodoro",
+                                "Select a Pomodoro session.",
                                 Toast.LENGTH_SHORT
                             ).show()
                             return@IconButton
@@ -338,6 +338,10 @@ fun PomodoroScreen(
                             ).show()
                             return@IconButton
                         }
+
+                        ServiceHelper.triggerForegroundService(
+                            context = context, action = ACTION_SERVICE_CANCEL
+                        )
                     },
                     modifier = Modifier
                         .padding(start = 4.dp)
