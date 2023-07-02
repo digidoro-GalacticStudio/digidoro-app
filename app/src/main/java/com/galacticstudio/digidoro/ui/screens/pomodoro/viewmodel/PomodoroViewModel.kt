@@ -53,8 +53,6 @@ class PomodoroViewModel(
             }
 
             is PomodoroUIEvent.Rebuild -> {
-                // Handle the rebuild event
-                Log.d("MyErrors", "Enter in rebuild alll")
                 getAllPomodoros()
             }
 
@@ -70,7 +68,6 @@ class PomodoroViewModel(
                 _state.value = _state.value.copy(
                     name = event.name
                 )
-                // Handle the name changed event
             }
 
             is PomodoroUIEvent.SessionsCompletedChanged -> {
@@ -95,7 +92,6 @@ class PomodoroViewModel(
             }
 
             is PomodoroUIEvent.UpdatePomodoro -> {
-                Log.d("MyErrors", "------:------ ${_state.value.selectedPomodoro}")
                 _state.value.selectedPomodoro?.let {
                     updatePomodoro(
                         it.id,
@@ -120,11 +116,9 @@ class PomodoroViewModel(
 
 
     private fun getAllPomodoros() {
-        Log.d("MyErrors", "Gett alll")
         executeOperation(
             operation = { pomodoroRepository.getAllPomodoros() },
             onSuccess = { response ->
-                Log.d("MyErrors", "QUe paso ? ${response}")
                 _state.value = _state.value.copy(
                     pomodoroList = mapToPomodoroModels(response.data)
                 )
@@ -161,7 +155,6 @@ class PomodoroViewModel(
         totalSessions: Int,
         theme: String
     ) {
-        Log.d("MyErrors", "tHIS IS AN UPDATE: ${totalSessions}")
         executeOperation(
             operation = {
                 pomodoroRepository.updatePomodoro(

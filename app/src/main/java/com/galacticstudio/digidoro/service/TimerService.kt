@@ -43,6 +43,7 @@ class TimerService : Service() {
     private var initialTime: Int = 25
     private var duration: Duration = (initialTime.toLong() * 60).seconds
     private var savedDuration: Duration = (initialTime.toLong() * 60).seconds
+    private var type: String = "pomodoro"
 
     private lateinit var timer: Timer
 
@@ -125,26 +126,32 @@ class TimerService : Service() {
         when (intent?.getStringExtra(TIMER_STATE)) {
             TimerState.Variables.name -> {
 
-                val initialSeconds = intent.getIntExtra("initialSeconds", 0)
-                this.initialTime = initialSeconds
+                this.initialTime =  intent.getIntExtra("initialMinutes", 0)
+                this.type = intent.getStringExtra("type") ?: "pomodoro"
 
                 duration = (initialTime.toLong() * 60).seconds
                 savedDuration = (initialTime.toLong() * 60).seconds
 
                 updateTimeUnits()
             }
+
             TimerState.Started.name -> {
                 setStopButton()
                 startForegroundService()
+
+                updateTitleNotification("Running")
 
                 startTimer(savedDuration) { hours, minutes, seconds ->
                     updateNotification(hours = hours, minutes = minutes, seconds = seconds)
                 }
             }
+
             TimerState.Stopped.name -> {
                 stopTimer()
                 setResumeButton()
+                updateTitleNotification("Paused")
             }
+
             TimerState.Canceled.name -> {
                 stopTimer()
                 cancelTimer()
@@ -154,27 +161,36 @@ class TimerService : Service() {
         intent?.action.let {
             when (it) {
                 ACTION_SERVICE_VARIABLES -> {
-                    val initialSeconds = intent?.getIntExtra("initialSeconds", 0)
-                    this.initialTime = initialSeconds ?: 0
+                    val initialMinutes = intent?.getIntExtra("initialMinutes", 0)
+                    this.initialTime = initialMinutes ?: 0
+
+                    this.type = intent?.getStringExtra("type") ?: "pomodoro"
 
                     duration = (initialTime.toLong() * 60).seconds
                     savedDuration = (initialTime.toLong() * 60).seconds
 
                     updateTimeUnits()
                 }
+
                 ACTION_SERVICE_START -> {
                     setStopButton()
                     startForegroundService()
 
-                    startTimer (savedDuration) { hours, minutes, seconds ->
+                    startTimer(savedDuration) { hours, minutes, seconds ->
                         updateNotification(hours = hours, minutes = minutes, seconds = seconds)
                     }
+
+                    updateTitleNotification("Running")
                 }
+
                 ACTION_SERVICE_STOP -> {
                     stopTimer()
                     setResumeButton()
                     savedDuration = duration
+
+                    updateTitleNotification("Paused")
                 }
+
                 ACTION_SERVICE_CANCEL -> {
                     stopTimer()
                     cancelTimer()
@@ -187,6 +203,8 @@ class TimerService : Service() {
         return super.onStartCommand(intent, flags, startId)
     }
 
+
+
     /**
      * Starts the timer with the given duration and tick listener.
      */
@@ -194,7 +212,7 @@ class TimerService : Service() {
         savedDuration: Duration,
         onTick: (h: String, m: String, s: String) -> Unit
     ) {
-       currentState.value = TimerState.Started
+        currentState.value = TimerState.Started
         duration = savedDuration
         updateTimeUnits()
         onTick(hours.value, minutes.value, seconds.value)
@@ -206,7 +224,23 @@ class TimerService : Service() {
                 onTick(hours.value, minutes.value, seconds.value)
             } else {
                 stopTimer()
-                timerListener?.onTimeReached()
+
+                updateTitleNotification("Finished")
+
+                when (type) {
+                    "pomodoro" -> {
+                        timerListener?.onTimeReached()
+                        updateNotification("You've completed your Pomodoro session. Take a short break and recharge!")
+                    }
+
+                    "short_break" -> {
+                        updateNotification(" Start a new Pomodoro session and keep up the momentum.")
+                    }
+
+                    "long_break" -> {
+                        updateNotification("You're refreshed and ready to go! Start a new Pomodoro session and make progress towards your goals.")
+                    }
+                }
             }
         }
     }
@@ -286,6 +320,34 @@ class TimerService : Service() {
                     seconds = seconds,
                 )
             ).build()
+        )
+    }
+
+    /**
+     * Updates the notification with the given title and content.
+     */
+    private fun updateNotification(message: String) {
+        notificationManager.notify(
+            NOTIFICATION_ID,
+            notificationBuilder
+                .setContentText(message)
+                .build()
+        )
+    }
+
+    private fun updateTitleNotification(action: String) {
+        val title = when (type) {
+            "pomodoro" -> "Pomodoro - $action"
+            "short_break" -> "Short Break - $action"
+            "long_break" -> "Long Break - $action"
+            else -> {"Pomodoro - $action"}
+        }
+
+        notificationManager.notify(
+            NOTIFICATION_ID,
+            notificationBuilder
+                .setContentTitle(title)
+                .build()
         )
     }
 

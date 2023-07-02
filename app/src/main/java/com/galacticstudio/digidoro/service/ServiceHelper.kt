@@ -102,16 +102,23 @@ object ServiceHelper {
     }
 
     /**
-     * Trigger the TimerService as a foreground service with the specified action and initialSeconds.
+     * Trigger the TimerService as a foreground service with the specified action and initialMinutes.
      *
      * @param context The application context.
      * @param action The action to be performed by the TimerService.
-     * @param initialSeconds The initial seconds to be passed to the TimerService (optional).
+     * @param initialMinutes The initial seconds to be passed to the TimerService (optional).
      */
-    fun triggerForegroundService(context: Context, action: String, initialSeconds: Int? = null) {
+    fun triggerForegroundService(
+        context: Context,
+        action: String,
+        initialMinutes: Int? = null,
+        type: String,
+    ) {
         Intent(context, TimerService::class.java).apply {
             this.action = action
-            initialSeconds?.let { putExtra("initialSeconds", it) }
+            initialMinutes?.let { putExtra("initialMinutes", it) }
+            putExtra("type", type)
+
             context.startService(this)
         }
     }

@@ -15,15 +15,21 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RichTooltipState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -32,15 +38,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.galacticstudio.digidoro.R
-import com.galacticstudio.digidoro.data.todoList
 import com.galacticstudio.digidoro.service.ServiceHelper
 import com.galacticstudio.digidoro.service.TimerService
 import com.galacticstudio.digidoro.service.TimerState
 import com.galacticstudio.digidoro.ui.screens.pomodoro.components.PomodoroDialog
+import com.galacticstudio.digidoro.ui.screens.pomodoro.components.PomodoroRichTooltip
 import com.galacticstudio.digidoro.ui.screens.pomodoro.viewmodel.PomodoroViewModel
 import com.galacticstudio.digidoro.ui.shared.button.CustomButton
 import com.galacticstudio.digidoro.ui.shared.button.ToggleButton
@@ -52,13 +57,13 @@ import com.galacticstudio.digidoro.ui.shared.cards.todocard.TodoCard
 import com.galacticstudio.digidoro.ui.shared.titles.CustomMessageData
 import com.galacticstudio.digidoro.ui.shared.titles.Title
 import com.galacticstudio.digidoro.ui.theme.Cherry_accent
-import com.galacticstudio.digidoro.util.DateUtils
 import com.galacticstudio.digidoro.util.Service
 import com.galacticstudio.digidoro.util.Service.ACTION_SERVICE_CANCEL
 import com.galacticstudio.digidoro.util.Service.ACTION_SERVICE_START
 import com.galacticstudio.digidoro.util.Service.ACTION_SERVICE_STOP
+import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun PomodoroScreen(
     navController: NavController,
@@ -77,21 +82,22 @@ fun PomodoroScreen(
         ServiceHelper.triggerForegroundService(
             context = context,
             action = Service.ACTION_SERVICE_VARIABLES,
-            initialSeconds = 1,
+            initialMinutes = 1,
+            type = "pomodoro"
         )
 
         snapshotFlow { minutes.toInt() to seconds.toInt() }
             .collect { (min, sec) ->
                 if (min == 0 && sec == 0) {
-                    Toast.makeText(context, "Contador llegó a cero", Toast.LENGTH_SHORT).show()
-
                     when (pomodoroViewModel.pomodoroType.value) {
                         PomodoroTimerState.Pomodoro -> {
                             pomodoroViewModel.onEvent(PomodoroUIEvent.Rebuild)
                         }
+
                         PomodoroTimerState.ShortBreak -> {
 
                         }
+
                         PomodoroTimerState.LongBreak -> {
 
                         }
@@ -101,7 +107,7 @@ fun PomodoroScreen(
     }
 
     LaunchedEffect(key1 = context) {
-        // Collect the response events from the notesViewModel
+        // Collect the response events from the pomodoroViewModel
         pomodoroViewModel.responseEvents.collect { event ->
             when (event) {
                 is PomodoroResponseState.Error -> {
@@ -126,18 +132,38 @@ fun PomodoroScreen(
 
     val contentPadding = PaddingValues(start = 24.dp, top = 24.dp, end = 24.dp, bottom = 120.dp)
 
+    //Tooltip variables
+    val tooltipState = remember { RichTooltipState() }
+    val scope = rememberCoroutineScope()
+
     LazyColumn(
         modifier = Modifier.fillMaxWidth(),
         contentPadding = contentPadding,
     ) {
         item {
-            Title(
-                message = CustomMessageData(
-                    title = "Your pomos",
-                    subTitle = "Customize and create your study sessions."
-                ),
-                alignment = Alignment.CenterHorizontally,
-            )
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.CenterEnd
+            ) {
+                Title(
+                    message = CustomMessageData(
+                        title = "Your pomos",
+                        subTitle = "Customize and create your study sessions."
+                    ),
+                    alignment = Alignment.CenterHorizontally,
+                )
+
+                IconButton(onClick = {scope.launch { tooltipState.show() }} ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Info,
+                        contentDescription = "Question",
+                        tint = MaterialTheme.colorScheme.onPrimary,
+                    )
+                }
+
+                PomodoroRichTooltip(tooltipState,scope)
+            }
+
             Spacer(modifier = Modifier.height(24.dp))
         }
 
@@ -156,7 +182,11 @@ fun PomodoroScreen(
                     enabled = pomodoroViewModel.state.value.selectedPomodoro != null
                 ) { selectedOption ->
                     if (pomodoroViewModel.state.value.selectedPomodoro == null) {
-                        Toast.makeText(context, "Select o create a new pomodoro", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            context,
+                            "Select o create a new pomodoro",
+                            Toast.LENGTH_SHORT
+                        ).show()
                         return@ToggleButton
                     }
 
@@ -164,31 +194,44 @@ fun PomodoroScreen(
                         is ToggleButtonOptionType.Today -> PomodoroTimerState.Pomodoro
                         is ToggleButtonOptionType.Weekly -> PomodoroTimerState.ShortBreak
                         is ToggleButtonOptionType.Monthly -> PomodoroTimerState.LongBreak
-                        else -> {PomodoroTimerState.Pomodoro}
+                        else -> {
+                            PomodoroTimerState.Pomodoro
+                        }
                     }
 
                     val minutesType = when (selectedOption.type) {
                         is ToggleButtonOptionType.Today -> 1
                         is ToggleButtonOptionType.Weekly -> 2
                         is ToggleButtonOptionType.Monthly -> 3
-                        else -> {0}
+                        else -> {
+                            0
+                        }
                     }
 
+                    val typeOption = when (selectedOption.type) {
+                        is ToggleButtonOptionType.Today -> "pomodoro"
+                        is ToggleButtonOptionType.Weekly -> "short_break"
+                        is ToggleButtonOptionType.Monthly -> "long_break"
+                        else -> {
+                            "pomodoro"
+                        }
+                    }
+
+                    //The timer was canceled, and I'm resending the notification variables.
+                    ServiceHelper.triggerForegroundService(
+                        context = context, action = ACTION_SERVICE_CANCEL
+                    )
+                    
                     ServiceHelper.triggerForegroundService(
                         context = context,
                         action = Service.ACTION_SERVICE_VARIABLES,
-                        initialSeconds = minutesType,
+                        initialMinutes = minutesType,
+                        type = typeOption,
                     )
 
                     pomodoroViewModel.onEvent(PomodoroUIEvent.TypeChanged(type))
                 }
             }
-        }
-
-        item {
-            Text(
-                text = pomodoroViewModel.pomodoroType.value.toString(),
-            )
         }
 
         item {
@@ -216,7 +259,11 @@ fun PomodoroScreen(
                 IconButton(
                     onClick = {
                         if (pomodoroViewModel.state.value.selectedPomodoro == null) {
-                            Toast.makeText(context, "Select o create a new pomodoro", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                context,
+                                "Select o create a new pomodoro",
+                                Toast.LENGTH_SHORT
+                            ).show()
                             return@IconButton
                         }
 
@@ -238,7 +285,11 @@ fun PomodoroScreen(
                 IconButton(
                     onClick = {
                         if (pomodoroViewModel.state.value.selectedPomodoro == null) {
-                            Toast.makeText(context, "Select o create a new pomodoro", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                context,
+                                "Select o create a new pomodoro",
+                                Toast.LENGTH_SHORT
+                            ).show()
                             return@IconButton
                         }
 
@@ -271,12 +322,20 @@ fun PomodoroScreen(
                 IconButton(
                     onClick = {
                         if (pomodoroViewModel.state.value.selectedPomodoro == null) {
-                            Toast.makeText(context, "Select o create a new pomodoro", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                context,
+                                "Select o create a new pomodoro",
+                                Toast.LENGTH_SHORT
+                            ).show()
                             return@IconButton
                         }
 
                         if (pomodoroViewModel.pomodoroType.value == PomodoroTimerState.Pomodoro) {
-                            Toast.makeText(context, "You can only skip the breaks", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                context,
+                                "You can only skip the breaks",
+                                Toast.LENGTH_SHORT
+                            ).show()
                             return@IconButton
                         }
                     },
@@ -304,7 +363,6 @@ fun PomodoroScreen(
                         text = "Add",
                     ) {
                         openDialog.value = true
-//                    loginViewModel.onEvent(LoginFormEvent.Submit)
                     }
                 }
 
@@ -325,8 +383,8 @@ fun PomodoroScreen(
                 Spacer(modifier = Modifier.height(24.dp))
                 Title(
                     message = CustomMessageData(
-                        title = "Selected pomodoro",
-                        subTitle = "Start the timer and complete your sessions"
+                        title = "Active Pomodoro",
+                        subTitle = "Begin the timer and conquer your tasks one Pomodoro at a time."
                     ),
                     titleStyle = MaterialTheme.typography.headlineSmall
                 )
@@ -335,9 +393,10 @@ fun PomodoroScreen(
                     message = selectedPomodoro?.name ?: "",
                     boldSubtitle = "${selectedPomodoro?.sessionsCompleted} / ",
                     normalSubtitle = selectedPomodoro?.totalSessions.toString(),
-                    colorTheme = Color(android.graphics.Color.parseColor(
-                        selectedPomodoro?.theme.toString()
-                    )
+                    colorTheme = Color(
+                        android.graphics.Color.parseColor(
+                            selectedPomodoro?.theme.toString()
+                        )
                     ),
                     onClick = {}
                 )
@@ -370,6 +429,7 @@ fun PomodoroScreen(
         }
     }
 }
+
 
 enum class PomodoroTimerState {
     Pomodoro,
