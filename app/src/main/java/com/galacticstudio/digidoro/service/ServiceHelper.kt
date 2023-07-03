@@ -4,6 +4,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.util.Log
 import androidx.compose.animation.ExperimentalAnimationApi
 import com.galacticstudio.digidoro.MainActivity
 import com.galacticstudio.digidoro.util.Service.CANCEL_REQUEST_CODE
@@ -113,11 +114,13 @@ object ServiceHelper {
         action: String,
         initialMinutes: Int? = null,
         type: String,
+        pomodoroId: String,
     ) {
         Intent(context, TimerService::class.java).apply {
             this.action = action
             initialMinutes?.let { putExtra("initialMinutes", it) }
             putExtra("type", type)
+            putExtra("pomodoroId", pomodoroId)
 
             context.startService(this)
         }

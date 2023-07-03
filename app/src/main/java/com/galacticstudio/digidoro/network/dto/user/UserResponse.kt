@@ -9,6 +9,12 @@ data class UserResponse(
     @SerializedName("data") val data: ProfileData
 )
 
+data class PremiumResponse(
+    @SerializedName("status") val status: String,
+    @SerializedName("code") val code: Int,
+    @SerializedName("message") val message: String,
+)
+
 data class ProfileData(
     @SerializedName("_id") val id: String,
     @SerializedName("firstname") val firstname: String,

@@ -23,4 +23,5 @@ sealed class Screen(val route: String) {
     object VerifyAccount: Screen(route = "verify_account_screen")
     object EditCredentials: Screen(route = "edit_credentials_screen")
     object EditUser: Screen(route = "edit_user_screen")
+    object PremiumUser: Screen(route = "premium_user_screen")
 }

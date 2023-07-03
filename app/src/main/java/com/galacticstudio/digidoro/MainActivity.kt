@@ -28,7 +28,6 @@ import com.galacticstudio.digidoro.navigation.AppScaffold
 import com.galacticstudio.digidoro.service.TimerListener
 import com.galacticstudio.digidoro.service.TimerService
 import com.galacticstudio.digidoro.ui.screens.MainViewModel
-import com.galacticstudio.digidoro.ui.screens.pomodoro.PomodoroTimerState
 import com.galacticstudio.digidoro.ui.screens.pomodoro.PomodoroUIEvent
 import com.galacticstudio.digidoro.ui.screens.pomodoro.viewmodel.PomodoroViewModel
 import com.galacticstudio.digidoro.ui.theme.DigidoroTheme
@@ -59,11 +58,16 @@ class MainActivity : ComponentActivity(), TimerListener {
         PomodoroViewModel.Factory
     }
 
+
+
     // Method called when 0:00 minute is reached on the stopwatch
-    override fun onTimeReached() {
-        // Call the corresponding event in the ViewModel
-        if (pomodoroViewModel.pomodoroType.value == PomodoroTimerState.Pomodoro) {
-            pomodoroViewModel.onEvent(PomodoroUIEvent.UpdatePomodoro)
+    override fun onTimeReached(pomodoroId: String, type: String) {
+        Log.d("MyErrors", "--------pomodoroId ${pomodoroId}  + ${type}   --")
+        if (pomodoroId.isNotEmpty() && type == "pomodoro") {
+            val auxiliarViewModel: PomodoroViewModel by viewModels {
+                PomodoroViewModel.Factory
+            }
+            auxiliarViewModel.onEvent(PomodoroUIEvent.IncrementSessionPomodoro(pomodoroId))
         }
 
         // Play the notification sound
@@ -98,11 +102,11 @@ class MainActivity : ComponentActivity(), TimerListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            val controller = rememberNavController()
+
             val mainViewModel: MainViewModel by viewModels {
                 MainViewModel.Factory(applicationContext)
             }
-
-            val controller =  rememberNavController()
 
             DigidoroTheme {
                 Surface(
@@ -111,7 +115,7 @@ class MainActivity : ComponentActivity(), TimerListener {
                 ) {
                     if(isBound) {
                         AppScaffold(
-                            navController = rememberNavController(),
+                            navController = controller,
                             mainViewModel = mainViewModel,
                             stopwatchService = stopwatchService,
                             pomodoroViewModel = pomodoroViewModel,

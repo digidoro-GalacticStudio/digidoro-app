@@ -3,6 +3,12 @@ package com.galacticstudio.digidoro.network.dto.pomodoro
 import com.google.gson.annotations.SerializedName
 import java.util.Date
 
+data class SimpleResponse(
+    @SerializedName("status") val status: String,
+    @SerializedName("code") val code: Int,
+    @SerializedName("message") val message: String,
+)
+
 data class PomodoroResponse(
     @SerializedName("status") val status: String,
     @SerializedName("code") val code: Int,

@@ -1,5 +1,6 @@
 package com.galacticstudio.digidoro.ui.screens.pomodoro.viewmodel
 
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -56,7 +57,7 @@ class PomodoroViewModel(
             }
 
             is PomodoroUIEvent.Rebuild -> {
-                getAllPomodoros()
+                getAllPomodoros(event.pomodoroId)
             }
 
             is PomodoroUIEvent.TypeChanged -> {
@@ -125,17 +126,8 @@ class PomodoroViewModel(
                 )
             }
 
-            is PomodoroUIEvent.UpdatePomodoro -> {
-                _state.value.selectedPomodoro?.let {
-                    updatePomodoro(
-                        it.id,
-                        it.name,
-                        it.sessionsCompleted + 1,
-                        it.totalSessions,
-                        it.theme,
-                        true,
-                    )
-                }
+            is PomodoroUIEvent.IncrementSessionPomodoro -> {
+                incrementSessions(event.pomodoroId)
             }
 
             is PomodoroUIEvent.EditPomodoro -> {
@@ -159,13 +151,21 @@ class PomodoroViewModel(
         }
     }
 
-    private fun getAllPomodoros() {
+    private fun getAllPomodoros(pomodoroId: String? = null) {
         executeOperation(
             operation = { pomodoroRepository.getAllPomodoros() },
             onSuccess = { response ->
+                val models = mapToPomodoroModels(response.data)
                 _state.value = _state.value.copy(
-                    pomodoroList = mapToPomodoroModels(response.data)
+                    pomodoroList = models
                 )
+
+                if (!pomodoroId.isNullOrEmpty()) {
+                    val selectedPomodoro = models.find { it.id == pomodoroId }
+                    _state.value = _state.value.copy(
+                        selectedPomodoro = selectedPomodoro
+                    )
+                }
             }
         )
     }
@@ -229,6 +229,31 @@ class PomodoroViewModel(
                 }
 
                 if (reward) updateScore()
+
+                getAllPomodoros()
+            }
+        )
+    }
+
+    private fun incrementSessions(
+        pomodoroId: String,
+    ) {
+        executeOperation(
+            operation = {
+                pomodoroRepository.incrementSessions(
+                    pomodoroId,
+                )
+            },
+            onSuccess = { response ->
+                _state.value = _state.value.copy(
+                    selectedPomodoro = _state.value.selectedPomodoro?.copy(
+                        sessionsCompleted = (_state.value.selectedPomodoro?.sessionsCompleted?.plus(
+                            1
+                        )) ?: 0
+                    )
+                )
+
+                updateScore()
 
                 getAllPomodoros()
             }

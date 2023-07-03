@@ -34,6 +34,10 @@ class UserRepository(
         return handleApiCall { userService.updateUser(request) }
     }
 
+    suspend fun upgradeUser(): ApiResponse<String> {
+        return handleApiCall { userService.upgradeUser().message }
+    }
+
     suspend fun getCurrentUser(): ApiResponse<ProfileData> {
         return handleApiCall { userService.getCurrentUser().data }
     }

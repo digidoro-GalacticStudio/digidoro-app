@@ -50,6 +50,12 @@ class PomodoroRepository(private val pomodoroService: PomodoroService) {
         return handleApiCall { pomodoroService.updatePomodoro(pomodoroId, request).data }
     }
 
+    suspend fun incrementSessions(
+        pomodoroId: String,
+    ): ApiResponse<String> {
+        return handleApiCall { pomodoroService.incrementSessions(pomodoroId).message }
+    }
+
     suspend fun deletePomodoro(pomodoroId: String): ApiResponse<PomodoroData> {
         return handleApiCall { pomodoroService.deletePomodoro(pomodoroId).data }
     }

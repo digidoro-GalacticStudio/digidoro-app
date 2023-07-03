@@ -26,6 +26,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.galacticstudio.digidoro.R
+import com.galacticstudio.digidoro.navigation.HOME_GRAPH_ROUTE
 import com.galacticstudio.digidoro.navigation.Screen
 import com.galacticstudio.digidoro.ui.screens.login.Logo
 import com.galacticstudio.digidoro.ui.screens.login.RegisterButton
@@ -104,6 +105,8 @@ fun RegisterScreen(
                 }
 
                 is RegisterResponseState.Success -> {
+                    navController.navigate(Screen.Login.route)
+
                     Toast.makeText(
                         context,
                         "Register Successful ",

@@ -102,28 +102,27 @@ fun OptionsComposable(
         ){
             navController.navigate(Screen.Ranking.route)
         }
-//        OptionComposable(
-//            title = "Create Your Pomodoros",
-//            icon = R.drawable.pomo,
-//            description = "Pomodoro icon"
-//
-//        ){
-//            navController.navigate(Screen.Pomodoro.route)
-//        }
+        OptionComposable(
+            title = "Create Your Pomodoros",
+            icon = R.drawable.pomo,
+            description = "Pomodoro icon"
+
+        ){
+            navController.navigate(Screen.Pomodoro.route)
+        }
         OptionComposable(
             title = "Upgrade to Pro+",
             icon = R.drawable.fire_icon,
             description = "Enable Pro icon"
         ){
-
+            navController.navigate(Screen.PremiumUser.route)
         }
         OptionComposable(
             title = "Rate Us on Play Store",
             icon = R.drawable.level_star_icon,
             description = "Rate on Play Store icon"
         ){
-            //TODO REPLACE THIS
-            val appPackageName = "com.example.myapp"
+            val appPackageName = "com.galacticstudio.digidoro"
             val playStoreUrl = "https://play.google.com/store/apps/details?id=$appPackageName".toUri()
             val intent = Intent(Intent.ACTION_VIEW, playStoreUrl)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
