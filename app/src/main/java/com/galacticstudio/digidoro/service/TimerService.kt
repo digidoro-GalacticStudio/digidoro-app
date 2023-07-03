@@ -56,6 +56,8 @@ class TimerService : Service() {
         private set
     var currentState = mutableStateOf(TimerState.Idle)
         private set
+    var pomodoroId = mutableStateOf("")
+        private set
 
     /**
      * Binds the service to the client.
@@ -125,9 +127,9 @@ class TimerService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.getStringExtra(TIMER_STATE)) {
             TimerState.Variables.name -> {
-
                 this.initialTime =  intent.getIntExtra("initialMinutes", 0)
                 this.type = intent.getStringExtra("type") ?: "pomodoro"
+                this@TimerService.pomodoroId.value = intent.getStringExtra("pomodoroId") ?: ""
 
                 duration = (initialTime.toLong() * 60).seconds
                 savedDuration = (initialTime.toLong() * 60).seconds
@@ -161,10 +163,9 @@ class TimerService : Service() {
         intent?.action.let {
             when (it) {
                 ACTION_SERVICE_VARIABLES -> {
-                    val initialMinutes = intent?.getIntExtra("initialMinutes", 0)
-                    this.initialTime = initialMinutes ?: 0
-
+                    this.initialTime = intent?.getIntExtra("initialMinutes", 0) ?: 0
                     this.type = intent?.getStringExtra("type") ?: "pomodoro"
+                    this@TimerService.pomodoroId.value = intent?.getStringExtra("pomodoroId") ?: ""
 
                     duration = (initialTime.toLong() * 60).seconds
                     savedDuration = (initialTime.toLong() * 60).seconds
@@ -226,7 +227,7 @@ class TimerService : Service() {
                 stopTimer()
 
                 updateTitleNotification("Finished")
-                timerListener?.onTimeReached()
+                timerListener?.onTimeReached(this@TimerService.pomodoroId.value, type)
 
                 when (type) {
                     "pomodoro" -> {
@@ -414,5 +415,5 @@ interface TimerListener {
     /**
      * Called when the timer reaches the specified time.
      */
-    fun onTimeReached()
+    fun onTimeReached(pomodoroId: String, type: String)
 }

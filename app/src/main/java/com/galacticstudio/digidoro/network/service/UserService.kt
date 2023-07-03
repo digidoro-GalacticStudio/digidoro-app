@@ -4,6 +4,7 @@ import com.galacticstudio.digidoro.network.dto.emailrecuperation.RecuperationReq
 import com.galacticstudio.digidoro.network.dto.emailrecuperation.RecuperationResponse
 import com.galacticstudio.digidoro.network.dto.note.NoteListResponse
 import com.galacticstudio.digidoro.network.dto.note.NoteRequest
+import com.galacticstudio.digidoro.network.dto.user.PremiumResponse
 import com.galacticstudio.digidoro.network.dto.user.UserRequest
 import com.galacticstudio.digidoro.network.dto.user.UserResponse
 import retrofit2.http.Body
@@ -21,4 +22,7 @@ interface UserService {
 
     @PATCH("api/user/own")
     suspend fun updateUser(@Body user: UserRequest): UserResponse
+
+    @POST("api/user/premium")
+    suspend fun upgradeUser(): PremiumResponse
 }

@@ -3,6 +3,7 @@ package com.galacticstudio.digidoro.network.service
 import com.galacticstudio.digidoro.network.dto.pomodoro.PomodoroListResponse
 import com.galacticstudio.digidoro.network.dto.pomodoro.PomodoroRequest
 import com.galacticstudio.digidoro.network.dto.pomodoro.PomodoroResponse
+import com.galacticstudio.digidoro.network.dto.pomodoro.SimpleResponse
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -29,6 +30,9 @@ interface PomodoroService {
 
     @PATCH("api/pomodoro/own/{id}")
     suspend fun updatePomodoro(@Path("id") pomodoroId: String, @Body pomodoro: PomodoroRequest): PomodoroResponse
+
+    @PATCH("api/pomodoro/own/sessions/{id}")
+    suspend fun incrementSessions(@Path("id") pomodoroId: String): SimpleResponse
 
     @DELETE("api/pomodoro/own/{id}")
     suspend fun deletePomodoro(@Path("id") pomodoroId: String): PomodoroResponse

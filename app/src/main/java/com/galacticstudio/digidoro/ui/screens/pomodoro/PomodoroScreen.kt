@@ -75,24 +75,29 @@ fun PomodoroScreen(
     val hours by stopwatchService.hours
     val minutes by stopwatchService.minutes
     val seconds by stopwatchService.seconds
+    val pomodoroId by stopwatchService.pomodoroId
     val currentState by stopwatchService.currentState
 
     LaunchedEffect(Unit) {
-        pomodoroViewModel.onEvent(PomodoroUIEvent.Rebuild)
+        pomodoroViewModel.onEvent(PomodoroUIEvent.Rebuild(pomodoroId))
 
-        ServiceHelper.triggerForegroundService(
-            context = context,
-            action = Service.ACTION_SERVICE_VARIABLES,
-            initialMinutes = 25,
-            type = "pomodoro"
-        )
+        if (currentState != TimerState.Started) {
+            val selectedId = pomodoroViewModel.state.value.selectedPomodoro?.id ?: ""
+            ServiceHelper.triggerForegroundService(
+                context = context,
+                action = Service.ACTION_SERVICE_VARIABLES,
+                initialMinutes = 25,
+                type = "pomodoro",
+                pomodoroId = selectedId,
+            )
+        }
 
         snapshotFlow { minutes.toInt() to seconds.toInt() }
             .collect { (min, sec) ->
                 if (min == 0 && sec == 0) {
                     when (pomodoroViewModel.pomodoroType.value) {
                         PomodoroTimerState.Pomodoro -> {
-                            pomodoroViewModel.onEvent(PomodoroUIEvent.Rebuild)
+                            pomodoroViewModel.onEvent(PomodoroUIEvent.Rebuild())
                         }
 
                         PomodoroTimerState.ShortBreak -> {
@@ -240,6 +245,7 @@ fun PomodoroScreen(
                         action = Service.ACTION_SERVICE_VARIABLES,
                         initialMinutes = minutesType,
                         type = typeOption,
+                        pomodoroId = pomodoroViewModel.state.value.selectedPomodoro?.id ?: ""
                     )
 
                     pomodoroViewModel.onEvent(PomodoroUIEvent.TypeChanged(type))
@@ -456,6 +462,19 @@ fun PomodoroScreen(
                     colorTheme = Color(android.graphics.Color.parseColor(pomodoro.theme)),
                     onClick = {
                         pomodoroViewModel.onEvent(PomodoroUIEvent.SelectedPomodoroChanged(pomodoro))
+
+                        //Reset the timer
+                        ServiceHelper.triggerForegroundService(
+                            context = context, action = ACTION_SERVICE_CANCEL
+                        )
+
+                        ServiceHelper.triggerForegroundService(
+                            context = context,
+                            action = Service.ACTION_SERVICE_VARIABLES,
+                            initialMinutes = 25,
+                            type = "pomodoro",
+                            pomodoroId = pomodoroViewModel.state.value.selectedPomodoro?.id ?: ""
+                        )
                     },
                     onLongClick = {
                         pomodoroViewModel.onEvent(PomodoroUIEvent.EditedChanged(true, pomodoro))
