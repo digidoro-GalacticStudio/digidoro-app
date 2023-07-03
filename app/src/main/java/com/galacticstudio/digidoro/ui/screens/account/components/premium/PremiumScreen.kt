@@ -5,10 +5,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -75,20 +74,22 @@ fun PremiumScreen(
     }
 
     Column(
-        modifier = Modifier.fillMaxSize().padding(35.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(35.dp),
         verticalArrangement = Arrangement.Center
     ) {
         Logo()
-        Spacer(modifier = Modifier.width(24.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
         Title(
             message = CustomMessageData(
                 title = "Upgrade to Premium",
                 subTitle = "Unlock exclusive features and benefits (free)*"
             ),
-            alignment = Alignment.CenterHorizontally
+            alignment = Alignment.CenterHorizontally,
         )
-        Spacer(modifier = Modifier.width(24.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
         if (app.getRoles().contains("premium")) {
             Text(
@@ -106,7 +107,7 @@ fun PremiumScreen(
             )
         }
 
-        Spacer(modifier = Modifier.width(24.dp))
+        Spacer(modifier = Modifier.height(24.dp))
         RegisterButton(
             text = "return",
             onClick = { navController.popBackStack() }
