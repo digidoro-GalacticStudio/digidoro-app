@@ -31,7 +31,6 @@ class Application : Application() {
         setToken(getToken())
         setRoles(getRoles())
         setUsername(getUsername())
-        setId(getUserId())
         getLoginService()
     }
 
@@ -69,7 +68,6 @@ class Application : Application() {
 
     fun getUsername(): String = prefs.getString(USERNAME, "")!!
 
-    fun getUserId(): String = prefs.getString(ID, "")!!
 
     fun hasToken(): Boolean {
         val token = getToken()
@@ -86,7 +84,11 @@ class Application : Application() {
     }
 
     val notesRepository: NoteRepository by lazy {
-        NoteRepository(getNoteAPIService(), database)
+        NoteRepository(
+            getNoteAPIService(),
+            database,
+            context
+            )
     }
 
     val favoriteNotesRepository: FavoriteNoteRepository by lazy {
@@ -106,14 +108,17 @@ class Application : Application() {
     }
 
     val pomodoroRepository: PomodoroRepository by lazy {
-        PomodoroRepository(getPomodoroAPIService())
+        PomodoroRepository(
+            getPomodoroAPIService(),
+            database,
+            context
+            )
     }
 
     val todoRepository: TodoRepository by lazy{
         TodoRepository(
             getTodoApiService(),
             database,
-            getUserId(),
             context
             )
     }
@@ -148,16 +153,9 @@ class Application : Application() {
         editor.apply()
     }
 
-    fun saveId(id: String){
-        val editor = prefs.edit()
-        editor.putString(ID, id)
-        editor.apply()
-    }
-
     companion object {
         const val USER_TOKEN = "user_token"
         const val USER_ROLES = "user_roles"
         const val USERNAME = "username"
-        const val ID = "id"
     }
 }

@@ -2,20 +2,17 @@ package com.galacticstudio.digidoro.data.db.models
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.util.Date
 
 @Entity(tableName = "pomodoro")
 data class PomodoroModelEntity(
     @PrimaryKey
-    var _id: String,
-    var name: String,
-    var user_id: String,
-    var pomodoro: Int,
-    var breakTime: Int,
-    var long_break: Int,
-    var break_pomodoro: Int,
-    var pomodoro_day: Int,
-    var theme: String,
-    var reminder: Boolean,
-    var createdAt: String,
-    var updatedAt: String
+    val _id: String,
+    val name: String,
+    val user_id: String,
+    val sessions_completed: Int,
+    val total_sessions: Int,
+    val theme: String,
+    val createdAt: Date,
+    val updatedAt: Date
 )

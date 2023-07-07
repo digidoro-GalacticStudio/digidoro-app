@@ -1,12 +1,23 @@
 package com.galacticstudio.digidoro.repository
 
+import android.content.Context
+import com.galacticstudio.digidoro.data.db.DigidoroDataBase
 import com.galacticstudio.digidoro.network.ApiResponse
 import com.galacticstudio.digidoro.network.dto.pomodoro.PomodoroData
 import com.galacticstudio.digidoro.network.dto.pomodoro.PomodoroRequest
+import com.galacticstudio.digidoro.network.dto.pomodoro.toListPomdoroModelEntity
+import com.galacticstudio.digidoro.network.dto.pomodoro.toListPomodoroData
 import com.galacticstudio.digidoro.network.service.PomodoroService
+import com.galacticstudio.digidoro.repository.utils.CheckInternetConnectivity
 import com.galacticstudio.digidoro.repository.utils.handleApiCall
 
-class PomodoroRepository(private val pomodoroService: PomodoroService) {
+class PomodoroRepository(
+    private val pomodoroService: PomodoroService,
+    private val database: DigidoroDataBase,
+    private val context: Context
+    ) {
+
+    val pomodoroDao = database.PomodoroDao()
     suspend fun getAllPomodoros(
         sortBy: String? = null,
         order: String? = null,
@@ -15,13 +26,20 @@ class PomodoroRepository(private val pomodoroService: PomodoroService) {
         populate: String? = null,
     ): ApiResponse<List<PomodoroData>> {
         return handleApiCall {
-            pomodoroService.getAllPomodoros(
-                sortBy,
-                order,
-                page,
-                limit,
-                populate
-            ).data
+            val response = if(CheckInternetConnectivity(context)){
+                val apiResponse = pomodoroService.getAllPomodoros(
+                    sortBy,
+                    order,
+                    page,
+                    limit,
+                    populate
+                ).data
+                pomodoroDao.insertAll(apiResponse.toListPomdoroModelEntity())
+                apiResponse
+            }
+            else pomodoroDao.getAllPomodoros().toListPomodoroData()
+
+            response
         }
     }
 

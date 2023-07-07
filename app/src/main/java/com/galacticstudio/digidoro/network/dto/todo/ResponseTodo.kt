@@ -69,8 +69,8 @@ fun ResponseAllTodo.toTodosModel(): MutableList<TodoModel>{
 }
 
 //Convert response to todo item model entity
-fun ResponseAllTodo.toTodosModelEntity(): MutableList<TodoItemModelEntity>{
-    val response = data.mapIndexed{ _, element ->
+fun MutableList<TodoData>.toTodosModelEntity(): MutableList<TodoItemModelEntity>{
+    return map{ element ->
         TodoItemModelEntity(
             _id = element.id,
             user_id = element.user_id,
@@ -82,9 +82,7 @@ fun ResponseAllTodo.toTodosModelEntity(): MutableList<TodoItemModelEntity>{
             createdAt = element.createdAt,
             updatedAt = element.updatedAt
         )
-    }
-
-    return response.toMutableList()
+    }.toMutableList()
 }
 
 

@@ -18,8 +18,8 @@ interface TodoDao {
     suspend fun insertOne(todo: TodoItemModelEntity)
 
     //by user
-    @Query("SELECT * FROM todoitem WHERE user_id =:id")
-    suspend fun getAllNote(id: String): List<TodoItemModelEntity>
+    @Query("SELECT * FROM todoitem")
+    suspend fun getAllTodo(): MutableList<TodoItemModelEntity>
 
     @Query("SELECT * FROM todoitem WHERE _id = :id")
     suspend fun getTodoById(id: String): TodoItemModelEntity

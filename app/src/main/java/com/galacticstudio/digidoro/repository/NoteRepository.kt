@@ -1,18 +1,21 @@
 package com.galacticstudio.digidoro.repository
 
-import android.util.Log
+import android.content.Context
 import com.galacticstudio.digidoro.data.db.DigidoroDataBase
 import com.galacticstudio.digidoro.network.ApiResponse
 import com.galacticstudio.digidoro.network.dto.note.NoteData
 import com.galacticstudio.digidoro.network.dto.note.NoteRequest
 import com.galacticstudio.digidoro.network.dto.note.NoteThemeRequest
-import com.galacticstudio.digidoro.network.dto.note.toFolderModelEntity
+import com.galacticstudio.digidoro.network.dto.note.toNoteData
+import com.galacticstudio.digidoro.network.dto.note.toNoteModelEntity
 import com.galacticstudio.digidoro.network.service.NoteService
+import com.galacticstudio.digidoro.repository.utils.CheckInternetConnectivity
 import com.galacticstudio.digidoro.repository.utils.handleApiCall
 
 class NoteRepository(
     private val noteService: NoteService,
-    private val database: DigidoroDataBase
+    private val database: DigidoroDataBase,
+    private val context: Context
 ) {
     private val noteDao = database.NoteDao()
     suspend fun getAllNotes(
@@ -21,14 +24,16 @@ class NoteRepository(
         page: Int? = null,
         limit: Int? = null,
         populateFields: String? = null,
-        isTrashed: Boolean? = null,
+        isTrashed: Boolean = false,
     ): ApiResponse<List<NoteData>> {
         return handleApiCall {
-            val response = noteService.getAllNotes(sortBy, order, page, limit, populateFields, isTrashed)
+            val response = if(CheckInternetConnectivity(context)){
+                val apiResponse = noteService.getAllNotes(sortBy, order, page, limit, populateFields, isTrashed)
+                noteDao.insertAll(apiResponse.toNoteModelEntity())
+                apiResponse.data
+            } else noteDao.getAllNote(isTrashed).toNoteData()
 
-            noteDao.insertAll(response.toFolderModelEntity())
-
-            response.data
+            response
         }
     }
 

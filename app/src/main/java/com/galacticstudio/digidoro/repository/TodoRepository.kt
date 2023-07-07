@@ -23,7 +23,6 @@ import java.util.Date
 class TodoRepository(
     private val todoService: TodoService,
     private val database: DigidoroDataBase,
-    private val userID: String,
     private var context: Context
 ) {
     private val todoDao = database.TodoDao()
@@ -42,12 +41,12 @@ class TodoRepository(
                 val apiResponse = todoService.getTodos(
                     sortBy, order, page, limit, populate
                 )
-                todoDao.insertAll(apiResponse.toTodosModelEntity())
+                todoDao.insertAll(apiResponse.data.toTodosModelEntity())
 
                 apiResponse.toTodosModel()
 
             } else {
-                todoDao.getAllNote(userID).toTodosModel()
+                todoDao.getAllTodo().toTodosModel()
             }
 
             response
