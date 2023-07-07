@@ -31,8 +31,8 @@ data class NoteData(
     @SerializedName("updatedAt") val updatedAt: String,
 )
 
-fun NoteListResponse.toNoteModelEntity(): List<NoteModelEntity>{
-    return data.map{ element ->
+fun List<NoteData>.toNoteModelEntity(): List<NoteModelEntity>{
+    return map{ element ->
         NoteModelEntity(
             _id = element.id,
             user_id = element.userId,

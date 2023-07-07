@@ -3,6 +3,8 @@ package com.galacticstudio.digidoro.network.dto.favoritenote
 import com.galacticstudio.digidoro.data.db.models.FavoriteNotesModelEntity
 import com.galacticstudio.digidoro.data.db.models.TodoItemModelEntity
 import com.galacticstudio.digidoro.network.dto.note.NoteData
+import com.galacticstudio.digidoro.network.dto.note.toNoteData
+import com.galacticstudio.digidoro.network.dto.note.toNoteModelEntity
 import com.galacticstudio.digidoro.network.dto.todo.ResponseAllTodo
 import com.google.gson.annotations.SerializedName
 
@@ -49,11 +51,10 @@ data class FavoriteNoteDao(
 
 fun FavoriteNoteResponse.toFavoriteNotesModelEntity(): MutableList<FavoriteNotesModelEntity>{
     val response = data.mapIndexed{ _, element ->
-        val listId = element.notes.map { it.id }
         FavoriteNotesModelEntity(
             _id = element.id,
             user_id = element.userId,
-            notes_id = listId
+            notes_id = element.notes.toNoteModelEntity()
         )
     }
 

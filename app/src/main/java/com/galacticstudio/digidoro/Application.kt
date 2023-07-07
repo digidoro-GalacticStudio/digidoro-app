@@ -92,11 +92,19 @@ class Application : Application() {
     }
 
     val favoriteNotesRepository: FavoriteNoteRepository by lazy {
-        FavoriteNoteRepository(getFavoriteNoteAPIService(), database)
+        FavoriteNoteRepository(
+            getFavoriteNoteAPIService(),
+            database,
+            context
+            )
     }
 
     val folderRepository: FolderRepository by lazy {
-        FolderRepository(getFolderAPIService(), database)
+        FolderRepository(
+            getFolderAPIService(),
+            database,
+            context
+        )
     }
 
     val userRepository: UserRepository by lazy {

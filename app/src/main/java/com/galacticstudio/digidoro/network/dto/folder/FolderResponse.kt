@@ -4,6 +4,8 @@ import com.galacticstudio.digidoro.data.db.models.FavoriteNotesModelEntity
 import com.galacticstudio.digidoro.data.db.models.FolderModelEntity
 import com.galacticstudio.digidoro.network.dto.favoritenote.FavoriteNoteResponse
 import com.galacticstudio.digidoro.network.dto.note.NoteData
+import com.galacticstudio.digidoro.network.dto.note.toNoteData
+import com.galacticstudio.digidoro.network.dto.note.toNoteModelEntity
 import com.google.gson.annotations.SerializedName
 
 data class FolderListResponse(
@@ -64,19 +66,32 @@ data class SelectedFolderResponse(
     @SerializedName("folders") val folders: List<FolderData>
 )
 
-fun  FolderNotesListResponse.toFolderModelEntity(): MutableList<FolderModelEntity>{
+fun  FolderNotesListResponse.toFolderModelEntity(): List<FolderModelEntity>{
     val response = data.mapIndexed{ _, element ->
-        val listId = element.notesId.map { it.id }
         FolderModelEntity(
             _id = element.id,
             user_id = element.userId,
             name = element.name,
             theme = element.theme,
-            notes_id = listId,
+            notes_id = element.notesId.toNoteModelEntity(),
             createdAt = element.createdAt,
             updatedAt = element.updatedAt
         )
     }
 
-    return response.toMutableList()
+    return response.toList()
+}
+
+fun  List<FolderModelEntity>.toFolderData(): List<FolderDataPopulated>{
+    return map{ element ->
+        FolderDataPopulated(
+            id = element._id,
+            userId = element.user_id,
+            name = element.name,
+            theme = element.theme,
+            notesId = element.notes_id.toNoteData(),
+            createdAt = element.createdAt,
+            updatedAt = element.updatedAt
+        )
+    }
 }

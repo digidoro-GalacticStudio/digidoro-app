@@ -17,7 +17,7 @@ class PomodoroRepository(
     private val context: Context
     ) {
 
-    val pomodoroDao = database.PomodoroDao()
+    private val pomodoroDao = database.PomodoroDao()
     suspend fun getAllPomodoros(
         sortBy: String? = null,
         order: String? = null,

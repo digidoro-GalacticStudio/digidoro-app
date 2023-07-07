@@ -1,5 +1,6 @@
 package com.galacticstudio.digidoro.repository
 
+import android.content.Context
 import android.util.Log
 import com.galacticstudio.digidoro.data.db.DigidoroDataBase
 import com.galacticstudio.digidoro.network.ApiResponse
@@ -10,23 +11,31 @@ import com.galacticstudio.digidoro.network.dto.folder.FolderThemeRequest
 import com.galacticstudio.digidoro.network.dto.folder.SelFolderResponse
 import com.galacticstudio.digidoro.network.dto.folder.SelectedFolderResponse
 import com.galacticstudio.digidoro.network.dto.folder.ToggleNoteRequest
+import com.galacticstudio.digidoro.network.dto.folder.toFolderData
 import com.galacticstudio.digidoro.network.dto.folder.toFolderModelEntity
 import com.galacticstudio.digidoro.network.dto.note.NoteData
 import com.galacticstudio.digidoro.network.service.FolderService
+import com.galacticstudio.digidoro.repository.utils.CheckInternetConnectivity
 import com.galacticstudio.digidoro.repository.utils.handleApiCall
 
 class FolderRepository(
     private val folderService: FolderService,
-    private val database: DigidoroDataBase
+    private val database: DigidoroDataBase,
+    private val context: Context
     ) {
     private val folderDao = database.FolderDao()
     suspend fun getAllFolders(populateFields: String? = null): ApiResponse<List<FolderDataPopulated>> {
         return handleApiCall {
-            val response = folderService.getAllFolders(populateFields)
 
-            folderDao.insertAll(response.toFolderModelEntity())
+            val response = if(CheckInternetConnectivity(context)){
+                val responseApi = folderService.getAllFolders(populateFields)
+                folderDao.insertAll(responseApi.toFolderModelEntity())
+                responseApi.data
+            }
+            else folderDao.getAllFolder().toFolderData()
 
-            response.data
+
+            response
         }
     }
 

@@ -6,7 +6,9 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import com.galacticstudio.digidoro.data.db.models.FavoriteNotesModelEntity
+import com.galacticstudio.digidoro.data.db.models.NoteModelEntity
 import com.galacticstudio.digidoro.network.dto.favoritenote.FavoriteNoteDao
+import com.galacticstudio.digidoro.network.dto.note.NoteData
 
 @Dao
 interface FavoriteNoteDao{
@@ -17,7 +19,7 @@ interface FavoriteNoteDao{
     suspend fun insertOne(favoriteNote: FavoriteNotesModelEntity)
 
     @Query("SELECT * FROM favoritenotes")
-    suspend fun pagingSource(): List<FavoriteNoteDao>
+    suspend fun getFavoriteNoteWithAllNotes(): List<FavoriteNotesModelEntity>
 
     @Query("SELECT * FROM favoritenotes WHERE _id = :id")
     suspend fun getFavoriteNoteById(id: String): FavoriteNotesModelEntity
@@ -26,27 +28,31 @@ interface FavoriteNoteDao{
     @Query("UPDATE favoritenotes SET notes_id =:notes WHERE _id =:id")
     suspend fun updateFavoriteNotesNoteById(id: String, notes: List<String>)
 
-//  set better update to toggle elements in array notes id
-    @Transaction
-    suspend fun toggleFavoriteNoteById(id: String){
-        val favoriteNote = getFavoriteNoteById(id).notes_id
-    val updatedFavoriteNotes = if (favoriteNote.contains(id))
-            favoriteNote.filterNot { it == id }
-        else
-            favoriteNote + id
+    //get note by id
+    @Query("SELECT * FROM note WHERE _id =:id")
+    suspend fun getNoteInFavorite(id: String) : NoteModelEntity
 
-    updateFavoriteNotesNoteById(id, favoriteNote)
-    }
+
+//  set better update to toggle elements in array notes id
+//    @Transaction
+//    suspend fun toggleFavoriteNoteById(id: String){
+//    val folder = getFavoriteNoteById(id).notes_id
+//    val updatedFolder = folder.map{ element ->
+//        if(element._id == id) folder.filterNot { it == element }
+//        else folder + getNoteInFavorite(id)
+//    }
+//        updateFavoriteNotesNoteById(id, updatedFolder)
+//    }
 
     //  set better update to delete elements in array notes id
-    @Transaction
-    suspend fun deleteNotesById(id: String){
-        val folder = getFavoriteNoteById(id).notes_id
-        val updatedFolder = if (folder.contains(id))
-            folder.filterNot { it == id }
-        else folder
-
-        updateFavoriteNotesNoteById(id, folder)
-    }
+//    @Transaction
+//    suspend fun deleteNotesById(id: String){
+//        val folder = getFavoriteNoteById(id).notes_id
+//        val updatedFolder = if (folder.contains(id))
+//            folder.filterNot { it == id }
+//        else folder
+//
+//        updateFavoriteNotesNoteById(id, folder)
+//    }
 
 }

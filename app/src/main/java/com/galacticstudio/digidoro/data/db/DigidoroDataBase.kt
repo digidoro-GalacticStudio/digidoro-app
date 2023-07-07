@@ -6,6 +6,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.galacticstudio.digidoro.Application
 import com.galacticstudio.digidoro.data.db.converters.DateConverter
+import com.galacticstudio.digidoro.data.db.converters.ListNoteModelEntityConverter
 import com.galacticstudio.digidoro.data.db.converters.ListStringConverter
 import com.galacticstudio.digidoro.data.db.dao.FavoriteNoteDao
 import com.galacticstudio.digidoro.data.db.dao.FolderDao
@@ -27,7 +28,7 @@ import com.galacticstudio.digidoro.data.db.models.UsersModelEntity
     exportSchema = false
 )
 @TypeConverters(
-    value = [DateConverter::class, ListStringConverter::class]
+    value = [DateConverter::class, ListStringConverter::class, ListNoteModelEntityConverter::class]
 )
 abstract class DigidoroDataBase() : RoomDatabase() {
     abstract fun FavoriteNoteDao() : FavoriteNoteDao

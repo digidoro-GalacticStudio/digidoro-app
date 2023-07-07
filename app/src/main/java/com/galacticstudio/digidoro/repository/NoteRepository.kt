@@ -28,9 +28,9 @@ class NoteRepository(
     ): ApiResponse<List<NoteData>> {
         return handleApiCall {
             val response = if(CheckInternetConnectivity(context)){
-                val apiResponse = noteService.getAllNotes(sortBy, order, page, limit, populateFields, isTrashed)
+                val apiResponse = noteService.getAllNotes(sortBy, order, page, limit, populateFields, isTrashed).data
                 noteDao.insertAll(apiResponse.toNoteModelEntity())
-                apiResponse.data
+                apiResponse
             } else noteDao.getAllNote(isTrashed).toNoteData()
 
             response

@@ -27,29 +27,29 @@ interface FolderDao {
     suspend fun updateFolderNoteById(id: String, notes: List<String>)
 
     //  set better update to toggle elements in array notes id
-    @Transaction
-    suspend fun toggleNotesById(id: String){
-        val folder = getFolderById(id).notes_id
-        val updatedFolder = if (folder.contains(id))
-            folder.filterNot { it == id }
-        else folder + id
-
-        updateFolderNoteById(id, folder)
-    }
-    //update theme
+//    @Transaction
+//    suspend fun toggleNotesById(id: String){
+//        val folder = getFolderById(id).notes_id
+//        val updatedFolder = if (folder.contains(id))
+//            folder.filterNot { it == id }
+//        else folder + id
+//
+//        updateFolderNoteById(id, folder)
+//    }
+//    //update theme
     @Query("UPDATE folder SET theme =:theme WHERE _id =:id")
     suspend fun updateThemeById(id: String, theme:String)
 
     //  set better update to delete elements in array notes id
-    @Transaction
-    suspend fun deleteNotesById(id: String){
-        val folder = getFolderById(id).notes_id;
-        val updatedFolder = if (folder.contains(id))
-            folder.filterNot { it == id }
-        else folder
-
-        updateFolderNoteById(id, folder)
-    }
+//    @Transaction
+//    suspend fun deleteNotesById(id: String){
+//        val folder = getFolderById(id).notes_id;
+//        val updatedFolder = if (folder.contains(id))
+//            folder.filterNot { it == id }
+//        else folder
+//
+//        updateFolderNoteById(id, folder)
+//    }
 
     //delete folder
     @Query("DELETE FROM folder WHERE _id =:id")

@@ -3,6 +3,7 @@ package com.galacticstudio.digidoro.data.db.models
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
+import com.galacticstudio.digidoro.data.db.converters.ListNoteModelEntityConverter
 import com.galacticstudio.digidoro.data.db.converters.ListStringConverter
 
 
@@ -14,8 +15,9 @@ data class FolderModelEntity(
     var name: String,
     var theme: String,
 
-    @TypeConverters(ListStringConverter::class)
-    var notes_id: List<String>,
+    @TypeConverters(ListNoteModelEntityConverter::class)
+    var notes_id: List<NoteModelEntity>,
+
     var createdAt: String,
     var updatedAt: String
 )
