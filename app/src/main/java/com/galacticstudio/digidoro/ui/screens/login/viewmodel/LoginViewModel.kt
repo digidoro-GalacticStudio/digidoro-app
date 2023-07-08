@@ -13,6 +13,11 @@ import com.galacticstudio.digidoro.domain.usecase.fields.ValidateEmail
 import com.galacticstudio.digidoro.domain.usecase.fields.ValidatePassword
 import com.galacticstudio.digidoro.network.ApiResponse
 import com.galacticstudio.digidoro.repository.CredentialsRepository
+import com.galacticstudio.digidoro.repository.FavoriteNoteRepository
+import com.galacticstudio.digidoro.repository.FolderRepository
+import com.galacticstudio.digidoro.repository.NoteRepository
+import com.galacticstudio.digidoro.repository.PomodoroRepository
+import com.galacticstudio.digidoro.repository.TodoRepository
 import com.galacticstudio.digidoro.ui.screens.login.LoginFormEvent
 import com.galacticstudio.digidoro.ui.screens.login.LoginFormState
 import com.galacticstudio.digidoro.ui.screens.login.LoginResponseState
@@ -154,7 +159,7 @@ class LoginViewModel(
                 LoginViewModel(
                     validateEmail = ValidateEmail(),
                     validatePassword = ValidatePassword(),
-                    repository = app.credentialsRepository
+                    repository = app.credentialsRepository,
                 )
             }
         }

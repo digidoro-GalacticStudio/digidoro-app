@@ -1,6 +1,7 @@
 package com.galacticstudio.digidoro.repository
 
 import android.content.Context
+import android.util.Log
 import com.galacticstudio.digidoro.data.db.DigidoroDataBase
 import com.galacticstudio.digidoro.network.ApiResponse
 import com.galacticstudio.digidoro.network.dto.favoritenote.FavoriteNoteRequest
@@ -18,20 +19,32 @@ class FavoriteNoteRepository(
     private val context: Context
 ) {
     private val favoriteNoteDao = database.FavoriteNoteDao()
+
+    suspend fun insertInDataBase(
+        populateFields: String? = null,
+    ): ApiResponse<String> {
+        return handleApiCall {
+            val response = if(CheckInternetConnectivity(context)){
+                val response = favoriteNoteService.getAllFavoriteNotes(populateFields)
+                favoriteNoteDao.insertAll(response.toFavoriteNotesModelEntity())
+                "Inserted successfully"
+            }
+            else "could not insert into database"
+            Log.d("favoriteNoteRepository", response)
+            response
+        }
+    }
+
     suspend fun getAllFavoriteNotes(
         populateFields: String? = null,
     ): ApiResponse<List<NoteData>> {
         return handleApiCall {
-            val reponse = if(CheckInternetConnectivity(context)){
-                val response = favoriteNoteService.getAllFavoriteNotes(populateFields)
+            val response = if(CheckInternetConnectivity(context))
+                favoriteNoteService.getAllFavoriteNotes(populateFields).data[0].notes
 
-                favoriteNoteDao.insertAll(response.toFavoriteNotesModelEntity())
-
-                response.data[0].notes
-            }
             else favoriteNoteDao.getFavoriteNoteWithAllNotes()[0].notes_id.toNoteData()
 
-            reponse
+            response
         }
     }
 

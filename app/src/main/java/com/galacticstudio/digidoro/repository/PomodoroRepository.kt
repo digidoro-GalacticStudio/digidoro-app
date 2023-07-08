@@ -1,6 +1,7 @@
 package com.galacticstudio.digidoro.repository
 
 import android.content.Context
+import android.util.Log
 import com.galacticstudio.digidoro.data.db.DigidoroDataBase
 import com.galacticstudio.digidoro.network.ApiResponse
 import com.galacticstudio.digidoro.network.dto.pomodoro.PomodoroData
@@ -18,6 +19,18 @@ class PomodoroRepository(
     ) {
 
     private val pomodoroDao = database.PomodoroDao()
+
+    suspend fun insertIntoDataBase(): ApiResponse<String> {
+        return handleApiCall {
+            val response = if(CheckInternetConnectivity(context)){
+                val apiResponse = pomodoroService.getAllPomodoros().data
+                pomodoroDao.insertAll(apiResponse.toListPomdoroModelEntity())
+                "Inserted successfully"
+            }
+            else "could not insert into database"
+            response
+        }
+    }
     suspend fun getAllPomodoros(
         sortBy: String? = null,
         order: String? = null,
@@ -34,7 +47,7 @@ class PomodoroRepository(
                     limit,
                     populate
                 ).data
-                pomodoroDao.insertAll(apiResponse.toListPomdoroModelEntity())
+//                pomodoroDao.insertAll(apiResponse.toListPomdoroModelEntity())
                 apiResponse
             }
             else pomodoroDao.getAllPomodoros().toListPomodoroData()

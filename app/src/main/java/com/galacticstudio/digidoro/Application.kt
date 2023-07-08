@@ -20,6 +20,12 @@ class Application : Application() {
         getSharedPreferences("Retrofit", Context.MODE_PRIVATE)
     }
 
+
+    private val database: DigidoroDataBase by lazy {
+        DigidoroDataBase.getInstance(this)
+    }
+
+
     private lateinit var context: Context
 
     override fun onCreate() {
@@ -74,10 +80,6 @@ class Application : Application() {
         return token.isNotEmpty()
     }
 
-    private val database: DigidoroDataBase by lazy {
-        DigidoroDataBase.getInstance(this)
-    }
-
     //initialize repositories
     val credentialsRepository: CredentialsRepository by lazy {
         CredentialsRepository(getAPIService(), database)
@@ -130,7 +132,6 @@ class Application : Application() {
             context
             )
     }
-
     fun saveAuthToken(token: String){
         val editor = prefs.edit()
         editor.putString(USER_TOKEN, token)
@@ -147,8 +148,27 @@ class Application : Application() {
         RetrofitInstance.setToken("")
         RetrofitInstance.clearToken()
     }
+    suspend fun clearDataBase(){
+        database.FavoriteNoteDao().deleteFavoriteNotes()
+        database.UserDao().deleteUsers()
+        database.PomodoroDao().deletePomodoros()
+        database.NoteDao().deleteNotes()
+        database.TodoDao().deleteTodo()
+        database.FolderDao().deleteFolders()
+    }
 
+    suspend fun insertIntoDataBase(){
+        favoriteNotesRepository.insertInDataBase(
+            populateFields = "notes_id"
+        )
+        folderRepository.insertInDataBase(
+            populateFields = "notes_id"
+        )
+        notesRepository.insertIntoDataBase()
+        pomodoroRepository.insertIntoDataBase()
+        todoRepository.insertIntoDataBase()
 
+    }
     fun saveRoles(roles: List<String>) {
         val editor = prefs.edit()
         editor.putStringSet(USER_ROLES, roles.toSet())

@@ -55,4 +55,7 @@ interface FavoriteNoteDao{
 //        updateFavoriteNotesNoteById(id, folder)
 //    }
 
+    @Query("DELETE FROM favoritenotes")
+    suspend fun deleteFavoriteNotes()
+
 }

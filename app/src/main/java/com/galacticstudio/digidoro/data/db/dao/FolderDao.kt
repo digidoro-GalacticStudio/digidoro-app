@@ -53,5 +53,8 @@ interface FolderDao {
 
     //delete folder
     @Query("DELETE FROM folder WHERE _id =:id")
-    suspend fun deleteFolder(id: String)
+    suspend fun deleteFolder(id: String
+
+    )@Query("DELETE FROM folder")
+    suspend fun deleteFolders()
 }

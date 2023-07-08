@@ -94,6 +94,9 @@ fun AccountScreen(
             color = MaterialTheme.colorScheme.primary
         ) {
             app.clearAuthToken()
+            suspend {
+                app.clearDataBase()
+            }
             navController.navigate(HOME_GRAPH_ROUTE)
         }
     }

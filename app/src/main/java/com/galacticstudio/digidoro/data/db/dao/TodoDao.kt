@@ -51,7 +51,7 @@ interface TodoDao {
     }
 
     //delete Note
-    @Query("DELETE FROM todoitem WHERE _id =:id")
-    suspend fun deleteNote(id: String)
+    @Query("DELETE FROM todoitem")
+    suspend fun deleteTodo()
 
 }

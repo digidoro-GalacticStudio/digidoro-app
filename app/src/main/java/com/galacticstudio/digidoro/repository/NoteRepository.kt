@@ -1,6 +1,7 @@
 package com.galacticstudio.digidoro.repository
 
 import android.content.Context
+import android.util.Log
 import com.galacticstudio.digidoro.data.db.DigidoroDataBase
 import com.galacticstudio.digidoro.network.ApiResponse
 import com.galacticstudio.digidoro.network.dto.note.NoteData
@@ -18,6 +19,20 @@ class NoteRepository(
     private val context: Context
 ) {
     private val noteDao = database.NoteDao()
+    suspend fun insertIntoDataBase(): ApiResponse<String> {
+        return handleApiCall {
+
+            val response = if(CheckInternetConnectivity(context)){
+                val apiResponse = noteService.getAllNotes().data
+                noteDao.insertAll(apiResponse.toNoteModelEntity())
+                "Inserted successfully"
+            }
+            else "could not insert into database"
+
+            response
+        }
+    }
+
     suspend fun getAllNotes(
         sortBy: String? = null,
         order: String? = null,
@@ -29,7 +44,7 @@ class NoteRepository(
         return handleApiCall {
             val response = if(CheckInternetConnectivity(context)){
                 val apiResponse = noteService.getAllNotes(sortBy, order, page, limit, populateFields, isTrashed).data
-                noteDao.insertAll(apiResponse.toNoteModelEntity())
+//                noteDao.insertAll(apiResponse.toNoteModelEntity())
                 apiResponse
             } else noteDao.getAllNote(isTrashed).toNoteData()
 

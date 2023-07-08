@@ -20,4 +20,7 @@ interface PomodoroDao {
 
     @Query("SELECT * FROM pomodoro WHERE _id = :id")
     suspend fun getPomodoroById(id: String): PomodoroModelEntity
+
+    @Query("DELETE FROM POMODORO")
+    suspend fun deletePomodoros()
 }

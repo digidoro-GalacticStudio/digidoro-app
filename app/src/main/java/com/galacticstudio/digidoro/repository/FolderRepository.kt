@@ -24,12 +24,25 @@ class FolderRepository(
     private val context: Context
     ) {
     private val folderDao = database.FolderDao()
+
+    suspend fun insertInDataBase(populateFields: String? = null): ApiResponse<String> {
+        return handleApiCall {
+            val response = if(CheckInternetConnectivity(context)){
+                val responseApi = folderService.getAllFolders(populateFields)
+                folderDao.insertAll(responseApi.toFolderModelEntity())
+                "Inserted successfully"
+            }
+            else "could not insert into database"
+            Log.d("folderNoteRepository", response)
+            response
+        }
+    }
     suspend fun getAllFolders(populateFields: String? = null): ApiResponse<List<FolderDataPopulated>> {
         return handleApiCall {
 
             val response = if(CheckInternetConnectivity(context)){
                 val responseApi = folderService.getAllFolders(populateFields)
-                folderDao.insertAll(responseApi.toFolderModelEntity())
+//                folderDao.insertAll(responseApi.toFolderModelEntity())
                 responseApi.data
             }
             else folderDao.getAllFolder().toFolderData()

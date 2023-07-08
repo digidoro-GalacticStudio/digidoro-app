@@ -107,6 +107,7 @@ fun LoginScreen(
                     app.saveAuthToken(event.token)
                     app.saveRoles(event.roles)
                     app.saveUsername(event.username)
+                    app.insertIntoDataBase()
 
                     Toast.makeText(
                         context,

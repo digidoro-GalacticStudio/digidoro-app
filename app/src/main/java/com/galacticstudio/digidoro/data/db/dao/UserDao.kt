@@ -32,4 +32,7 @@ interface UserDao {
     suspend fun updateTodoItemById(id: String, firstname:String = "", lastname: String = "", username: String = "", date_birth: String="", phone_number: String)
 
 
+    @Query("DELETE FROM USERS")
+    suspend fun deleteUsers()
+
 }

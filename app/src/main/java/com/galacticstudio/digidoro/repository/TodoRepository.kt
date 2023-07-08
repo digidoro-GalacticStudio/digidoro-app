@@ -29,6 +29,16 @@ class TodoRepository(
 
     // Retrieve the application instance from the current context
 
+    suspend fun insertIntoDataBase(): ApiResponse<String>{
+        return handleApiCall {
+            val response = if(CheckInternetConnectivity(context = context)){
+                val apiResponse = todoService.getTodos()
+                todoDao.insertAll(apiResponse.data.toTodosModelEntity())
+                "Inserted successfully"
+            } else "could not insert into database"
+            response
+        }
+    }
         suspend fun getAllTodo(
         sortBy: String ?= null,
         order: String ?= null,
@@ -41,7 +51,7 @@ class TodoRepository(
                 val apiResponse = todoService.getTodos(
                     sortBy, order, page, limit, populate
                 )
-                todoDao.insertAll(apiResponse.data.toTodosModelEntity())
+//                todoDao.insertAll(apiResponse.data.toTodosModelEntity())
 
                 apiResponse.toTodosModel()
 
