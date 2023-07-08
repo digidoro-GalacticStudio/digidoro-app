@@ -24,8 +24,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.galacticstudio.digidoro.R
 import com.galacticstudio.digidoro.Application
+import com.galacticstudio.digidoro.R
 import com.galacticstudio.digidoro.navigation.HOME_GRAPH_ROUTE
 import com.galacticstudio.digidoro.ui.screens.account.components.options.OptionComposable
 import com.galacticstudio.digidoro.ui.screens.account.components.options.OptionsComposable
@@ -34,12 +34,15 @@ import com.galacticstudio.digidoro.ui.screens.ranking.RankingUIEvent
 import com.galacticstudio.digidoro.ui.screens.ranking.mapper.UserRankingMapper
 import com.galacticstudio.digidoro.ui.screens.ranking.viewmodel.RankingViewModel
 import com.galacticstudio.digidoro.ui.theme.DigidoroTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 @Composable
 @Preview(showSystemUi = true)
 fun AccountPreview() {
-    DigidoroTheme() {
+    DigidoroTheme {
         AccountScreen(navController = rememberNavController())
 
     }
@@ -93,11 +96,12 @@ fun AccountScreen(
             backgroundColor = MaterialTheme.colorScheme.secondary,
             color = MaterialTheme.colorScheme.primary
         ) {
-            suspend{
-                app.clearAuthToken()
+            val scope = CoroutineScope(Dispatchers.Main)
+            scope.launch {
                 app.clearDataBase()
-                navController.navigate(HOME_GRAPH_ROUTE)
             }
+            app.clearAuthToken()
+            navController.navigate(HOME_GRAPH_ROUTE)
         }
     }
 
