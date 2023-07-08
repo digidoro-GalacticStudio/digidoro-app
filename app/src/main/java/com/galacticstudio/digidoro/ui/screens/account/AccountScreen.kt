@@ -93,11 +93,11 @@ fun AccountScreen(
             backgroundColor = MaterialTheme.colorScheme.secondary,
             color = MaterialTheme.colorScheme.primary
         ) {
-            app.clearAuthToken()
-            suspend {
+            suspend{
+                app.clearAuthToken()
                 app.clearDataBase()
+                navController.navigate(HOME_GRAPH_ROUTE)
             }
-            navController.navigate(HOME_GRAPH_ROUTE)
         }
     }
 

@@ -64,4 +64,12 @@ class FavoriteNoteRepository(
             ).data.notesId
         }
     }
+
+    suspend fun deleteAll(): ApiResponse<String>{
+        return handleApiCall {
+            favoriteNoteDao.deleteFavoriteNotes()
+
+            "Deleted successfully"
+        }
+    }
 }

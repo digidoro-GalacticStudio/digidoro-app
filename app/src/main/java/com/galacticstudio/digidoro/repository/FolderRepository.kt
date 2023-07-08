@@ -93,4 +93,12 @@ class FolderRepository(
         Log.d("MyErrors", "MY REQUEST: ${request}")
         return handleApiCall { folderService.toggleFolder(folderId, request).data }
     }
+
+    suspend fun deleteAll(): ApiResponse<String>{
+        return handleApiCall {
+            folderDao.deleteFolders()
+
+            "Deleted successfully"
+        }
+    }
 }

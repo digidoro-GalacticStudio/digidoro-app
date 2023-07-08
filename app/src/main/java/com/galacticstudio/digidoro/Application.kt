@@ -149,12 +149,11 @@ class Application : Application() {
         RetrofitInstance.clearToken()
     }
     suspend fun clearDataBase(){
-        database.FavoriteNoteDao().deleteFavoriteNotes()
-        database.UserDao().deleteUsers()
-        database.PomodoroDao().deletePomodoros()
-        database.NoteDao().deleteNotes()
-        database.TodoDao().deleteTodo()
-        database.FolderDao().deleteFolders()
+        favoriteNotesRepository.deleteAll()
+        folderRepository.deleteAll()
+        notesRepository.deleteAll()
+        pomodoroRepository.deleteAll()
+        todoRepository.deleteAll()
     }
 
     suspend fun insertIntoDataBase(){

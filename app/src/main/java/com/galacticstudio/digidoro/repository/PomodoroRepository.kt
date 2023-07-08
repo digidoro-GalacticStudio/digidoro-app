@@ -90,4 +90,12 @@ class PomodoroRepository(
     suspend fun deletePomodoro(pomodoroId: String): ApiResponse<PomodoroData> {
         return handleApiCall { pomodoroService.deletePomodoro(pomodoroId).data }
     }
+
+    suspend fun deleteAll(): ApiResponse<String>{
+        return handleApiCall {
+            pomodoroDao.deletePomodoros()
+
+            "Deleted successfully"
+        }
+    }
 }

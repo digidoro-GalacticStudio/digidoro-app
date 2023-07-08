@@ -89,4 +89,12 @@ class NoteRepository(
     suspend fun toggleTrashNoteById(noteId: String): ApiResponse<NoteData> {
         return handleApiCall { noteService.toggleTrashNoteById(noteId).data }
     }
+
+    suspend fun deleteAll(): ApiResponse<String>{
+        return handleApiCall {
+            noteDao.deleteNotes()
+
+            "Deleted successfully"
+        }
+    }
 }

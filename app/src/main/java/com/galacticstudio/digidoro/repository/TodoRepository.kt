@@ -105,4 +105,11 @@ class TodoRepository(
         }
     }
 
+    suspend fun deleteAll(): ApiResponse<String>{
+        return handleApiCall {
+            todoDao.deleteTodo()
+
+            "Deleted successfully"
+        }
+    }
 }
