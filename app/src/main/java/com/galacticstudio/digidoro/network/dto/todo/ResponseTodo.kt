@@ -87,7 +87,7 @@ fun MutableList<TodoData>.toTodosModelEntity(): MutableList<TodoItemModelEntity>
 
 
 //Convert response to todo s model
-fun List<TodoItemModelEntity>.toTodosModel(): MutableList<TodoModel>{
+fun List<TodoItemModelEntity>.toListTodosModel(): MutableList<TodoModel>{
 
    return map{element ->
         TodoModel(
@@ -100,4 +100,16 @@ fun List<TodoItemModelEntity>.toTodosModel(): MutableList<TodoModel>{
             reminder = element.reminder
         )
     }.toMutableList()
+}
+fun TodoItemModelEntity.toTodosModel(): TodoModel{
+   return TodoModel(
+       id = this._id ,
+       title = this.title,
+       description = this.description,
+       theme = this.theme,
+       createdAt = this.createdAt,
+       state = this.is_completed,
+       reminder = this.reminder
+   )
+
 }

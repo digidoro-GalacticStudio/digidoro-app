@@ -1,15 +1,12 @@
 package com.galacticstudio.digidoro.repository
 
 import android.content.Context
-import android.util.Log
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
-import com.galacticstudio.digidoro.Application
 import com.galacticstudio.digidoro.data.api.TodoModel
 import com.galacticstudio.digidoro.data.db.DigidoroDataBase
+import com.galacticstudio.digidoro.data.db.models.TodoItemModelEntity
 import com.galacticstudio.digidoro.network.ApiResponse
 import com.galacticstudio.digidoro.network.dto.todo.RequestTodo
+import com.galacticstudio.digidoro.network.dto.todo.toListTodosModel
 import com.galacticstudio.digidoro.network.dto.todo.toTodoModel
 import com.galacticstudio.digidoro.network.dto.todo.toTodosModel
 import com.galacticstudio.digidoro.network.dto.todo.toTodosModelEntity
@@ -48,16 +45,10 @@ class TodoRepository(
     ): ApiResponse<List<TodoModel>>{
         return handleApiCall {
             val response = if(CheckInternetConnectivity(context = context)){
-                val apiResponse = todoService.getTodos(
+                todoService.getTodos(
                     sortBy, order, page, limit, populate
-                )
-//                todoDao.insertAll(apiResponse.data.toTodosModelEntity())
-
-                apiResponse.toTodosModel()
-
-            } else {
-                todoDao.getAllTodo().toTodosModel()
-            }
+                ).toTodosModel()
+            } else todoDao.getAllTodo().toListTodosModel()
 
             response
         }
@@ -70,10 +61,20 @@ class TodoRepository(
         description: String = "",
     ): ApiResponse<TodoModel> {
         return handleApiCall {
-            val request = RequestTodo(
-                title, description, "#$theme", DateUtils.dateKTToDateAPI(reminder)
-            )
-            todoService.createTodo(request).toTodoModel()
+            if(CheckInternetConnectivity(context)){
+                val request = RequestTodo(
+                    title, description, "#$theme", DateUtils.dateKTToDateAPI(reminder)
+                )
+                todoService.createTodo(request).toTodoModel()
+            }
+            else{
+                val request = TodoItemModelEntity(
+                    title = title, description = description, theme = "#$theme", reminder = reminder
+                )
+
+                todoDao.insertTodo(request).toTodosModel()
+            }
+
         }
     }
 
@@ -86,28 +87,43 @@ class TodoRepository(
         description: String = "",
     ): ApiResponse<TodoModel>{
         return handleApiCall {
-            val request = RequestTodo(title, description, "#$theme", DateUtils.dateKTToDateAPI(reminder))
-            todoService.updateTodo(
-                id = id,
-                request = request
+
+            if(CheckInternetConnectivity(context)){
+                val request = RequestTodo(title, description, "#$theme", DateUtils.dateKTToDateAPI(reminder))
+                todoService.updateTodo(
+                    id = id,
+                    request = request
                 ).toTodoModel()
+
+            }
+            else {
+                todoDao.updateTodoById(
+                    id, title, description, "#$theme", DateUtils.dateKTToDateAPI(reminder)
+                ).toTodosModel()
+            }
         }
     }
 
     suspend fun toggleTodoState(id: String): ApiResponse<TodoModel>{
         return  handleApiCall {
-            todoService.toggleTodoDone(id = id).toTodoModel()
+            if(CheckInternetConnectivity(context)){
+                todoService.toggleTodoDone(id = id).toTodoModel()
+            }
+            else{
+                todoDao.toggleStatusById(id = id).toTodosModel()
+            }
         }
     }
     suspend fun deleteTodoById(id: String): ApiResponse<TodoModel>{
         return handleApiCall {
-            todoService.deleteNoteById(id = id).toTodoModel()
+            if(CheckInternetConnectivity(context)) todoService.deleteNoteById(id = id).toTodoModel()
+            else todoDao.deleteTodoById(id).toTodosModel()
         }
     }
 
     suspend fun deleteAll(): ApiResponse<String>{
         return handleApiCall {
-            todoDao.deleteTodo()
+            todoDao.deleteAllTodo()
 
             "Deleted successfully"
         }

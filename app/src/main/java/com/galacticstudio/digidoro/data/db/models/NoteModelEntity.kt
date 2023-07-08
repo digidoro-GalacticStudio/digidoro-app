@@ -4,13 +4,14 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
 import com.galacticstudio.digidoro.data.db.converters.ListStringConverter
+import java.util.UUID
 
 
 @Entity(tableName = "note")
 data class NoteModelEntity(
     @PrimaryKey
-    var _id: String,
-    var user_id: String,
+    var _id: String = UUID.randomUUID().toString(),
+    var user_id: String = UUID.randomUUID().toString(),
     var title: String,
     var message: String,
 
