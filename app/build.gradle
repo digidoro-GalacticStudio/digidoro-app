@@ -77,4 +77,12 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 
+    //Pager
+    def paging_version = "3.1.1"
+    implementation("androidx.paging:paging-runtime:$paging_version")
+/*
+    implementation("com.airbnb.android:lottie:6.0.1")
+*/
+
+
 }

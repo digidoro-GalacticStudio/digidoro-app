@@ -213,3 +213,27 @@ val userList: MutableList<UserModel> = mutableListOf(
         total_score = 200
     )
 )
+
+//TODO: Aquí esta para que cambies la data dentro del OnBoardingScreen.kt (las imagenes estan dentro del repo)
+// aqui cuando lo arregles pasamos las img en linea e implementamos lo que vimos en clases sisi
+
+
+//val onBoardingList: ArrayList<OnBoardingData> = arrayListOf(
+//    OnBoardingData(
+//        image = "https://res.cloudinary.com/dzav4tb08/image/upload/v1688875695/welcome_sm4ffg.png",
+//        tittle = "Welcome to the digi community",
+//        desc = "Get ready to boost your productivity!"
+//    ),
+//    OnBoardingData(
+//        image = "https://res.cloudinary.com/dzav4tb08/image/upload/v1688874200/hero_pic_olxkyg.png",
+//        tittle = "Welcome to the digi community",
+//        desc = "Get ready to boost your productivity!"
+//    ),
+//    OnBoardingData(
+//        image = "https://res.cloudinary.com/dzav4tb08/image/upload/v1688874200/ranking_landing_yad3oo.png",
+//        tittle = "Welcome to the digi community",
+//        desc = "Get ready to boost your productivity!"
+//    ),
+//)
+//
+
