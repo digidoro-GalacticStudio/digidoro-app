@@ -68,6 +68,7 @@ fun PreviewFunction(){
     }
 }
 
+//TODO: Deje en el Dummy Text, por si queres pasarlo ahi y dejar de tener aqui la data sisisis
 @ExperimentalFoundationApi
 @Composable
 fun MainFunction(){
