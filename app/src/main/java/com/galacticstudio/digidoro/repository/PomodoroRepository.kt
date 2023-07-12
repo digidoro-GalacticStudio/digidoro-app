@@ -8,6 +8,7 @@ import com.galacticstudio.digidoro.network.dto.pomodoro.PomodoroData
 import com.galacticstudio.digidoro.network.dto.pomodoro.PomodoroRequest
 import com.galacticstudio.digidoro.network.dto.pomodoro.toListPomdoroModelEntity
 import com.galacticstudio.digidoro.network.dto.pomodoro.toListPomodoroData
+import com.galacticstudio.digidoro.network.dto.pomodoro.toPomodoroData
 import com.galacticstudio.digidoro.network.service.PomodoroService
 import com.galacticstudio.digidoro.repository.utils.CheckInternetConnectivity
 import com.galacticstudio.digidoro.repository.utils.handleApiCall
@@ -57,7 +58,12 @@ class PomodoroRepository(
     }
 
     suspend fun getPomodoroById(pomodoroId: String): ApiResponse<PomodoroData> {
-        return handleApiCall { pomodoroService.getPomodoroById(pomodoroId).data }
+        return handleApiCall {
+            val response = if(CheckInternetConnectivity(context)) pomodoroService.getPomodoroById(pomodoroId).data
+            else pomodoroDao.getPomodoroById(pomodoroId).toPomodoroData()
+
+            response
+        }
     }
 
     suspend fun createPomodoro(

@@ -4,6 +4,7 @@ import com.galacticstudio.digidoro.data.db.models.FavoriteNotesModelEntity
 import com.galacticstudio.digidoro.data.db.models.FolderModelEntity
 import com.galacticstudio.digidoro.network.dto.favoritenote.FavoriteNoteResponse
 import com.galacticstudio.digidoro.network.dto.note.NoteData
+import com.galacticstudio.digidoro.network.dto.note.toListNoteData
 import com.galacticstudio.digidoro.network.dto.note.toNoteData
 import com.galacticstudio.digidoro.network.dto.note.toNoteModelEntity
 import com.google.gson.annotations.SerializedName
@@ -89,7 +90,7 @@ fun  List<FolderModelEntity>.toFolderData(): List<FolderDataPopulated>{
             userId = element.user_id,
             name = element.name,
             theme = element.theme,
-            notesId = element.notes_id.toNoteData(),
+            notesId = element.notes_id.toListNoteData(),
             createdAt = element.createdAt,
             updatedAt = element.updatedAt
         )

@@ -47,7 +47,7 @@ fun List<NoteData>.toNoteModelEntity(): List<NoteModelEntity>{
     }.toList()
 }
 
-fun List<NoteModelEntity>.toNoteData(): List<NoteData>{
+fun List<NoteModelEntity>.toListNoteData(): List<NoteData>{
     return map{ element ->
         NoteData(
             id = element._id,
@@ -61,4 +61,18 @@ fun List<NoteModelEntity>.toNoteData(): List<NoteData>{
             updatedAt = element.updatedAt
         )
     }.toList()
+}
+
+fun NoteModelEntity.toNoteData(): NoteData{
+    return NoteData(
+        id = this._id,
+        userId = this.user_id,
+        title = this.title,
+        message = this.message,
+        tags = this.tags,
+        theme = this.theme,
+        isTrashed = this.is_trashed,
+        createdAt = this.createdAt,
+        updatedAt = this.updatedAt
+    )
 }

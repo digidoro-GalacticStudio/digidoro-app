@@ -64,3 +64,15 @@ fun List<PomodoroModelEntity>.toListPomodoroData(): List<PomodoroData>{
         )
     }.toList()
 }
+fun PomodoroModelEntity.toPomodoroData(): PomodoroData{
+    return PomodoroData(
+        id = this._id,
+        name = this.name,
+        user_id = this.user_id,
+        sessionsCompleted = this.sessions_completed,
+        totalSessions = this.total_sessions,
+        theme = this.theme,
+        createdAt = this.createdAt,
+        updatedAt = this.updatedAt
+    )
+}

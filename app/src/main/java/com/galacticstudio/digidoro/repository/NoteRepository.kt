@@ -7,6 +7,7 @@ import com.galacticstudio.digidoro.network.ApiResponse
 import com.galacticstudio.digidoro.network.dto.note.NoteData
 import com.galacticstudio.digidoro.network.dto.note.NoteRequest
 import com.galacticstudio.digidoro.network.dto.note.NoteThemeRequest
+import com.galacticstudio.digidoro.network.dto.note.toListNoteData
 import com.galacticstudio.digidoro.network.dto.note.toNoteData
 import com.galacticstudio.digidoro.network.dto.note.toNoteModelEntity
 import com.galacticstudio.digidoro.network.service.NoteService
@@ -44,16 +45,20 @@ class NoteRepository(
         return handleApiCall {
             val response = if(CheckInternetConnectivity(context)){
                 val apiResponse = noteService.getAllNotes(sortBy, order, page, limit, populateFields, isTrashed).data
-//                noteDao.insertAll(apiResponse.toNoteModelEntity())
                 apiResponse
-            } else noteDao.getAllNote(isTrashed).toNoteData()
+            } else noteDao.getAllNote(isTrashed).toListNoteData()
 
             response
         }
     }
 
     suspend fun getNoteById(noteId: String): ApiResponse<NoteData> {
-        return handleApiCall { noteService.getNoteById(noteId).data }
+        return handleApiCall {
+            val response = if(CheckInternetConnectivity(context)) noteService.getNoteById(noteId).data
+            else noteDao.getNoteById(noteId).toNoteData()
+
+            response
+        }
     }
 
     suspend fun createNote(
