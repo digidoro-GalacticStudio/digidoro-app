@@ -46,10 +46,15 @@ interface PomodoroDao {
         theme: String = "",
         updatedAt: Date = Calendar.getInstance().time)
 
+    @Query("UPDATE pomodoro SET sessions_completed = (sessions_completed + 1) WHERE _id =:id")
+    suspend fun updateCompletedSessions(id: String)
+
     //delete queries
     @Query("DELETE FROM POMODORO")
     suspend fun deletePomodoros()
 
+    @Query("DELETE FROM pomodoro WHERE _id =:id")
+    suspend fun deleteOne(id: String)
     //transactions insert
     @Transaction
     suspend fun insertPomodoro(pomodoro: PomodoroModelEntity): PomodoroModelEntity{
@@ -60,8 +65,23 @@ interface PomodoroDao {
     //transaction to update
     @Transaction
     suspend fun updatePomodoroById(id: String, pomodoro: PomodoroModelEntity) : PomodoroModelEntity{
-        update(id, pomodoro.name, pomodoro.sessions_completed, pomodoro.total_sessions, pomodoro.theme)
+        //TODO: Check for total session update
+        update(id, name = pomodoro.name, sessionsCompleted = pomodoro.sessions_completed, totalSessions = pomodoro.total_sessions, theme = pomodoro.theme)
         return getPomodoroById(id)
     }
 
+    @Transaction
+    suspend fun updateCompletedSessionsById(id: String): String{
+        //TODO check for UpdateTransaction()
+        updateCompletedSessionsById(id)
+        return "Successfully completed"
+    }
+
+    //transaction delete
+    @Transaction
+    suspend fun deletePomodoroById(id: String): PomodoroModelEntity{
+        val response = getPomodoroById(id)
+        deleteOne(id)
+        return response
+    }
 }
