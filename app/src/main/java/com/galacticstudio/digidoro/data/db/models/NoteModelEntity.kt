@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
 import com.galacticstudio.digidoro.data.db.converters.ListStringConverter
+import java.util.Calendar
 import java.util.UUID
 
 
@@ -18,7 +19,7 @@ data class NoteModelEntity(
     @TypeConverters(ListStringConverter::class)
     var tags: List<String>,
     var theme: String,
-    var is_trashed: Boolean,
-    var createdAt: String,
-    var updatedAt: String
+    var is_trashed: Boolean = false,
+    var createdAt: String = Calendar.getInstance().time.toString(),
+    var updatedAt: String = Calendar.getInstance().time.toString()
 )

@@ -3,6 +3,7 @@ package com.galacticstudio.digidoro.repository
 import android.content.Context
 import android.util.Log
 import com.galacticstudio.digidoro.data.db.DigidoroDataBase
+import com.galacticstudio.digidoro.data.db.models.NoteModelEntity
 import com.galacticstudio.digidoro.network.ApiResponse
 import com.galacticstudio.digidoro.network.dto.note.NoteData
 import com.galacticstudio.digidoro.network.dto.note.NoteRequest
@@ -55,7 +56,7 @@ class NoteRepository(
     suspend fun getNoteById(noteId: String): ApiResponse<NoteData> {
         return handleApiCall {
             val response = if(CheckInternetConnectivity(context)) noteService.getNoteById(noteId).data
-            else noteDao.getNoteById(noteId).toNoteData()
+            else noteDao.getNote(noteId).toNoteData()
 
             response
         }
@@ -67,8 +68,17 @@ class NoteRepository(
         tags: List<String>,
         theme: String
     ): ApiResponse<NoteData> {
-        val request = NoteRequest(title, message, tags, theme)
-        return handleApiCall { noteService.createNote(request).data }
+        return handleApiCall {
+            val response = if(CheckInternetConnectivity(context)){
+                val request = NoteRequest(title, message, tags, theme)
+                noteService.createNote(request).data
+            }
+            else{
+                val request = NoteModelEntity(title = title, message = message, tags = tags, theme = theme)
+                noteDao.createNote(request).toNoteData()
+            }
+            response
+        }
     }
 
     suspend fun updateNoteById(
@@ -78,21 +88,49 @@ class NoteRepository(
         tags: List<String>,
         theme: String
     ): ApiResponse<NoteData> {
-        val request = NoteRequest(title, message, tags, theme)
-        return handleApiCall { noteService.updateNoteById(noteId, request).data }
+        return handleApiCall {
+            val response = if(CheckInternetConnectivity(context)){
+                val request = NoteRequest(title, message, tags, theme)
+                noteService.updateNoteById(noteId, request).data
+            }
+            else {
+                val request = NoteModelEntity(title = title, message = message, tags =  tags, theme = theme)
+                noteDao.updateNoteById(noteId, request).toNoteData()
+            }
+
+            response
+        }
     }
 
     suspend fun deleteNoteById(noteId: String): ApiResponse<NoteData> {
-        return handleApiCall { noteService.deleteNoteById(noteId).data }
+        return handleApiCall {
+            val response = if(CheckInternetConnectivity(context)) noteService.deleteNoteById(noteId).data
+            else noteDao.deleteNoteById(noteId).toNoteData()
+
+            response
+        }
     }
 
     suspend fun updateThemeOfNoteById(noteId: String, theme: String): ApiResponse<NoteData> {
-        val request = NoteThemeRequest(noteId)
-        return handleApiCall { noteService.updateThemeOfNoteById(noteId, request).data }
+        return handleApiCall {
+            val response = if(CheckInternetConnectivity(context)){
+                val request = NoteThemeRequest(noteId)
+                noteService.updateThemeOfNoteById(noteId, request).data
+            }
+            else {
+                noteDao.toggleThemeById(id = noteId, theme = theme).toNoteData()
+            }
+            response
+        }
     }
 
     suspend fun toggleTrashNoteById(noteId: String): ApiResponse<NoteData> {
-        return handleApiCall { noteService.toggleTrashNoteById(noteId).data }
+        return handleApiCall {
+            val response = if(CheckInternetConnectivity(context)) noteService.toggleTrashNoteById(noteId).data
+            else noteDao.toggleTrashById(noteId).toNoteData()
+
+            response
+        }
     }
 
     suspend fun deleteAll(): ApiResponse<String>{
