@@ -8,6 +8,7 @@ import com.galacticstudio.digidoro.network.dto.favoritenote.FavoriteNoteRequest
 import com.galacticstudio.digidoro.network.dto.favoritenote.ToggleFavoriteNote
 import com.galacticstudio.digidoro.network.dto.favoritenote.toFavoriteNotesModelEntity
 import com.galacticstudio.digidoro.network.dto.note.NoteData
+import com.galacticstudio.digidoro.network.dto.note.toListNoteData
 import com.galacticstudio.digidoro.network.dto.note.toNoteData
 import com.galacticstudio.digidoro.network.service.FavoriteNoteService
 import com.galacticstudio.digidoro.repository.utils.CheckInternetConnectivity
@@ -42,7 +43,7 @@ class FavoriteNoteRepository(
             val response = if(CheckInternetConnectivity(context))
                 favoriteNoteService.getAllFavoriteNotes(populateFields).data[0].notes
 
-            else favoriteNoteDao.getFavoriteNoteWithAllNotes()[0].notes_id.toNoteData()
+            else favoriteNoteDao.getFavoriteNoteWithAllNotes()[0].notes_id.toListNoteData()
 
             response
         }
