@@ -76,7 +76,7 @@ interface TodoDao {
         return getTodoById(id)
     }
 
-    //toggle todo
+    //toggle to-do
     @Transaction
     suspend fun toggleStatusById(id: String): TodoItemModelEntity{
         val isCompleted = getTodoById(id)
@@ -84,6 +84,12 @@ interface TodoDao {
         toggleStatusInTodo(id, updateStatus)
         isCompleted.is_completed = updateStatus
         return isCompleted
+    }
+
+    @Transaction
+    suspend fun toggleStatusByStatus(id: String, updateStatus: Boolean): TodoItemModelEntity{
+        toggleStatusInTodo(id, updateStatus)
+        return getTodoById(id)
     }
 
     //delete

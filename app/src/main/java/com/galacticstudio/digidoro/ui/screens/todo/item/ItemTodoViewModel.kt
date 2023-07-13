@@ -133,7 +133,7 @@ class ItemTodoViewModel(
 
     private fun submitData(){
         if(!validateData()){
-            apiState = ItemTodoResponseState.ErrorWithMessage("Wrong Information")
+            sendResponseEvent(ItemTodoResponseState.ErrorWithMessage("Wrong Information"))
             return
         }
         createTodo(
@@ -145,7 +145,7 @@ class ItemTodoViewModel(
     }
     private fun updateData(){
         if(!validateData()){
-            apiState = ItemTodoResponseState.ErrorWithMessage("Wrong Information")
+            sendResponseEvent(ItemTodoResponseState.ErrorWithMessage("Wrong Information"))
             return
         }
 
@@ -161,7 +161,7 @@ class ItemTodoViewModel(
     private fun validateData(): Boolean{
         val result = addTodo.invoke(
             _state.value.title,
-            _state.value.description,
+            _state.value.title,
             _state.value.theme,
             _state.value.reminder
         )
@@ -187,7 +187,7 @@ class ItemTodoViewModel(
             operation = {
                 todoRepository.createTodo(
                     title = title,
-                    description =  description,
+                    description = description,
                     theme =  theme,
                     reminder =  reminder
                 )
