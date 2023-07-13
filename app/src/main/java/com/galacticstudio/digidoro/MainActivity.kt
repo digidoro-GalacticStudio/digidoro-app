@@ -1,5 +1,6 @@
 package com.galacticstudio.digidoro
 
+import android.annotation.SuppressLint
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -24,6 +25,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
+import androidx.work.Constraints
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequest
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import com.galacticstudio.digidoro.navigation.AppScaffold
 import com.galacticstudio.digidoro.service.TimerListener
 import com.galacticstudio.digidoro.service.TimerService
@@ -31,6 +37,9 @@ import com.galacticstudio.digidoro.ui.screens.MainViewModel
 import com.galacticstudio.digidoro.ui.screens.pomodoro.PomodoroUIEvent
 import com.galacticstudio.digidoro.ui.screens.pomodoro.viewmodel.PomodoroViewModel
 import com.galacticstudio.digidoro.ui.theme.DigidoroTheme
+import com.galacticstudio.digidoro.work.SyncWorker
+import kotlinx.coroutines.runBlocking
+
 
 @ExperimentalAnimationApi
 class MainActivity : ComponentActivity(), TimerListener {
@@ -58,11 +67,8 @@ class MainActivity : ComponentActivity(), TimerListener {
         PomodoroViewModel.Factory
     }
 
-
-
     // Method called when 0:00 minute is reached on the stopwatch
     override fun onTimeReached(pomodoroId: String, type: String) {
-        Log.d("MyErrors", "--------pomodoroId ${pomodoroId}  + ${type}   --")
         if (pomodoroId.isNotEmpty() && type == "pomodoro") {
             val auxiliarViewModel: PomodoroViewModel by viewModels {
                 PomodoroViewModel.Factory
@@ -99,14 +105,84 @@ class MainActivity : ComponentActivity(), TimerListener {
         }
     }
 
+
+
+
+    @SuppressLint("RestrictedApi")
+    private fun createSyncWorkRequest(): OneTimeWorkRequest {
+
+        val app = application as Application
+
+
+//        val constraints: Constraints = Builder()
+//            .setRequiredNetworkType(NetworkType.CONNECTED)
+//            .build()
+//        val inputData = Data.Builder()
+//            .putString("todoRepositoryClassName", TodoRepository::class.java.name)
+//            .put("pendingRequestRepository", app.pendingRequestRepository)
+//            .build()
+
+        return OneTimeWorkRequestBuilder<SyncWorker>()
+            .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
+//            .setInputData(inputData)
+            .build()
+    }
+
+    private fun scheduleSyncWork() {
+        Log.d("MyErrors", "SCHEDULE")
+        val workRequest = createSyncWorkRequest()
+
+        WorkManager.getInstance(this).enqueue(workRequest)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            Log.d("MyErrors", "onCreate()")
             val controller = rememberNavController()
 
             val mainViewModel: MainViewModel by viewModels {
                 MainViewModel.Factory(applicationContext)
             }
+
+
+
+//            val onetimeJob: OneTimeWorkRequest = Builder(YourJob::class.java)
+//                .setConstraints(constraints).build() // or PeriodicWorkRequest
+//
+//            WorkManager.getInstance().enqueue(onetimeJob)
+
+            /////
+//            val constraints = Constraints.Builder()
+//                .setRequiredNetworkType(NetworkType.CONNECTED)
+//                .build()
+//
+//            val syncWorkRequest = PeriodicWorkRequestBuilder<SyncWorker>(1, TimeUnit.HOURS)
+//                .setConstraints(constraints)
+//                .build()
+//
+//            val workerParams = WorkerParameters.Builder()
+//                .setInputData(
+//                    Data.Builder()
+//                    .put("todoRepository", todoRepository)
+//                    .put("noteRepository", noteRepository)
+//                    .put("folderRepository", folderRepository)
+//                    .build())
+//                .build()
+//
+//            val syncWorker = SyncWorker(
+//                context,
+//                workerParams,
+//                todoRepository,
+//                noteRepository,
+//                folderRepository
+//            )
+//            WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+//                "syncWork",
+//                ExistingPeriodicWorkPolicy.KEEP,
+//                syncWorkRequest
+//            )
+
 
             DigidoroTheme {
                 Surface(
@@ -143,5 +219,15 @@ class MainActivity : ComponentActivity(), TimerListener {
         // Unbind from the service and set isBound to false
         unbindService(connection)
         isBound = false
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d("MyErrors", "onResume()")
+
+        // Programar el SyncWorker cuando la actividad se reanude
+        runBlocking {
+            scheduleSyncWork()
+        }
     }
 }

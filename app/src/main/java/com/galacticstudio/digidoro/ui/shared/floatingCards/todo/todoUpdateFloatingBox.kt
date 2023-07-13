@@ -1,5 +1,6 @@
 package com.galacticstudio.digidoro.ui.shared.floatingCards.todo
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -70,6 +71,14 @@ fun TodoUpdateFloatingBox(
     val cornerRadius = 5.dp
     val day =
         SimpleDateFormat("yyyy/MM/dd", Locale.getDefault()).format(Calendar.getInstance().time)
+
+    val context = LocalContext.current
+    Toast.makeText(
+        context,
+        "TODO SELECTED "+ itemViewModel.state.value.id,
+        Toast.LENGTH_SHORT
+    ).show()
+
     Box(
         modifier = modifier
             .wrapContentWidth()

@@ -1,5 +1,6 @@
 package com.galacticstudio.digidoro.data.db.dao
 
+import android.util.Log
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -34,7 +35,6 @@ interface TodoDao {
             "title = CASE WHEN :title != '' THEN :title ELSE title END, " +
             "description = CASE WHEN :description != '' THEN :description ELSE description END, " +
             "theme = CASE WHEN :theme != '' THEN :theme ELSE theme END, " +
-            "theme = CASE WHEN :theme != NULL THEN :theme ELSE theme END, " +
             "reminder = CASE WHEN :reminder != NULL THEN :reminder ELSE reminder END," +
             "updatedAt =:updatedAt " +
             " WHERE _id =:id")
@@ -83,6 +83,12 @@ interface TodoDao {
         toggleStatusInTodo(id, updateStatus)
         isCompleted.is_completed = updateStatus
         return isCompleted
+    }
+
+    @Transaction
+    suspend fun toggleStatusByStatus(id: String, updateStatus: Boolean): TodoItemModelEntity{
+        toggleStatusInTodo(id, updateStatus)
+        return getTodoById(id)
     }
 
     //delete

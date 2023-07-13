@@ -13,12 +13,21 @@ class AddTodo() {
         theme: String,
         reminder: Date
     ): ValidationResult {
-        if(title.isBlank())
+        if(title.isBlank()) {
+            Log.d("MyErrors", "title cannot be empty")
             return ValidationResult(successful = false, errorMessage = "Title cannot be empty")
-        if(description.isBlank())
+        }
+
+        if(description.isBlank()) {
+            Log.d("MyErrors", "Description cannot be empty")
             return ValidationResult(successful = false, errorMessage = "Description cannot be empty")
-        if (theme.isBlank())
+        }
+
+        if (theme.isBlank()) {
+            Log.d("MyErrors", "Theme cannot be empty")
             return ValidationResult(successful = false, errorMessage = "Theme cannot be empty")
+        }
+
 
         return ValidationResult(successful = true, errorMessage = null)
     }

@@ -89,10 +89,6 @@ suspend fun <T> handleApiCall(call: suspend () -> T): ApiResponse<T> {
             else -> "API request failed: ${e.message}"
         }
         return ApiResponse.ErrorWithMessage(errorMessage)
-    } catch (e: Exception) {
-        // Handle generic Exception
-        Log.d("MyErrors", "Generic Error: $e")
-        return ApiResponse.Error(e)
     }
 }
 
