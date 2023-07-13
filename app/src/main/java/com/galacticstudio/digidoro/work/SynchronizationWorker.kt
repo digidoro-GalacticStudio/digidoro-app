@@ -3,6 +3,7 @@ package com.galacticstudio.digidoro.work
 import android.content.Context
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.lifecycle.MutableLiveData
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.Worker
@@ -29,13 +30,19 @@ class SynchronizationWorker(
     private val thisContext = context
 
     override suspend fun doWork(): Result  {
-        startForegroundService()
-
         val app = applicationContext as Application
         todoRepository = app.todoRepository
         pendingRequestRepository = app.pendingRequestRepository
 
         val pendingRequests = getPendingRequestsFromDatabase()
+
+        if (pendingRequests.isNotEmpty()) {
+            // Show a notification
+            startForegroundService()
+            // Indicates that the synchronization task has started
+            syncStatusLiveData.postValue(SyncStatus.IN_PROGRESS)
+        } else return Result.success()
+
 
         Log.d("MyErrors", "Do Work [" +pendingRequests.size + "] : "+ pendingRequests)
 
@@ -49,6 +56,9 @@ class SynchronizationWorker(
                 // Handle the error
             }
         }
+
+        // Indicates that the synchronization task has finished
+        syncStatusLiveData.postValue(SyncStatus.COMPLETED)
 
         return Result.success()
     }
@@ -220,4 +230,14 @@ class SynchronizationWorker(
             }
         }
     }
+
+    companion object {
+        val syncStatusLiveData = MutableLiveData<SyncStatus>()
+    }
+}
+
+enum class SyncStatus {
+    INITIAL,
+    IN_PROGRESS,
+    COMPLETED
 }
