@@ -11,6 +11,7 @@ import com.galacticstudio.digidoro.repository.FolderRepository
 import com.galacticstudio.digidoro.repository.NoteRepository
 import com.galacticstudio.digidoro.repository.PomodoroRepository
 import com.galacticstudio.digidoro.repository.RankingRepository
+import com.galacticstudio.digidoro.repository.RequestRepository
 import com.galacticstudio.digidoro.repository.TodoRepository
 import com.galacticstudio.digidoro.repository.UserRepository
 
@@ -83,6 +84,12 @@ class Application : Application() {
     //initialize repositories
     val credentialsRepository: CredentialsRepository by lazy {
         CredentialsRepository(getAPIService(), database)
+    }
+
+    val pendingRequestRepository: RequestRepository by lazy {
+        RequestRepository(
+            database,
+        )
     }
 
     val notesRepository: NoteRepository by lazy {

@@ -11,6 +11,7 @@ import com.galacticstudio.digidoro.data.db.converters.ListStringConverter
 import com.galacticstudio.digidoro.data.db.dao.FavoriteNoteDao
 import com.galacticstudio.digidoro.data.db.dao.FolderDao
 import com.galacticstudio.digidoro.data.db.dao.NoteDao
+import com.galacticstudio.digidoro.data.db.dao.PendingRequestDao
 import com.galacticstudio.digidoro.data.db.dao.PomodoroDao
 import com.galacticstudio.digidoro.data.db.dao.RankingDao
 import com.galacticstudio.digidoro.data.db.dao.TodoDao
@@ -18,12 +19,13 @@ import com.galacticstudio.digidoro.data.db.dao.UserDao
 import com.galacticstudio.digidoro.data.db.models.FavoriteNotesModelEntity
 import com.galacticstudio.digidoro.data.db.models.FolderModelEntity
 import com.galacticstudio.digidoro.data.db.models.NoteModelEntity
+import com.galacticstudio.digidoro.data.db.models.PendingRequestEntity
 import com.galacticstudio.digidoro.data.db.models.PomodoroModelEntity
 import com.galacticstudio.digidoro.data.db.models.TodoItemModelEntity
 import com.galacticstudio.digidoro.data.db.models.UsersModelEntity
 
 @Database(
-    entities = [UsersModelEntity::class, TodoItemModelEntity::class, PomodoroModelEntity::class, NoteModelEntity::class, FolderModelEntity::class, FavoriteNotesModelEntity::class],
+    entities = [UsersModelEntity::class, PendingRequestEntity::class, TodoItemModelEntity::class, PomodoroModelEntity::class, NoteModelEntity::class, FolderModelEntity::class, FavoriteNotesModelEntity::class],
     version = 1,
     exportSchema = false
 )
@@ -37,7 +39,7 @@ abstract class DigidoroDataBase() : RoomDatabase() {
     abstract fun RankingDao() : RankingDao
     abstract fun TodoDao() : TodoDao
     abstract fun UserDao() : UserDao
-
+    abstract fun PendingRequestDao() : PendingRequestDao
     abstract fun PomodoroDao() : PomodoroDao
 
     companion object{
