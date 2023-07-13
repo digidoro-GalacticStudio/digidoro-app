@@ -95,7 +95,7 @@ class DateUtils {
         }
 
         fun parseDateToString(date: Date): String{
-            val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.ENGLISH)
             return dateFormat.format(date)
         }
     }

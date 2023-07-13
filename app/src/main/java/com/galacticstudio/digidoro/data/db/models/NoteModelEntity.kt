@@ -23,6 +23,6 @@ data class NoteModelEntity(
     var tags: List<String>,
     var theme: String,
     var is_trashed: Boolean = false,
-    var createdAt: String = Calendar.getInstance().time.toString(),
-    var updatedAt: String = Calendar.getInstance().time.toString()
+    var createdAt: String = DateUtils.parseDateToString(Calendar.getInstance().time),
+    var updatedAt: String = DateUtils.parseDateToString(Calendar.getInstance().time)
 )
