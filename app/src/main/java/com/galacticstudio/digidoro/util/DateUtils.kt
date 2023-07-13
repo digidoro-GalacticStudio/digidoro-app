@@ -1,13 +1,17 @@
 package com.galacticstudio.digidoro.util
 
 import android.annotation.SuppressLint
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import java.text.SimpleDateFormat
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import java.util.TimeZone
 
 class DateUtils {
     companion object {
@@ -47,6 +51,12 @@ class DateUtils {
             return dateFormat.parse(dateString)
         }
 
+        @RequiresApi(Build.VERSION_CODES.O)
+        fun convertISO8601ToDate2(dateString: String): LocalDateTime {
+            val dateFormat = DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss z yyyy", Locale.US)
+            return LocalDateTime.parse(dateString, dateFormat)
+        }
+
         fun formatDateWithTime(date: Date?): Pair<String, String> {
             if (date == null) {
                 return "Invalid Date" to ""
@@ -82,6 +92,11 @@ class DateUtils {
                 return "Invalid Date"
             }
             return SimpleDateFormat("EEEE d", Locale.getDefault()).format(date)
+        }
+
+        fun parseDateToString(date: Date): String{
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
+            return dateFormat.format(date)
         }
     }
 }

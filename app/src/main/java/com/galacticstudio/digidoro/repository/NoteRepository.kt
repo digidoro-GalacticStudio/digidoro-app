@@ -14,6 +14,7 @@ import com.galacticstudio.digidoro.network.dto.note.toNoteModelEntity
 import com.galacticstudio.digidoro.network.service.NoteService
 import com.galacticstudio.digidoro.repository.utils.CheckInternetConnectivity
 import com.galacticstudio.digidoro.repository.utils.handleApiCall
+import com.google.gson.Gson
 
 class NoteRepository(
     private val noteService: NoteService,
@@ -25,8 +26,10 @@ class NoteRepository(
         return handleApiCall {
 
             val response = if(CheckInternetConnectivity(context)){
-                val apiResponse = noteService.getAllNotes().data
-                noteDao.insertAll(apiResponse.toNoteModelEntity())
+                val apiResponse = noteService.getAllNotes().data.toNoteModelEntity()
+                Log.d("works", apiResponse.toString())
+                //TODO: check works and notedatamoel
+                noteDao.insertAll(apiResponse)
                 "Inserted successfully"
             }
             else "could not insert into database"

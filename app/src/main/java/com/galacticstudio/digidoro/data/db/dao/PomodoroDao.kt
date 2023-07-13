@@ -73,7 +73,7 @@ interface PomodoroDao {
     @Transaction
     suspend fun updateCompletedSessionsById(id: String): String{
         //TODO check for UpdateTransaction()
-        updateCompletedSessionsById(id)
+        updateCompletedSessions(id)
         return "Successfully completed"
     }
 

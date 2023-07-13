@@ -111,7 +111,7 @@ class PomodoroRepository(
         pomodoroId: String,
     ): ApiResponse<String> {
         return handleApiCall {
-            val response =if(CheckInternetConnectivity(context)) pomodoroService.incrementSessions(pomodoroId).message
+            val response = if(CheckInternetConnectivity(context)) pomodoroService.incrementSessions(pomodoroId).message
             else  pomodoroDao.updateCompletedSessionsById(pomodoroId)
 
             response

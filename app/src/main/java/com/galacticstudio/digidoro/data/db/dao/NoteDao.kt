@@ -1,11 +1,14 @@
 package com.galacticstudio.digidoro.data.db.dao
 
+import android.util.Log
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import com.galacticstudio.digidoro.data.db.models.NoteModelEntity
+
+//TODO: Check on creation, duplication and tags creation
 
 @Dao
 interface NoteDao {
@@ -62,6 +65,7 @@ interface NoteDao {
     //transaction create
     @Transaction
     suspend fun createNote(note: NoteModelEntity): NoteModelEntity{
+        Log.d("note_data", note.toString())
         insertOne(note)
         return getLastInsertedNote()
     }
