@@ -35,7 +35,7 @@ import com.galacticstudio.digidoro.ui.screens.MainViewModel
 import com.galacticstudio.digidoro.ui.screens.pomodoro.PomodoroUIEvent
 import com.galacticstudio.digidoro.ui.screens.pomodoro.viewmodel.PomodoroViewModel
 import com.galacticstudio.digidoro.ui.theme.DigidoroTheme
-import com.galacticstudio.digidoro.work.SyncWorker
+import com.galacticstudio.digidoro.work.SynchronizationWorker
 
 @ExperimentalAnimationApi
 class MainActivity : ComponentActivity(), TimerListener {
@@ -104,7 +104,7 @@ class MainActivity : ComponentActivity(), TimerListener {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        val workRequest = OneTimeWorkRequestBuilder<SyncWorker>()
+        val workRequest = OneTimeWorkRequestBuilder<SynchronizationWorker>()
             .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
             .build()
 
