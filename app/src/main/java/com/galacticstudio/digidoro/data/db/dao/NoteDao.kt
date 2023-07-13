@@ -21,8 +21,10 @@ interface NoteDao {
     suspend fun insertOne(note: NoteModelEntity)
 
     //select queries
-    @Query("SELECT * FROM note where is_trashed =:is_trash")
-    suspend fun getAllNote(is_trash: Boolean): List<NoteModelEntity>
+    @Query("SELECT * FROM note where is_trashed =:is_trash ORDER BY " +
+            "CASE WHEN :order == 'desc' THEN createdAt END DESC, " +
+            "CASE WHEN :order == 'asc' THEN createdAt END ASC")
+    suspend fun getAllNote(is_trash: Boolean, order: String = "desc"): List<NoteModelEntity>
 
     @Query("SELECT * FROM note WHERE _id = :id")
     suspend fun getNote(id: String): NoteModelEntity

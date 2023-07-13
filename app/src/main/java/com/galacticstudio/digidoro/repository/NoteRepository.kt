@@ -2,6 +2,7 @@ package com.galacticstudio.digidoro.repository
 
 import android.content.Context
 import android.util.Log
+import androidx.compose.ui.text.toLowerCase
 import com.galacticstudio.digidoro.data.db.DigidoroDataBase
 import com.galacticstudio.digidoro.data.db.models.NoteModelEntity
 import com.galacticstudio.digidoro.network.ApiResponse
@@ -39,8 +40,8 @@ class NoteRepository(
     }
 
     suspend fun getAllNotes(
-        sortBy: String? = null,
-        order: String? = null,
+        sortBy: String = "createdAt",
+        order: String = "desc",
         page: Int? = null,
         limit: Int? = null,
         populateFields: String? = null,
@@ -50,7 +51,7 @@ class NoteRepository(
             val response = if(CheckInternetConnectivity(context)){
                 val apiResponse = noteService.getAllNotes(sortBy, order, page, limit, populateFields, isTrashed).data
                 apiResponse
-            } else noteDao.getAllNote(isTrashed).toListNoteData()
+            } else noteDao.getAllNote(is_trash =  isTrashed, order = order.lowercase()).toListNoteData()
 
             response
         }
