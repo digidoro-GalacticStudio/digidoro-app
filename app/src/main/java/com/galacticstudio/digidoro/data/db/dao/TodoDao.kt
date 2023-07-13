@@ -21,7 +21,7 @@ interface TodoDao {
     suspend fun insertOne(todo: TodoItemModelEntity)
 
     //select
-    @Query("SELECT * FROM todoitem")
+    @Query("SELECT * FROM todoitem ORDER BY createdAt DESC")
     suspend fun getAllTodo(): MutableList<TodoItemModelEntity>
 
     @Query("SELECT * FROM todoitem WHERE _id = :id")
