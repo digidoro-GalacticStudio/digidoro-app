@@ -2,9 +2,13 @@ package com.galacticstudio.digidoro.work
 
 import android.content.Context
 import android.util.Log
+import androidx.core.app.NotificationCompat
+import androidx.work.CoroutineWorker
+import androidx.work.ForegroundInfo
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.galacticstudio.digidoro.Application
+import com.galacticstudio.digidoro.R
 import com.galacticstudio.digidoro.data.api.EntityModel
 import com.galacticstudio.digidoro.data.api.TodoModel
 import com.galacticstudio.digidoro.data.db.models.Operation
@@ -14,22 +18,26 @@ import com.galacticstudio.digidoro.repository.RequestRepository
 import com.galacticstudio.digidoro.repository.TodoRepository
 import com.google.gson.Gson
 import kotlinx.coroutines.runBlocking
+import kotlin.random.Random
 
 class SynchronizationWorker(
     context: Context,
     workerParams: WorkerParameters,
-) : Worker(context, workerParams) {
+) : CoroutineWorker(context, workerParams) {
     private lateinit var pendingRequestRepository: RequestRepository
     private lateinit var todoRepository: TodoRepository
+    private val thisContext = context
 
-    override fun doWork(): Result = runBlocking {
+    override suspend fun doWork(): Result  {
+        startForegroundService()
+
         val app = applicationContext as Application
         todoRepository = app.todoRepository
         pendingRequestRepository = app.pendingRequestRepository
 
         val pendingRequests = getPendingRequestsFromDatabase()
 
-        Log.d("MyErrors", "Do Work "+pendingRequests)
+        Log.d("MyErrors", "Do Work [" +pendingRequests.size + "] : "+ pendingRequests)
 
         for (request in pendingRequests) {
             val success = syncWithApi(request)
@@ -42,7 +50,20 @@ class SynchronizationWorker(
             }
         }
 
-        Result.success()
+        return Result.success()
+    }
+
+    private suspend fun startForegroundService() {
+        setForeground(
+            ForegroundInfo(
+                Random.nextInt(),
+                NotificationCompat.Builder(thisContext, "synchronization_channel")
+                    .setSmallIcon(R.drawable.igi_logo)
+                    .setContentText("Synchronization...")
+                    .setContentTitle("sync in progress")
+                    .build()
+            )
+        )
     }
 
     private fun getPendingRequestsFromDatabase(): List<PendingRequestEntity> {
@@ -52,7 +73,9 @@ class SynchronizationWorker(
                     response.data
                 }
 
-                else -> {emptyList()}
+                else -> {
+                    emptyList()
+                }
             }
         }
     }
@@ -74,6 +97,7 @@ class SynchronizationWorker(
                     val success = entity?.let { handleCreateOperation(it) }
                     success ?: false
                 }
+
                 Operation.UPDATE -> {
                     val entity: EntityModel? = when (entityType) {
                         "TodoModel" -> gson.fromJson(jsonData, TodoModel::class.java)
@@ -84,10 +108,12 @@ class SynchronizationWorker(
                     val success = entity?.let { handleUpdateOperation(it) }
                     success ?: false
                 }
+
                 Operation.DELETE -> {
                     val success = handleDeleteOperation(jsonData, entityType)
                     success
                 }
+
                 Operation.TOGGLE -> {
                     val success = handleToggleOperation(jsonData)
                     success
@@ -110,7 +136,7 @@ class SynchronizationWorker(
             is TodoModel -> {
                 val response = todoRepository.createTodo(
                     entity.title,
-                    entity.theme.removePrefix("#") ,
+                    entity.theme.removePrefix("#"),
                     entity.reminder,
                     entity.description,
                 )
@@ -120,9 +146,13 @@ class SynchronizationWorker(
                         todoRepository.deleteTodoLocalDatabase(entity.id)
                         true
                     }
-                    else -> {false}
+
+                    else -> {
+                        false
+                    }
                 }
             }
+
             else -> {
                 false
             }
@@ -135,7 +165,7 @@ class SynchronizationWorker(
                 val response = todoRepository.updateTodo(
                     entity.id,
                     entity.title,
-                    entity.theme.removePrefix("#") ,
+                    entity.theme.removePrefix("#"),
                     entity.reminder,
                     entity.description,
                 )
@@ -144,9 +174,13 @@ class SynchronizationWorker(
                     is ApiResponse.Success -> {
                         true
                     }
-                    else -> {false}
+
+                    else -> {
+                        false
+                    }
                 }
             }
+
             else -> {
                 false
             }
@@ -160,9 +194,13 @@ class SynchronizationWorker(
                     is ApiResponse.Success -> {
                         true
                     }
-                    else -> {false}
+
+                    else -> {
+                        false
+                    }
                 }
             }
+
             else -> {
                 false
             }
@@ -171,12 +209,15 @@ class SynchronizationWorker(
 
 
     private suspend fun handleToggleOperation(idEntity: String): Boolean {
-        return  when (todoRepository.toggleTodoState(idEntity)) {
+        return when (todoRepository.toggleTodoState(idEntity)) {
             is ApiResponse.Success -> {
 
                 true
             }
-            else -> {false}
+
+            else -> {
+                false
+            }
         }
     }
 }
