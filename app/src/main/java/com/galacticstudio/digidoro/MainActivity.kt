@@ -24,6 +24,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
+import androidx.work.Constraints
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import com.galacticstudio.digidoro.navigation.AppScaffold
 import com.galacticstudio.digidoro.service.TimerListener
 import com.galacticstudio.digidoro.service.TimerService
@@ -31,6 +35,7 @@ import com.galacticstudio.digidoro.ui.screens.MainViewModel
 import com.galacticstudio.digidoro.ui.screens.pomodoro.PomodoroUIEvent
 import com.galacticstudio.digidoro.ui.screens.pomodoro.viewmodel.PomodoroViewModel
 import com.galacticstudio.digidoro.ui.theme.DigidoroTheme
+import com.galacticstudio.digidoro.work.SyncWorker
 
 @ExperimentalAnimationApi
 class MainActivity : ComponentActivity(), TimerListener {
@@ -62,7 +67,6 @@ class MainActivity : ComponentActivity(), TimerListener {
 
     // Method called when 0:00 minute is reached on the stopwatch
     override fun onTimeReached(pomodoroId: String, type: String) {
-        Log.d("MyErrors", "--------pomodoroId ${pomodoroId}  + ${type}   --")
         if (pomodoroId.isNotEmpty() && type == "pomodoro") {
             val auxiliarViewModel: PomodoroViewModel by viewModels {
                 PomodoroViewModel.Factory
@@ -100,6 +104,12 @@ class MainActivity : ComponentActivity(), TimerListener {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        val workRequest = OneTimeWorkRequestBuilder<SyncWorker>()
+            .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
+            .build()
+
+        WorkManager.getInstance(this).enqueue(workRequest)
+
         super.onCreate(savedInstanceState)
         setContent {
             val controller = rememberNavController()
