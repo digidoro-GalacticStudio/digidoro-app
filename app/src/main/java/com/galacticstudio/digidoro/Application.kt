@@ -20,6 +20,12 @@ class Application : Application() {
         getSharedPreferences("Retrofit", Context.MODE_PRIVATE)
     }
 
+
+    private val database: DigidoroDataBase by lazy {
+        DigidoroDataBase.getInstance(this)
+    }
+
+
     private lateinit var context: Context
 
     override fun onCreate() {
@@ -31,7 +37,6 @@ class Application : Application() {
         setToken(getToken())
         setRoles(getRoles())
         setUsername(getUsername())
-        setId(getUserId())
         getLoginService()
     }
 
@@ -69,15 +74,10 @@ class Application : Application() {
 
     fun getUsername(): String = prefs.getString(USERNAME, "")!!
 
-    fun getUserId(): String = prefs.getString(ID, "")!!
 
     fun hasToken(): Boolean {
         val token = getToken()
         return token.isNotEmpty()
-    }
-
-    private val database: DigidoroDataBase by lazy {
-        DigidoroDataBase.getInstance(this)
     }
 
     //initialize repositories
@@ -86,15 +86,27 @@ class Application : Application() {
     }
 
     val notesRepository: NoteRepository by lazy {
-        NoteRepository(getNoteAPIService(), database)
+        NoteRepository(
+            getNoteAPIService(),
+            database,
+            context
+            )
     }
 
     val favoriteNotesRepository: FavoriteNoteRepository by lazy {
-        FavoriteNoteRepository(getFavoriteNoteAPIService(), database)
+        FavoriteNoteRepository(
+            getFavoriteNoteAPIService(),
+            database,
+            context
+            )
     }
 
     val folderRepository: FolderRepository by lazy {
-        FolderRepository(getFolderAPIService(), database)
+        FolderRepository(
+            getFolderAPIService(),
+            database,
+            context
+        )
     }
 
     val userRepository: UserRepository by lazy {
@@ -106,18 +118,20 @@ class Application : Application() {
     }
 
     val pomodoroRepository: PomodoroRepository by lazy {
-        PomodoroRepository(getPomodoroAPIService())
+        PomodoroRepository(
+            getPomodoroAPIService(),
+            database,
+            context
+            )
     }
 
     val todoRepository: TodoRepository by lazy{
         TodoRepository(
             getTodoApiService(),
             database,
-            getUserId(),
             context
             )
     }
-
     fun saveAuthToken(token: String){
         val editor = prefs.edit()
         editor.putString(USER_TOKEN, token)
@@ -134,8 +148,26 @@ class Application : Application() {
         RetrofitInstance.setToken("")
         RetrofitInstance.clearToken()
     }
+    suspend fun clearDataBase(){
+        favoriteNotesRepository.deleteAll()
+        folderRepository.deleteAll()
+        notesRepository.deleteAll()
+        pomodoroRepository.deleteAll()
+        todoRepository.deleteAll()
+    }
 
+    suspend fun insertIntoDataBase(){
+        favoriteNotesRepository.insertInDataBase(
+            populateFields = "notes_id"
+        )
+        folderRepository.insertInDataBase(
+            populateFields = "notes_id"
+        )
+        notesRepository.insertIntoDataBase()
+        pomodoroRepository.insertIntoDataBase()
+        todoRepository.insertIntoDataBase()
 
+    }
     fun saveRoles(roles: List<String>) {
         val editor = prefs.edit()
         editor.putStringSet(USER_ROLES, roles.toSet())
@@ -148,16 +180,9 @@ class Application : Application() {
         editor.apply()
     }
 
-    fun saveId(id: String){
-        val editor = prefs.edit()
-        editor.putString(ID, id)
-        editor.apply()
-    }
-
     companion object {
         const val USER_TOKEN = "user_token"
         const val USER_ROLES = "user_roles"
         const val USERNAME = "username"
-        const val ID = "id"
     }
 }

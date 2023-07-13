@@ -6,7 +6,6 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import com.galacticstudio.digidoro.data.db.models.NoteModelEntity
-import com.galacticstudio.digidoro.network.dto.note.NoteData
 
 @Dao
 interface NoteDao {
@@ -17,8 +16,8 @@ interface NoteDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOne(note: NoteModelEntity)
 
-    @Query("SELECT * FROM note")
-    suspend fun getAllNote(): List<NoteModelEntity>
+    @Query("SELECT * FROM note where is_trashed =:is_trash")
+    suspend fun getAllNote(is_trash: Boolean): List<NoteModelEntity>
 
     @Query("SELECT * FROM note WHERE _id = :id")
     suspend fun getNoteById(id: String): NoteModelEntity
@@ -43,7 +42,7 @@ interface NoteDao {
             tags.filterNot { it == tag }
         else
             tags + tag
-           updateTagsInNote(id, updateTags)
+        updateTagsInNote(id, updateTags)
     }
 
     //update theme
@@ -55,14 +54,14 @@ interface NoteDao {
 
     @Transaction
     suspend fun toggleTrashById(id: String){
-        val is_trashed = getNoteById(id).is_trashed
-        val updateTrash = !is_trashed
+        val isTrashed = getNoteById(id).is_trashed
+        val updateTrash = !isTrashed
 
         toggleTrashInNote(id, updateTrash)
     }
 
     //delete Note
-    @Query("DELETE FROM note WHERE _id =:id")
-    suspend fun deleteNote(id: String)
+    @Query("DELETE FROM note")
+    suspend fun deleteNotes()
 
 }

@@ -31,8 +31,8 @@ data class NoteData(
     @SerializedName("updatedAt") val updatedAt: String,
 )
 
-fun NoteListResponse.toFolderModelEntity(): MutableList<NoteModelEntity>{
-    val response = data.mapIndexed{ _, element ->
+fun List<NoteData>.toNoteModelEntity(): List<NoteModelEntity>{
+    return map{ element ->
         NoteModelEntity(
             _id = element.id,
             user_id = element.userId,
@@ -44,7 +44,35 @@ fun NoteListResponse.toFolderModelEntity(): MutableList<NoteModelEntity>{
             createdAt = element.createdAt,
             updatedAt = element.updatedAt
         )
-    }
+    }.toList()
+}
 
-    return response.toMutableList()
+fun List<NoteModelEntity>.toListNoteData(): List<NoteData>{
+    return map{ element ->
+        NoteData(
+            id = element._id,
+            userId = element.user_id,
+            title = element.title,
+            message = element.message,
+            tags = element.tags,
+            theme = element.theme,
+            isTrashed = element.is_trashed,
+            createdAt = element.createdAt,
+            updatedAt = element.updatedAt
+        )
+    }.toList()
+}
+
+fun NoteModelEntity.toNoteData(): NoteData{
+    return NoteData(
+            id = this._id,
+            userId = this.user_id,
+            title = this.title,
+            message = this.message,
+            tags = this.tags,
+            theme = this.theme,
+            isTrashed = this.is_trashed,
+            createdAt = this.createdAt,
+            updatedAt = this.updatedAt
+        )
 }

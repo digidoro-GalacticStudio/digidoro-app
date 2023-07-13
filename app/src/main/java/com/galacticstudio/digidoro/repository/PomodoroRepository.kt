@@ -1,12 +1,37 @@
 package com.galacticstudio.digidoro.repository
 
+import android.content.Context
+import android.util.Log
+import com.galacticstudio.digidoro.data.db.DigidoroDataBase
 import com.galacticstudio.digidoro.network.ApiResponse
 import com.galacticstudio.digidoro.network.dto.pomodoro.PomodoroData
 import com.galacticstudio.digidoro.network.dto.pomodoro.PomodoroRequest
+import com.galacticstudio.digidoro.network.dto.pomodoro.toListPomdoroModelEntity
+import com.galacticstudio.digidoro.network.dto.pomodoro.toListPomodoroData
+import com.galacticstudio.digidoro.network.dto.pomodoro.toPomodoroData
 import com.galacticstudio.digidoro.network.service.PomodoroService
+import com.galacticstudio.digidoro.repository.utils.CheckInternetConnectivity
 import com.galacticstudio.digidoro.repository.utils.handleApiCall
 
-class PomodoroRepository(private val pomodoroService: PomodoroService) {
+class PomodoroRepository(
+    private val pomodoroService: PomodoroService,
+    private val database: DigidoroDataBase,
+    private val context: Context
+    ) {
+
+    private val pomodoroDao = database.PomodoroDao()
+
+    suspend fun insertIntoDataBase(): ApiResponse<String> {
+        return handleApiCall {
+            val response = if(CheckInternetConnectivity(context)){
+                val apiResponse = pomodoroService.getAllPomodoros().data
+                pomodoroDao.insertAll(apiResponse.toListPomdoroModelEntity())
+                "Inserted successfully"
+            }
+            else "could not insert into database"
+            response
+        }
+    }
     suspend fun getAllPomodoros(
         sortBy: String? = null,
         order: String? = null,
@@ -15,18 +40,30 @@ class PomodoroRepository(private val pomodoroService: PomodoroService) {
         populate: String? = null,
     ): ApiResponse<List<PomodoroData>> {
         return handleApiCall {
-            pomodoroService.getAllPomodoros(
-                sortBy,
-                order,
-                page,
-                limit,
-                populate
-            ).data
+            val response = if(CheckInternetConnectivity(context)){
+                val apiResponse = pomodoroService.getAllPomodoros(
+                    sortBy,
+                    order,
+                    page,
+                    limit,
+                    populate
+                ).data
+//                pomodoroDao.insertAll(apiResponse.toListPomdoroModelEntity())
+                apiResponse
+            }
+            else pomodoroDao.getAllPomodoros().toListPomodoroData()
+
+            response
         }
     }
 
     suspend fun getPomodoroById(pomodoroId: String): ApiResponse<PomodoroData> {
-        return handleApiCall { pomodoroService.getPomodoroById(pomodoroId).data }
+        return handleApiCall {
+            val response = if(CheckInternetConnectivity(context)) pomodoroService.getPomodoroById(pomodoroId).data
+            else pomodoroDao.getPomodoroById(pomodoroId).toPomodoroData()
+
+            response
+        }
     }
 
     suspend fun createPomodoro(
@@ -58,5 +95,13 @@ class PomodoroRepository(private val pomodoroService: PomodoroService) {
 
     suspend fun deletePomodoro(pomodoroId: String): ApiResponse<PomodoroData> {
         return handleApiCall { pomodoroService.deletePomodoro(pomodoroId).data }
+    }
+
+    suspend fun deleteAll(): ApiResponse<String>{
+        return handleApiCall {
+            pomodoroDao.deletePomodoros()
+
+            "Deleted successfully"
+        }
     }
 }
