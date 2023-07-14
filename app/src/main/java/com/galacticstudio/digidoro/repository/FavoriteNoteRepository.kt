@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import com.galacticstudio.digidoro.data.db.DigidoroDataBase
 import com.galacticstudio.digidoro.network.ApiResponse
+import com.galacticstudio.digidoro.network.dto.favoritenote.FavoriteNoteDao
 import com.galacticstudio.digidoro.network.dto.favoritenote.FavoriteNoteRequest
 import com.galacticstudio.digidoro.network.dto.favoritenote.ToggleFavoriteNote
 import com.galacticstudio.digidoro.network.dto.favoritenote.toFavoriteNotesModelEntity
@@ -57,8 +58,17 @@ class FavoriteNoteRepository(
         favoriteNoteId: String,
         noteId: String,
     ): ApiResponse<List<String>> {
-        val request = FavoriteNoteRequest(noteId)
         return handleApiCall {
+            val request = FavoriteNoteRequest(noteId)
+            val response = if(CheckInternetConnectivity(context)) {
+                val request = FavoriteNoteRequest(noteId)
+                favoriteNoteService.toggleFavoriteNote(
+                    favoriteNoteId,
+                    request
+                ).data.notesId
+            }
+            else favoriteNoteDao.toggleFavoriteNoteById(noteId = noteId)
+
             favoriteNoteService.toggleFavoriteNote(
                 favoriteNoteId,
                 request

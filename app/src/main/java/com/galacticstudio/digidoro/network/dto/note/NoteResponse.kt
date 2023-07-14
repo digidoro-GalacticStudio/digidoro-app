@@ -67,6 +67,12 @@ fun List<NoteModelEntity>.toListNoteData(): List<NoteData>{
     }.toList()
 }
 
+fun List<NoteModelEntity>.toListNotesId(): List<String>{
+    return map{ element ->
+        element._id
+    }.toList()
+}
+
 fun NoteModelEntity.toNoteData(): NoteData{
     return NoteData(
         id = this._id,

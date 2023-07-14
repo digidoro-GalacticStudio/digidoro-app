@@ -94,13 +94,13 @@ fun TodoUpdateFloatingBox(
         ) {
             Column(Modifier.wrapContentWidth()) {
                 TitleCard(
-                    placeHolder = "Nombra tu task",
+                    placeHolder = "Your task",
                     value = itemViewModel.state.value.title
                 ) {
                     itemViewModel.onEvent(ItemTodoEvent.titleChanged(it))
                 }
                 GrayInput(
-                    label = "Fecha",
+                    label = "Date",
                     placeHolder = day,
                     fieldWidth = 100.dp,
                     type = TextFieldType.DATE,
@@ -154,7 +154,7 @@ fun TodoUpdateControler(
         horizontalArrangement = Arrangement.SpaceAround
     ) {
         ButtonControl(
-            text = "Cancelar",
+            text = "Cancel",
             contentColor = MaterialTheme.colorScheme.secondary,
             backgroundColor = Color.Transparent,
             borderColor = Color.Transparent,
@@ -162,7 +162,7 @@ fun TodoUpdateControler(
         )
 
         ButtonControl(
-            text = "Eliminar",
+            text = "Delete",
             contentColor = MaterialTheme.colorScheme.secondary,
             backgroundColor = Color.Transparent,
             borderColor = Color.Transparent,
@@ -175,7 +175,7 @@ fun TodoUpdateControler(
         )
 
         ButtonControl(
-            text = "Actualizar",
+            text = "Update",
             contentColor = MaterialTheme.colorScheme.secondary,
             backgroundColor = colorResource(id = R.color.gray_text_color),
             borderColor = MaterialTheme.colorScheme.secondary,

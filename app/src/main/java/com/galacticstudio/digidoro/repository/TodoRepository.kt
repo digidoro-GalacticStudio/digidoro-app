@@ -116,7 +116,6 @@ class TodoRepository(
         description: String = "",
     ): ApiResponse<TodoModel> {
         return handleApiCall {
-
             if (CheckInternetConnectivity(context)) {
                 val request =
                     RequestTodo(title, description, "#$theme", DateUtils.dateKTToDateAPI(reminder))

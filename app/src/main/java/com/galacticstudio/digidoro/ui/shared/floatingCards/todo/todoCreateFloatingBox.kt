@@ -93,13 +93,13 @@ fun TodoCreateFloatingBox(
         ) {
             Column(Modifier.wrapContentWidth()) {
                 TitleCard(
-                    placeHolder = "Nombra tu task",
+                    placeHolder = "Your task",
                     value = itemViewModel.state.value.title
                 ) {
                     itemViewModel.onEvent(ItemTodoEvent.titleChanged(it))
                 }
                 GrayInput(
-                    label = "Fecha",
+                    label = "Date",
                     placeHolder = day,
                     fieldWidth = 100.dp,
                     type = TextFieldType.DATE,
@@ -147,7 +147,7 @@ fun TodoCreateControler(
         modifier = Modifier.fillMaxWidth()
     ) {
         ButtonControl(
-            text = "Cancelar",
+            text = "Cancel",
             contentColor = MaterialTheme.colorScheme.secondary,
             backgroundColor = Color.Transparent,
             borderColor = Color.Transparent,
@@ -155,7 +155,7 @@ fun TodoCreateControler(
         )
         Spacer(modifier = Modifier.width(110.dp))
         ButtonControl(
-            text = "Guardar",
+            text = "Save",
             contentColor = MaterialTheme.colorScheme.secondary,
             backgroundColor = colorResource(id = R.color.gray_text_color),
             borderColor = MaterialTheme.colorScheme.secondary,

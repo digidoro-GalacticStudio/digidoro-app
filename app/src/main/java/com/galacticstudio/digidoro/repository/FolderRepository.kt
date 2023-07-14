@@ -3,6 +3,7 @@ package com.galacticstudio.digidoro.repository
 import android.content.Context
 import android.util.Log
 import com.galacticstudio.digidoro.data.db.DigidoroDataBase
+import com.galacticstudio.digidoro.data.db.models.FolderModelEntity
 import com.galacticstudio.digidoro.network.ApiResponse
 import com.galacticstudio.digidoro.network.dto.folder.FolderData
 import com.galacticstudio.digidoro.network.dto.folder.FolderDataPopulated
@@ -13,6 +14,7 @@ import com.galacticstudio.digidoro.network.dto.folder.SelectedFolderResponse
 import com.galacticstudio.digidoro.network.dto.folder.ToggleNoteRequest
 import com.galacticstudio.digidoro.network.dto.folder.toFolderData
 import com.galacticstudio.digidoro.network.dto.folder.toFolderModelEntity
+import com.galacticstudio.digidoro.network.dto.folder.toPopulatedFolderData
 import com.galacticstudio.digidoro.network.dto.note.NoteData
 import com.galacticstudio.digidoro.network.service.FolderService
 import com.galacticstudio.digidoro.repository.utils.CheckInternetConnectivity
@@ -42,10 +44,9 @@ class FolderRepository(
 
             val response = if(CheckInternetConnectivity(context)){
                 val responseApi = folderService.getAllFolders(populateFields)
-//                folderDao.insertAll(responseApi.toFolderModelEntity())
                 responseApi.data
             }
-            else folderDao.getAllFolder().toFolderData()
+            else folderDao.getAllFolder().toPopulatedFolderData()
 
 
             response
@@ -57,7 +58,12 @@ class FolderRepository(
     }
 
     suspend fun getSelectedFolders(folderId: String): ApiResponse<SelectedFolderResponse> {
-        return handleApiCall { folderService.getSelectedFolders(folderId).data }
+        return handleApiCall {
+            val response = if(CheckInternetConnectivity(context)) folderService.getSelectedFolders(folderId).data
+            else folderDao.getSelectedFolder(folderId)
+
+            response
+        }
     }
 
     suspend fun getFolderById(folderId: String, populateFields: String? = null): ApiResponse<FolderData> {
@@ -65,8 +71,17 @@ class FolderRepository(
     }
 
     suspend fun createFolder(name: String, theme: String, notesId: List<String> = emptyList()): ApiResponse<FolderData> {
-        val request = FolderRequest(name, theme, notesId)
-        return handleApiCall { folderService.createFolder(request).data }
+        return handleApiCall {
+            val response = if(CheckInternetConnectivity(context)){
+                val request = FolderRequest(name, theme, notesId)
+                folderService.createFolder(request).data
+            }
+            else {
+                val request = FolderModelEntity(name = name, theme = theme, notes_id = emptyList())
+                folderDao.CreateFolder(request).toFolderData()
+            }
+            response
+        }
     }
 
     suspend fun updateFolderById(
@@ -89,9 +104,15 @@ class FolderRepository(
     }
 
     suspend fun toggleFolder(folderId: String, noteId: String): ApiResponse<FolderData> {
-        val request  = ToggleNoteRequest(noteId)
-        Log.d("MyErrors", "MY REQUEST: ${request}")
-        return handleApiCall { folderService.toggleFolder(folderId, request).data }
+        return handleApiCall {
+            val response = if(CheckInternetConnectivity(context)){
+                val request  = ToggleNoteRequest(noteId)
+                folderService.toggleFolder(folderId, request).data
+            }
+            else folderDao.toggleNotesInFolder(folderId = folderId, noteId = noteId).toFolderData()
+
+            response
+        }
     }
 
     suspend fun deleteAll(): ApiResponse<String>{
