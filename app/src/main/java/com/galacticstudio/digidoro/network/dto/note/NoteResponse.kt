@@ -74,14 +74,14 @@ fun List<NoteModelEntity>.toListNotesId(): List<String>{
 
 fun NoteModelEntity.toNoteData(): NoteData{
     return NoteData(
-        id = this._id,
-        userId = this.user_id,
-        title = this.title,
-        message = this.message,
-        tags = this.tags,
-        theme = this.theme,
-        isTrashed = this.is_trashed,
-        createdAt = this.createdAt,
-        updatedAt = this.updatedAt
-    )
+            id = this._id,
+            userId = this.user_id,
+            title = this.title,
+            message = this.message,
+            tags = this.tags,
+            theme = this.theme,
+            isTrashed = this.is_trashed,
+            createdAt = this.createdAt,
+            updatedAt = this.updatedAt
+        )
 }

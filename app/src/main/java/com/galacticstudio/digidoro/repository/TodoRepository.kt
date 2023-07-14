@@ -62,20 +62,24 @@ class TodoRepository(
         description: String = "",
     ): ApiResponse<TodoModel> {
         return handleApiCall {
-            if(CheckInternetConnectivity(context)){
-                val request = RequestTodo(
+//            if(CheckInternetConnectivity(context)){
+//                val request = RequestTodo(
+//                    title, description, "#$theme", DateUtils.dateKTToDateAPI(reminder)
+//                )
+//                todoService.createTodo(request).toTodoModel()
+//            }
+//            else{
+//                val request = TodoItemModelEntity(
+//                    title = title, description = description, theme = "#$theme", reminder = reminder
+//                )
+//
+//                todoDao.insertTodo(request).toTodosModel()
+//            }
+
+            val request = RequestTodo(
                     title, description, "#$theme", DateUtils.dateKTToDateAPI(reminder)
                 )
                 todoService.createTodo(request).toTodoModel()
-            }
-            else{
-                val request = TodoItemModelEntity(
-                    title = title, description = description, theme = "#$theme", reminder = reminder
-                )
-
-                todoDao.insertTodo(request).toTodosModel()
-            }
-
         }
     }
 
@@ -89,36 +93,44 @@ class TodoRepository(
     ): ApiResponse<TodoModel>{
         return handleApiCall {
 
-            if(CheckInternetConnectivity(context)){
-                val request = RequestTodo(title, description, "#$theme", DateUtils.dateKTToDateAPI(reminder))
+//            if(CheckInternetConnectivity(context)){
+//                val request = RequestTodo(title, description, "#$theme", DateUtils.dateKTToDateAPI(reminder))
+//                todoService.updateTodo(
+//                    id = id,
+//                    request = request
+//                ).toTodoModel()
+//
+//            }
+//            else {
+//                todoDao.updateTodoById(
+//                    id, title, description, "#$theme", DateUtils.dateKTToDateAPI(reminder)
+//                ).toTodosModel()
+//            }
+            val request = RequestTodo(title, description, "#$theme", DateUtils.dateKTToDateAPI(reminder))
                 todoService.updateTodo(
                     id = id,
                     request = request
                 ).toTodoModel()
-
-            }
-            else {
-                todoDao.updateTodoById(
-                    id, title, description, "#$theme", DateUtils.dateKTToDateAPI(reminder)
-                ).toTodosModel()
-            }
         }
     }
 
     suspend fun toggleTodoState(id: String): ApiResponse<TodoModel>{
         return  handleApiCall {
-            if(CheckInternetConnectivity(context)){
-                todoService.toggleTodoDone(id = id).toTodoModel()
-            }
-            else{
-                todoDao.toggleStatusById(id = id).toTodosModel()
-            }
+//            if(CheckInternetConnectivity(context)){
+//                todoService.toggleTodoDone(id = id).toTodoModel()
+//            }
+//            else{
+//                todoDao.toggleStatusById(id = id).toTodosModel()
+//            }
+            todoService.toggleTodoDone(id = id).toTodoModel()
+
         }
     }
     suspend fun deleteTodoById(id: String): ApiResponse<TodoModel>{
         return handleApiCall {
-            if(CheckInternetConnectivity(context)) todoService.deleteNoteById(id = id).toTodoModel()
-            else todoDao.deleteTodoById(id).toTodosModel()
+//            if(CheckInternetConnectivity(context)) todoService.deleteNoteById(id = id).toTodoModel()
+//            else todoDao.deleteTodoById(id).toTodosModel()
+            todoService.deleteNoteById(id = id).toTodoModel()
         }
     }
 
