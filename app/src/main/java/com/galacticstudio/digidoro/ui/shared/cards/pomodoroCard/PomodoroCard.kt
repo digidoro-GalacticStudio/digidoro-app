@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -27,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.galacticstudio.digidoro.ui.theme.Nunito
+import com.galacticstudio.digidoro.util.WindowSize
 import com.galacticstudio.digidoro.util.shadowWithBorder
 
 /**
@@ -51,6 +53,9 @@ fun PomodoroCard(
     val borderWidth = 2.dp
     val paddingValue = 18.dp
 
+    val screenSize = LocalConfiguration.current.screenWidthDp.dp
+    val topOffSet = if (screenSize < WindowSize.COMPACT) Offset(15f, 15f) else Offset(12f, 12f)
+
     Card(
         onClick = { onClick() },
         modifier = Modifier
@@ -63,7 +68,7 @@ fun PomodoroCard(
                 borderColor = MaterialTheme.colorScheme.onPrimary,
                 cornerRadius = borderRadius,
                 shadowColor = colorTheme,
-                shadowOffset = Offset(15f, 15f)
+                shadowOffset = topOffSet
             )
             .border(
                 borderWidth,

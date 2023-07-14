@@ -27,6 +27,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -38,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import com.galacticstudio.digidoro.R
 import com.galacticstudio.digidoro.util.shadowWithBorder
 import com.galacticstudio.digidoro.ui.theme.Gray60
+import com.galacticstudio.digidoro.util.WindowSize
 
 /**
  * A composable function that represents a password text field with an optional leading icon.
@@ -62,8 +64,8 @@ fun PasswordTextField(
     var showPassword by remember { mutableStateOf(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    val borderWidth = LocalDensity.current.run { 2.toDp() }
-    val borderRadius = LocalDensity.current.run { 18.toDp() }
+    val borderWidth = 1.dp
+    val borderRadius = 5.dp
 
     val customTextSelectionColors = TextSelectionColors(
         handleColor = Color(0xFF3D3F42),
@@ -73,6 +75,8 @@ fun PasswordTextField(
     CompositionLocalProvider(
         LocalTextSelectionColors provides customTextSelectionColors,
     ) {
+        val screenSize = LocalConfiguration.current.screenWidthDp.dp
+        val topOffSet = if (screenSize < WindowSize.COMPACT) Offset(15f, 15f) else Offset(12f, 12f)
         TextField(
             value = value,
             onValueChange = { onTextFieldChanged(it) },
@@ -85,7 +89,7 @@ fun PasswordTextField(
                         else MaterialTheme.colorScheme.onPrimary,
                     cornerRadius = borderRadius,
                     shadowColor = if (isError) MaterialTheme.colorScheme.error.copy(0.6f) else Color(0xFF202124),
-                    shadowOffset = Offset(15f, 15f)
+                    shadowOffset = topOffSet
                 )
                 .border(
                     width = borderWidth,

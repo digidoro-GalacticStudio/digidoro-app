@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
@@ -27,6 +28,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.galacticstudio.digidoro.util.shadowWithBorder
 import com.galacticstudio.digidoro.ui.theme.Gray60
+import com.galacticstudio.digidoro.util.WindowSize
 
 /**
  * An enum class representing the type of a text field.
@@ -63,8 +65,8 @@ fun TextFieldItem(
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    val borderWidth = LocalDensity.current.run { 2.toDp() }
-    val borderRadius = LocalDensity.current.run { 18.toDp() }
+    val borderWidth = 1.dp
+    val borderRadius = 5.dp
 
     val customTextSelectionColors = TextSelectionColors(
         handleColor = Color(0xFF3D3F42),
@@ -74,6 +76,8 @@ fun TextFieldItem(
     CompositionLocalProvider(
         LocalTextSelectionColors provides customTextSelectionColors,
     ) {
+        val screenSize = LocalConfiguration.current.screenWidthDp.dp
+        val topOffSet = if (screenSize < WindowSize.COMPACT) Offset(15f, 15f) else Offset(12f, 12f)
         TextField(
             value = value,
             onValueChange = { onTextFieldChanged(it) },
@@ -86,7 +90,7 @@ fun TextFieldItem(
                         else  MaterialTheme.colorScheme.onPrimary,
                     cornerRadius = borderRadius,
                     shadowColor = if (isError) MaterialTheme.colorScheme.error.copy(0.6f) else Color(0xFF202124),
-                    shadowOffset = Offset(15f, 15f)
+                    shadowOffset = topOffSet
                 )
                 .border(
                     width = borderWidth,

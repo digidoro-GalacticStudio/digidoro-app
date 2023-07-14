@@ -2,6 +2,7 @@ package com.galacticstudio.digidoro.navigation
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.slideInHorizontally
@@ -172,7 +173,6 @@ fun AppScaffold(
             }
         },
     ) {
-
         if (screenSize > WindowSize.MEDIUM) {
             PermanentNavigationBar(
                 navController,
@@ -187,7 +187,7 @@ fun AppScaffold(
                     pomodoroViewModel,
                 )
             }
-        } else if ((screenSize > WindowSize.COMPACT) && (screenSize < WindowSize.MEDIUM)) {
+        } else if ((screenSize >= WindowSize.COMPACT) && (screenSize <= WindowSize.MEDIUM)) {
             NavigationBarRail(navController, bottomBarState) {
                 AppContent(
                     navController = navController,

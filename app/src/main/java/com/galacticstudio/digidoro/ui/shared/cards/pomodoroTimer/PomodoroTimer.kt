@@ -20,10 +20,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import com.galacticstudio.digidoro.R
 import com.galacticstudio.digidoro.ui.theme.DigidoroTheme
+import com.galacticstudio.digidoro.util.WindowSize
 import com.galacticstudio.digidoro.util.shadowWithCorner
 
 data class DataTime(val minutes: String, val seconds: String)
@@ -33,12 +35,15 @@ val cornerRadius = 10.dp
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun TimerBlock(time: String) {
+    val screenSize = LocalConfiguration.current.screenWidthDp.dp
+    val topOffSet = if (screenSize < WindowSize.COMPACT) Offset(15f, 15f) else Offset(12f, 12f)
+
     DigidoroTheme() {
         Box(
             modifier = Modifier
                 .shadowWithCorner(
                     cornerRadius = cornerRadius,
-                    shadowOffset = Offset(15.0f, 15.0f),
+                    shadowOffset = topOffSet,
                     shadowColor = MaterialTheme.colorScheme.onPrimary
                 )
                 .border(1.dp, MaterialTheme.colorScheme.onPrimary, RoundedCornerShape(cornerRadius))
