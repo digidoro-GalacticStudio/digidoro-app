@@ -1,5 +1,6 @@
 package com.galacticstudio.digidoro.network.dto.pomodoro
 
+import com.galacticstudio.digidoro.data.api.PomodoroModel
 import com.galacticstudio.digidoro.data.db.models.PomodoroModelEntity
 import com.google.gson.annotations.SerializedName
 import java.util.Date
@@ -69,6 +70,18 @@ fun PomodoroModelEntity.toPomodoroData(): PomodoroData{
         id = this._id,
         name = this.name,
         user_id = this.user_id,
+        sessionsCompleted = this.sessions_completed,
+        totalSessions = this.total_sessions,
+        theme = this.theme,
+        createdAt = this.createdAt,
+        updatedAt = this.updatedAt
+    )
+}
+fun PomodoroModelEntity.toPomodoroModel(): PomodoroModel{
+    return PomodoroModel(
+        id = this._id,
+        name = this.name,
+        userId = this.user_id,
         sessionsCompleted = this.sessions_completed,
         totalSessions = this.total_sessions,
         theme = this.theme,

@@ -100,10 +100,6 @@ fun TodoScreen(
     val syncStatus = SynchronizationWorker.syncStatusLiveData.observeAsState(initial = SyncStatus.INITIAL)
 
     LaunchedEffect(syncStatus.value) {
-        if (syncStatus.value == SyncStatus.INITIAL) {
-            Log.d("MyErrors", "INITIAL")
-
-        }
         if (syncStatus.value == SyncStatus.COMPLETED) {
             Toast.makeText(
                 context,
@@ -111,7 +107,6 @@ fun TodoScreen(
                 Toast.LENGTH_SHORT
             ).show()
             todoViewModel.onEvent(TodosEvent.Rebuild)
-            Log.d("MyErrors", "COMPLETED")
 
             SynchronizationWorker.syncStatusLiveData.value = SyncStatus.INITIAL
         }
@@ -122,7 +117,6 @@ fun TodoScreen(
                 Toast.LENGTH_SHORT
             ).show()
             todoViewModel.onEvent(TodosEvent.LoadingChanged(true))
-            Log.d("MyErrors", "IN_PROGRESS")
         }
     }
 

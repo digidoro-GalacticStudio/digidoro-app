@@ -11,12 +11,14 @@ import com.galacticstudio.digidoro.Application
 import com.galacticstudio.digidoro.R
 import com.galacticstudio.digidoro.data.api.EntityModel
 import com.galacticstudio.digidoro.data.api.NoteModel
+import com.galacticstudio.digidoro.data.api.PomodoroModel
 import com.galacticstudio.digidoro.data.api.TodoModel
 import com.galacticstudio.digidoro.data.db.models.Operation
 import com.galacticstudio.digidoro.data.db.models.PendingRequestEntity
 import com.galacticstudio.digidoro.network.ApiResponse
 import com.galacticstudio.digidoro.network.dto.note.NoteData
 import com.galacticstudio.digidoro.repository.NoteRepository
+import com.galacticstudio.digidoro.repository.PomodoroRepository
 import com.galacticstudio.digidoro.repository.RequestRepository
 import com.galacticstudio.digidoro.repository.TodoRepository
 import com.google.gson.Gson
@@ -30,12 +32,14 @@ class SynchronizationWorker(
     private lateinit var pendingRequestRepository: RequestRepository
     private lateinit var todoRepository: TodoRepository
     private lateinit var noteRepository: NoteRepository
+    private lateinit var pomodoroRepository: PomodoroRepository
     private val thisContext = context
 
     override suspend fun doWork(): Result  {
         val app = applicationContext as Application
         todoRepository = app.todoRepository
         noteRepository = app.notesRepository
+        pomodoroRepository = app.pomodoroRepository
         pendingRequestRepository = app.pendingRequestRepository
 
         val pendingRequests = getPendingRequestsFromDatabase()
@@ -105,6 +109,7 @@ class SynchronizationWorker(
                     val entity: EntityModel? = when (entityType) {
                         "TodoModel" -> gson.fromJson(jsonData, TodoModel::class.java)
                         "NoteModel" -> gson.fromJson(jsonData, NoteModel::class.java)
+                        "PomodoroModel" -> gson.fromJson(jsonData, PomodoroModel::class.java)
                         else -> null
                     }
 
@@ -116,6 +121,7 @@ class SynchronizationWorker(
                     val entity: EntityModel? = when (entityType) {
                         "TodoModel" -> gson.fromJson(jsonData, TodoModel::class.java)
                         "NoteModel" -> gson.fromJson(jsonData, NoteModel::class.java)
+                        "PomodoroModel" -> gson.fromJson(jsonData, PomodoroModel::class.java)
                         else -> null
                     }
 
@@ -169,6 +175,16 @@ class SynchronizationWorker(
 
                 handleApiResponse(response, entity.id, noteRepository::deleteNoteLocalDatabase)
             }
+            is PomodoroModel -> {
+                val response = pomodoroRepository.createPomodoro(
+                    entity.name,
+                    entity.sessionsCompleted,
+                    entity.totalSessions,
+                    entity.theme,
+                )
+
+                handleApiResponse(response, entity.id, pomodoroRepository::deletePomodoroLocalDatabase)
+            }
 
             else -> {
                 false
@@ -202,6 +218,18 @@ class SynchronizationWorker(
                 handleApiResponse(response)
             }
 
+            is PomodoroModel -> {
+                val response = pomodoroRepository.updatePomodoro(
+                    entity.id,
+                    entity.name,
+                    entity.sessionsCompleted,
+                    entity.totalSessions,
+                    entity.theme,
+                )
+
+                handleApiResponse(response)
+            }
+
             else -> {
                 false
             }
@@ -224,6 +252,18 @@ class SynchronizationWorker(
 
             "NoteModel" -> {
                 when (noteRepository.deleteNoteById(idEntity)) {
+                    is ApiResponse.Success -> {
+                        true
+                    }
+
+                    else -> {
+                        false
+                    }
+                }
+            }
+
+            "PomodoroModel" -> {
+                when (pomodoroRepository.deletePomodoro(idEntity)) {
                     is ApiResponse.Success -> {
                         true
                     }
