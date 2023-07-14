@@ -116,11 +116,6 @@ fun TodoScreen(
                 }
 
                 is TodosResponseState.Success -> {
-                    Toast.makeText(
-                        context,
-                        "Todos retrieved successfully",
-                        Toast.LENGTH_SHORT
-                    ).show()
                 }
 
                 else -> {}
@@ -310,7 +305,7 @@ fun TodoStaticBody(
         //static elements
         Spacer(modifier = Modifier.height(16.dp))
         Title(
-            message = CustomMessageData("Tus task", "Comienza tu día paso a paso"),
+            message = CustomMessageData("Your task", "Start your day step by step"),
             alignment = Alignment.CenterHorizontally
         )
         Spacer(modifier = Modifier.height(24.dp))
@@ -348,7 +343,7 @@ fun TodoStaticBody(
 
         Spacer(modifier = Modifier.height(16.dp))
         Title(
-            message = CustomMessageData("Falta completar", "No olvides tus actividades"),
+            message = CustomMessageData("To be completed", "Don't forget your activities"),
             alignment = Alignment.CenterHorizontally
         )
         Spacer(modifier = Modifier.height(16.dp))
@@ -372,7 +367,7 @@ fun TodoStaticBody(
 
         Spacer(modifier = Modifier.height(24.dp))
         Title(
-            message = CustomMessageData("¡Lo lograste!", "Mira tus tareas completadas"),
+            message = CustomMessageData("You got it!", "Check your completed tasks"),
             alignment = Alignment.CenterHorizontally
         )
 
