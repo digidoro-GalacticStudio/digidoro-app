@@ -1,6 +1,7 @@
 package com.galacticstudio.digidoro.repository
 
 import android.content.Context
+import android.util.Log
 import com.galacticstudio.digidoro.data.api.TodoModel
 import com.galacticstudio.digidoro.data.db.DigidoroDataBase
 import com.galacticstudio.digidoro.data.db.models.TodoItemModelEntity

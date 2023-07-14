@@ -3,7 +3,10 @@ package com.galacticstudio.digidoro.network.dto.note
 import com.galacticstudio.digidoro.data.db.models.FolderModelEntity
 import com.galacticstudio.digidoro.data.db.models.NoteModelEntity
 import com.galacticstudio.digidoro.network.dto.folder.FolderNotesListResponse
+import com.galacticstudio.digidoro.util.DateUtils
 import com.google.gson.annotations.SerializedName
+import java.util.Calendar
+import java.util.Date
 
 data class NoteResponse(
     @SerializedName("status") val status: String,
@@ -60,6 +63,12 @@ fun List<NoteModelEntity>.toListNoteData(): List<NoteData>{
             createdAt = element.createdAt,
             updatedAt = element.updatedAt
         )
+    }.toList()
+}
+
+fun List<NoteModelEntity>.toListNotesId(): List<String>{
+    return map{ element ->
+        element._id
     }.toList()
 }
 

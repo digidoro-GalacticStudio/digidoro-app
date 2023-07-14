@@ -1,5 +1,6 @@
 package com.galacticstudio.digidoro.network.dto.folder
 
+import com.galacticstudio.digidoro.data.db.dao.FolderDao
 import com.galacticstudio.digidoro.data.db.models.FavoriteNotesModelEntity
 import com.galacticstudio.digidoro.data.db.models.FolderModelEntity
 import com.galacticstudio.digidoro.network.dto.favoritenote.FavoriteNoteResponse
@@ -83,7 +84,7 @@ fun  FolderNotesListResponse.toFolderModelEntity(): List<FolderModelEntity>{
     return response.toList()
 }
 
-fun  List<FolderModelEntity>.toFolderData(): List<FolderDataPopulated>{
+fun  List<FolderModelEntity>.toPopulatedFolderData(): List<FolderDataPopulated>{
     return map{ element ->
         FolderDataPopulated(
             id = element._id,
@@ -95,4 +96,30 @@ fun  List<FolderModelEntity>.toFolderData(): List<FolderDataPopulated>{
             updatedAt = element.updatedAt
         )
     }
+}
+
+fun  List<FolderModelEntity>.toListFolderData(): List<FolderData>{
+    return map{ element ->
+        FolderData(
+            id = element._id,
+            userId = element.user_id,
+            name = element.name,
+            theme = element.theme,
+            notesId = element.notes_id.map { it._id },
+            createdAt = element.createdAt,
+            updatedAt = element.updatedAt
+        )
+    }
+}
+fun  FolderModelEntity.toFolderData(): FolderData{
+    val arrayId = this.notes_id.map { element -> element._id }
+    return FolderData(
+            id = this._id,
+            userId = this.user_id,
+            name = this.name,
+            theme = this.theme,
+            notesId = arrayId,
+            createdAt = this.createdAt,
+            updatedAt = this.updatedAt
+        )
 }

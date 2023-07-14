@@ -5,6 +5,8 @@ import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
 import com.galacticstudio.digidoro.data.db.converters.ListNoteModelEntityConverter
 import com.galacticstudio.digidoro.data.db.converters.ListStringConverter
+import com.galacticstudio.digidoro.util.DateUtils
+import java.util.Calendar
 import java.util.UUID
 
 
@@ -19,6 +21,6 @@ data class FolderModelEntity(
     @TypeConverters(ListNoteModelEntityConverter::class)
     var notes_id: List<NoteModelEntity>,
 
-    var createdAt: String,
-    var updatedAt: String
+    var createdAt: String = DateUtils.parseDateToString(Calendar.getInstance().time),
+    var updatedAt: String = DateUtils.parseDateToString(Calendar.getInstance().time)
 )

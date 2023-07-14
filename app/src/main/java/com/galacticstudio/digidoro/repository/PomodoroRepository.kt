@@ -3,6 +3,7 @@ package com.galacticstudio.digidoro.repository
 import android.content.Context
 import android.util.Log
 import com.galacticstudio.digidoro.data.db.DigidoroDataBase
+import com.galacticstudio.digidoro.data.db.models.PomodoroModelEntity
 import com.galacticstudio.digidoro.network.ApiResponse
 import com.galacticstudio.digidoro.network.dto.pomodoro.PomodoroData
 import com.galacticstudio.digidoro.network.dto.pomodoro.PomodoroRequest
@@ -48,7 +49,6 @@ class PomodoroRepository(
                     limit,
                     populate
                 ).data
-//                pomodoroDao.insertAll(apiResponse.toListPomdoroModelEntity())
                 apiResponse
             }
             else pomodoroDao.getAllPomodoros().toListPomodoroData()
@@ -72,8 +72,18 @@ class PomodoroRepository(
         totalSessions: Int,
         theme: String
     ): ApiResponse<PomodoroData> {
-        val request = PomodoroRequest(name, sessionsCompleted, totalSessions, theme)
-        return handleApiCall { pomodoroService.createPomodoro(request).data }
+        return handleApiCall {
+            val response = if(CheckInternetConnectivity(context)){
+                val request = PomodoroRequest(name, sessionsCompleted, totalSessions, theme)
+                pomodoroService.createPomodoro(request).data
+            }
+            else {
+                val request = PomodoroModelEntity(name = name, sessions_completed = sessionsCompleted, total_sessions = totalSessions, theme = theme)
+                pomodoroDao.insertPomodoro(request).toPomodoroData()
+            }
+
+            response
+         }
     }
 
     suspend fun updatePomodoro(
@@ -83,18 +93,38 @@ class PomodoroRepository(
         totalSessions: Int,
         theme: String
     ): ApiResponse<PomodoroData> {
-        val request = PomodoroRequest(name, sessionsCompleted, totalSessions, theme)
-        return handleApiCall { pomodoroService.updatePomodoro(pomodoroId, request).data }
+        return handleApiCall {
+
+            val response = if(CheckInternetConnectivity(context)){
+                val request = PomodoroRequest(name, sessionsCompleted, totalSessions, theme)
+                pomodoroService.updatePomodoro(pomodoroId, request).data
+            }
+            else {
+                val request = PomodoroModelEntity(name = name, sessions_completed = sessionsCompleted, total_sessions = totalSessions, theme = theme)
+                pomodoroDao.updatePomodoroById(pomodoroId, request).toPomodoroData()
+            }
+            response
+        }
     }
 
     suspend fun incrementSessions(
         pomodoroId: String,
     ): ApiResponse<String> {
-        return handleApiCall { pomodoroService.incrementSessions(pomodoroId).message }
+        return handleApiCall {
+            val response = if(CheckInternetConnectivity(context)) pomodoroService.incrementSessions(pomodoroId).message
+            else  pomodoroDao.updateCompletedSessionsById(pomodoroId)
+
+            response
+        }
     }
 
     suspend fun deletePomodoro(pomodoroId: String): ApiResponse<PomodoroData> {
-        return handleApiCall { pomodoroService.deletePomodoro(pomodoroId).data }
+        return handleApiCall {
+            val response = if(CheckInternetConnectivity(context)) pomodoroService.deletePomodoro(pomodoroId).data
+            else pomodoroDao.deletePomodoroById(pomodoroId).toPomodoroData()
+
+            response
+        }
     }
 
     suspend fun deleteAll(): ApiResponse<String>{

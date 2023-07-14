@@ -2,6 +2,7 @@ package com.galacticstudio.digidoro.data.db.models
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.util.Calendar
 import java.util.Date
 import java.util.UUID
 
@@ -14,6 +15,6 @@ data class PomodoroModelEntity(
     val sessions_completed: Int,
     val total_sessions: Int,
     val theme: String,
-    val createdAt: Date,
-    val updatedAt: Date
+    val createdAt: Date = Calendar.getInstance().time,
+    val updatedAt: Date = Calendar.getInstance().time
 )
