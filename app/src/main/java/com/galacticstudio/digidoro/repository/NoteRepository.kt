@@ -52,17 +52,20 @@ class NoteRepository(
         isTrashed: Boolean = false,
     ): ApiResponse<List<NoteData>> {
         return handleApiCall {
-            val response = if (CheckInternetConnectivity(context)) {
-                val apiResponse = noteService.getAllNotes(
-                    sortBy,
-                    order,
-                    page,
-                    limit,
-                    populateFields,
-                    isTrashed
-                ).data
-                apiResponse
-            } else noteDao.getAllNote(is_trash = isTrashed, order = order.lowercase())
+//            val response = if (CheckInternetConnectivity(context)) {
+//                val apiResponse = noteService.getAllNotes(
+//                    sortBy,
+//                    order,
+//                    page,
+//                    limit,
+//                    populateFields,
+//                    isTrashed
+//                ).data
+//                apiResponse
+//            } else noteDao.getAllNote(is_trash = isTrashed, order = order.lowercase())
+//                .toListNoteData()
+
+            val response = noteDao.getAllNote(is_trash = isTrashed, order = order.lowercase())
                 .toListNoteData()
 
             response
@@ -287,7 +290,7 @@ class NoteRepository(
         }
     }
 
-    suspend fun deleteNoteLocalDatabase(id: String): ApiResponse<Unit>{
+    suspend fun deleteNoteLocalDatabase(id: String): ApiResponse<Unit> {
         return handleApiCall {
             noteDao.deleteNoteById(id).toNoteData()
         }

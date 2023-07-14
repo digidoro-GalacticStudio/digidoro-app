@@ -79,11 +79,12 @@ class TodoRepository(
                     title = response.title,
                     description = response.description,
                     theme = response.theme,
-                    reminder = reminder
+                    reminder = reminder,
+                    is_completed = status,
                 )
                 todoDao.insertTodo(requestRoom)
 
-                if (status) todoService.toggleTodoDone(response.id)
+                if (status) { todoService.toggleTodoDone(response.id) }
 
                 response
             } else {

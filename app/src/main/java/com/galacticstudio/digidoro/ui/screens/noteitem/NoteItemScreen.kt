@@ -223,7 +223,7 @@ fun NoteItemScreen(
             if (noteItemViewModel.state.value.noteError == null) {
 
                 scope.launch {
-                    delay(300)
+                    delay(700)
                     navController.popBackStack()
                 }
 
@@ -390,7 +390,7 @@ fun TopBarNote(
                             onClick = {
                                 noteItemViewModel.onEvent(NoteItemEvent.ToggleTrash)
                                 scope.launch {
-                                    delay(300)
+                                    delay(500)
                                     onReturnClick()
                                 }
                             }

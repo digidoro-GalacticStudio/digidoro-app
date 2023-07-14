@@ -1,5 +1,6 @@
 package com.galacticstudio.digidoro.ui.screens.todo.item
 
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -185,6 +186,7 @@ class ItemTodoViewModel(
     ){
         executeOperation(
             operation = {
+                Log.d("MyErrors", "operation here")
                 todoRepository.createTodo(
                     title = title,
                     description = description,
