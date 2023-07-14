@@ -27,6 +27,7 @@ import androidx.compose.material3.RichTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -48,6 +49,7 @@ import com.galacticstudio.digidoro.service.TimerState
 import com.galacticstudio.digidoro.ui.screens.pomodoro.components.PomodoroDialog
 import com.galacticstudio.digidoro.ui.screens.pomodoro.components.PomodoroRichTooltip
 import com.galacticstudio.digidoro.ui.screens.pomodoro.viewmodel.PomodoroViewModel
+import com.galacticstudio.digidoro.ui.screens.todo.list.TodosEvent
 import com.galacticstudio.digidoro.ui.shared.button.CustomButton
 import com.galacticstudio.digidoro.ui.shared.button.ToggleButton
 import com.galacticstudio.digidoro.ui.shared.button.ToggleButtonOption
@@ -62,6 +64,8 @@ import com.galacticstudio.digidoro.util.Service
 import com.galacticstudio.digidoro.util.Service.ACTION_SERVICE_CANCEL
 import com.galacticstudio.digidoro.util.Service.ACTION_SERVICE_START
 import com.galacticstudio.digidoro.util.Service.ACTION_SERVICE_STOP
+import com.galacticstudio.digidoro.work.SyncStatus
+import com.galacticstudio.digidoro.work.SynchronizationWorker
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterial3Api::class)
@@ -77,6 +81,28 @@ fun PomodoroScreen(
     val seconds by stopwatchService.seconds
     val pomodoroId by stopwatchService.pomodoroId
     val currentState by stopwatchService.currentState
+
+    val syncStatus = SynchronizationWorker.syncStatusLiveData.observeAsState(initial = SyncStatus.INITIAL)
+
+    LaunchedEffect(syncStatus.value) {
+        if (syncStatus.value == SyncStatus.COMPLETED) {
+            Toast.makeText(
+                context,
+                "Synchronization finished",
+                Toast.LENGTH_SHORT
+            ).show()
+            pomodoroViewModel.onEvent(PomodoroUIEvent.Rebuild())
+
+            SynchronizationWorker.syncStatusLiveData.value = SyncStatus.INITIAL
+        }
+        if (syncStatus.value == SyncStatus.IN_PROGRESS) {
+            Toast.makeText(
+                context,
+                "Synchronization started",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
 
     LaunchedEffect(Unit) {
         pomodoroViewModel.onEvent(PomodoroUIEvent.Rebuild(pomodoroId))

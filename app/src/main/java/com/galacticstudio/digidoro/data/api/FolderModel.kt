@@ -8,7 +8,7 @@ data class FolderModel(
     val notesId: List<String>,
     val createdAt: String,
     val updatedAt: String
-)
+): EntityModel()
 
 data class FolderPopulatedModel(
     val id: String,
@@ -18,10 +18,10 @@ data class FolderPopulatedModel(
     val notesId: List<NoteModel>,
     val createdAt: String,
     val updatedAt: String
-)
+): EntityModel()
 
 fun convertToFolderPopulatedModel(folder: FolderModel): FolderPopulatedModel {
-    val emptyNotes = folder.notesId.map { NoteModel(it, "", "", "", listOf(), "", false) }
+    val emptyNotes = folder.notesId.map { NoteModel(it, "", "", listOf(), "", false) }
     return FolderPopulatedModel(
         folder.id,
         folder.userId,

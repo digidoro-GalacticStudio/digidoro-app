@@ -1,8 +1,11 @@
 package com.galacticstudio.digidoro
 
 import android.app.Application
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
 import android.content.SharedPreferences
+import android.os.Build
 import com.galacticstudio.digidoro.data.db.DigidoroDataBase
 import com.galacticstudio.digidoro.network.retrofit.RetrofitInstance
 import com.galacticstudio.digidoro.repository.CredentialsRepository
@@ -11,6 +14,7 @@ import com.galacticstudio.digidoro.repository.FolderRepository
 import com.galacticstudio.digidoro.repository.NoteRepository
 import com.galacticstudio.digidoro.repository.PomodoroRepository
 import com.galacticstudio.digidoro.repository.RankingRepository
+import com.galacticstudio.digidoro.repository.RequestRepository
 import com.galacticstudio.digidoro.repository.TodoRepository
 import com.galacticstudio.digidoro.repository.UserRepository
 
@@ -31,6 +35,17 @@ class Application : Application() {
     override fun onCreate() {
         super.onCreate()
         context = applicationContext
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                "synchronization_channel",
+                "Synchronization Data",
+                NotificationManager.IMPORTANCE_HIGH
+            )
+
+            val notificationManager = getSystemService(NotificationManager::class.java)
+            notificationManager.createNotificationChannel(channel)
+        }
     }
 
     private fun getAPIService() = with(RetrofitInstance){
@@ -83,6 +98,12 @@ class Application : Application() {
     //initialize repositories
     val credentialsRepository: CredentialsRepository by lazy {
         CredentialsRepository(getAPIService(), database)
+    }
+
+    val pendingRequestRepository: RequestRepository by lazy {
+        RequestRepository(
+            database,
+        )
     }
 
     val notesRepository: NoteRepository by lazy {

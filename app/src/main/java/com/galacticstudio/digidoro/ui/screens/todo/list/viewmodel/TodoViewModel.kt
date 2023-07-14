@@ -50,6 +50,11 @@ class TodoViewModel(
             is TodosEvent.Rebuild ->{
                 getAllTodo(state.value.todosOrder)
             }
+            is TodosEvent.LoadingChanged ->{
+                _state.value = _state.value.copy(
+                    isLoading = event.isLoading
+                )
+            }
             is TodosEvent.Order ->{
                 if(
                     state.value.todosOrder::class == event.todoOrder::class &&

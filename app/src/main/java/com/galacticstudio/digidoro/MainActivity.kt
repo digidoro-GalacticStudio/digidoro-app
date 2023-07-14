@@ -31,11 +31,12 @@ import com.galacticstudio.digidoro.ui.screens.MainViewModel
 import com.galacticstudio.digidoro.ui.screens.pomodoro.PomodoroUIEvent
 import com.galacticstudio.digidoro.ui.screens.pomodoro.viewmodel.PomodoroViewModel
 import com.galacticstudio.digidoro.ui.theme.DigidoroTheme
+import com.galacticstudio.digidoro.work.NetworkChangeHandler
 
 @ExperimentalAnimationApi
 class MainActivity : ComponentActivity(), TimerListener {
-
-    private lateinit var stopwatchService: TimerService
+    private lateinit var timerService: TimerService
+    private lateinit var networkChangeHandler: NetworkChangeHandler
 
     // Variable to indicate if the service is bound
     private var isBound by mutableStateOf(false)
@@ -43,9 +44,9 @@ class MainActivity : ComponentActivity(), TimerListener {
     private val connection = object : ServiceConnection {
         override fun onServiceConnected(className: ComponentName, service: IBinder) {
             val binder = service as TimerService.TimerBinder
-            stopwatchService = binder.getService()
+            timerService = binder.getService()
             isBound = true
-            stopwatchService.setTimerListener(this@MainActivity)
+            timerService.setTimerListener(this@MainActivity)
         }
 
         override fun onServiceDisconnected(arg0: ComponentName) {
@@ -58,11 +59,8 @@ class MainActivity : ComponentActivity(), TimerListener {
         PomodoroViewModel.Factory
     }
 
-
-
     // Method called when 0:00 minute is reached on the stopwatch
     override fun onTimeReached(pomodoroId: String, type: String) {
-        Log.d("MyErrors", "--------pomodoroId ${pomodoroId}  + ${type}   --")
         if (pomodoroId.isNotEmpty() && type == "pomodoro") {
             val auxiliarViewModel: PomodoroViewModel by viewModels {
                 PomodoroViewModel.Factory
@@ -97,10 +95,15 @@ class MainActivity : ComponentActivity(), TimerListener {
         Intent(this, TimerService::class.java).also { intent ->
             bindService(intent, connection, Context.BIND_AUTO_CREATE)
         }
+
+        networkChangeHandler.registerNetworkCallback()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        networkChangeHandler = NetworkChangeHandler(this)
+
         setContent {
             val controller = rememberNavController()
 
@@ -117,7 +120,7 @@ class MainActivity : ComponentActivity(), TimerListener {
                         AppScaffold(
                             navController = controller,
                             mainViewModel = mainViewModel,
-                            stopwatchService = stopwatchService,
+                            stopwatchService = timerService,
                             pomodoroViewModel = pomodoroViewModel,
                         )
                     }

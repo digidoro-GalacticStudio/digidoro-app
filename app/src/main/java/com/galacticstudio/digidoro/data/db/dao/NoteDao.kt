@@ -22,8 +22,8 @@ interface NoteDao {
 
     //select queries
     @Query("SELECT * FROM note where is_trashed =:is_trash ORDER BY " +
-            "CASE WHEN :order == 'desc' THEN createdAt END DESC, " +
-            "CASE WHEN :order == 'asc' THEN createdAt END ASC")
+            "CASE WHEN :order == 'desc' THEN updatedAt END DESC, " +
+            "CASE WHEN :order == 'asc' THEN updatedAt END ASC")
     suspend fun getAllNote(is_trash: Boolean, order: String = "desc"): List<NoteModelEntity>
 
     @Query("SELECT * FROM note WHERE _id = :id")
@@ -98,6 +98,13 @@ interface NoteDao {
 
         updateTrashInNote(id, updateTrash)
 
+        return getNote(id)
+    }
+
+    //transaction toggle trash
+    @Transaction
+    suspend fun toggleTrashByStatus(id: String, isTrashed: Boolean): NoteModelEntity{
+        updateTrashInNote(id, isTrashed)
         return getNote(id)
     }
 

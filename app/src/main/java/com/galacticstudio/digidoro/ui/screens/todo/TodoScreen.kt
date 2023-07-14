@@ -1,5 +1,6 @@
 package com.galacticstudio.digidoro.ui.screens.todo
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
@@ -30,6 +31,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -60,6 +63,8 @@ import com.galacticstudio.digidoro.ui.shared.titles.CustomMessageData
 import com.galacticstudio.digidoro.ui.shared.titles.Title
 import com.galacticstudio.digidoro.ui.theme.DigidoroTheme
 import com.galacticstudio.digidoro.util.WindowSize
+import com.galacticstudio.digidoro.work.SyncStatus
+import com.galacticstudio.digidoro.work.SynchronizationWorker
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -92,6 +97,29 @@ fun TodoScreen(
     val state = todoViewModel.state.value
     val context = LocalContext.current
 
+    val syncStatus = SynchronizationWorker.syncStatusLiveData.observeAsState(initial = SyncStatus.INITIAL)
+
+    LaunchedEffect(syncStatus.value) {
+        if (syncStatus.value == SyncStatus.COMPLETED) {
+            Toast.makeText(
+                context,
+                "Synchronization finished",
+                Toast.LENGTH_SHORT
+            ).show()
+            todoViewModel.onEvent(TodosEvent.Rebuild)
+
+            SynchronizationWorker.syncStatusLiveData.value = SyncStatus.INITIAL
+        }
+        if (syncStatus.value == SyncStatus.IN_PROGRESS) {
+            Toast.makeText(
+                context,
+                "Synchronization started",
+                Toast.LENGTH_SHORT
+            ).show()
+            todoViewModel.onEvent(TodosEvent.LoadingChanged(true))
+        }
+    }
+
     LaunchedEffect(Unit) {
         todoViewModel.onEvent(TodosEvent.Rebuild)
     }
@@ -114,10 +142,6 @@ fun TodoScreen(
                         Toast.LENGTH_SHORT
                     ).show()
                 }
-
-                is TodosResponseState.Success -> {
-                }
-
                 else -> {}
             }
         }
@@ -145,7 +169,7 @@ fun TodoScreen(
                 }
 
                 is ItemTodoResponseState.Success ->{
-                    todoViewModel.onEvent(TodosEvent.Rebuild)
+                    if (syncStatus.value != SyncStatus.IN_PROGRESS) todoViewModel.onEvent(TodosEvent.Rebuild)
                 }
                 else -> {}
             }

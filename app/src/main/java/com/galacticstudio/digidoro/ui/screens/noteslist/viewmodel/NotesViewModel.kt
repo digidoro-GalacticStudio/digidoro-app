@@ -1,5 +1,6 @@
 package com.galacticstudio.digidoro.ui.screens.noteslist.viewmodel
 
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -73,6 +74,10 @@ class NotesViewModel(
 
             is NotesEvent.Rebuild -> {
                 rebuildUI(event.resultsMode)
+            }
+
+            is NotesEvent.LoadingChanged -> {
+                _state.value = _state.value.copy(isLoading = event.isLoading)
             }
 
             is NotesEvent.SelectedFolderChanged -> {
@@ -174,11 +179,13 @@ class NotesViewModel(
             }
 
             val response = when (_resultsMode.value) {
-                is NoteResultsMode.AllNotes -> noteRepository.getAllNotes(
-                    sortBy,
-                    order,
-                    isTrashed = false
-                )
+                is NoteResultsMode.AllNotes -> {
+                    noteRepository.getAllNotes(
+                        sortBy,
+                        order,
+                        isTrashed = false
+                    )
+                }
 
                 is NoteResultsMode.FavoriteNotes -> favoriteNoteRepository.getAllFavoriteNotes(
                     populateFields = "notes_id"
@@ -194,7 +201,7 @@ class NotesViewModel(
                     sortBy,
                     order,
                     isTrashed = false
-                ) //noteRepository.getFolderNotes(sortBy, order)
+                )
             }
 
             when (response) {
@@ -212,7 +219,7 @@ class NotesViewModel(
                         noteOrder = noteOrder,
                         isLoading = false,
                     )
-                    sendResponseEvent(NotesResponseState.Success)
+                    sendResponseEvent(NotesResponseState.Success(false))
                 }
             }
         }
@@ -236,7 +243,7 @@ class NotesViewModel(
                         folders = mapToFolderNotesModels(response.data),
 //                        isLoading = false,
                     )
-                    sendResponseEvent(NotesResponseState.Success)
+                    sendResponseEvent(NotesResponseState.Success(false))
                 }
             }
         }
@@ -261,7 +268,7 @@ class NotesViewModel(
                         notes = mapToNoteModels(response.data),
 //                        isLoading = false,
                     )
-                    sendResponseEvent(NotesResponseState.Success)
+                    sendResponseEvent(NotesResponseState.Success(false))
                 }
             }
         }
@@ -291,6 +298,7 @@ class NotesViewModel(
 
     private fun getNotesWithoutFolders(noteId: String) {
         executeOperation(
+            reload = false,
             operation = { folderRepository.getSelectedFolders(noteId) },
             onSuccess = { response ->
                 _state.value = _state.value.copy(
@@ -356,6 +364,7 @@ class NotesViewModel(
     }
 
     private fun <T> executeOperation(
+        reload: Boolean = true,
         operation: suspend () -> ApiResponse<T>,
         onSuccess: ((ApiResponse.Success<T>) -> Unit)? = null
     ) {
@@ -371,7 +380,7 @@ class NotesViewModel(
 
                 is ApiResponse.Success -> {
                     onSuccess?.invoke(response)
-                    sendResponseEvent(NotesResponseState.Success)
+                    sendResponseEvent(NotesResponseState.Success(reload = reload))
                 }
             }
         }
@@ -381,14 +390,13 @@ class NotesViewModel(
         return noteDataList.map { noteData ->
             NoteModel(
                 id = noteData.id,
-                user_id = noteData.userId,
                 title = noteData.title,
                 message = noteData.message,
                 tags = noteData.tags,
                 theme = noteData.theme,
                 is_trashed = noteData.isTrashed,
-                createdAt = convertISO8601ToDate(noteData.createdAt),
-                updatedAt = convertISO8601ToDate(noteData.updatedAt)
+                createdAt = noteData.createdAt,
+                updatedAt = noteData.updatedAt
             )
         }
     }

@@ -7,5 +7,5 @@ sealed class NotesResponseState {
     object Resume : NotesResponseState()
     class Error(val exception: Exception) : NotesResponseState()
     data class ErrorWithMessage(val message: String) : NotesResponseState()
-    object Success : NotesResponseState()
+    data class Success(val reload: Boolean) : NotesResponseState()
 }
