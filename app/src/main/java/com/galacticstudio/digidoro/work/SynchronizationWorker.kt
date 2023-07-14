@@ -6,15 +6,17 @@ import androidx.core.app.NotificationCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
-import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.galacticstudio.digidoro.Application
 import com.galacticstudio.digidoro.R
 import com.galacticstudio.digidoro.data.api.EntityModel
+import com.galacticstudio.digidoro.data.api.NoteModel
 import com.galacticstudio.digidoro.data.api.TodoModel
 import com.galacticstudio.digidoro.data.db.models.Operation
 import com.galacticstudio.digidoro.data.db.models.PendingRequestEntity
 import com.galacticstudio.digidoro.network.ApiResponse
+import com.galacticstudio.digidoro.network.dto.note.NoteData
+import com.galacticstudio.digidoro.repository.NoteRepository
 import com.galacticstudio.digidoro.repository.RequestRepository
 import com.galacticstudio.digidoro.repository.TodoRepository
 import com.google.gson.Gson
@@ -27,11 +29,13 @@ class SynchronizationWorker(
 ) : CoroutineWorker(context, workerParams) {
     private lateinit var pendingRequestRepository: RequestRepository
     private lateinit var todoRepository: TodoRepository
+    private lateinit var noteRepository: NoteRepository
     private val thisContext = context
 
     override suspend fun doWork(): Result  {
         val app = applicationContext as Application
         todoRepository = app.todoRepository
+        noteRepository = app.notesRepository
         pendingRequestRepository = app.pendingRequestRepository
 
         val pendingRequests = getPendingRequestsFromDatabase()
@@ -101,9 +105,10 @@ class SynchronizationWorker(
                 Operation.CREATE -> {
                     val entity: EntityModel? = when (entityType) {
                         "TodoModel" -> gson.fromJson(jsonData, TodoModel::class.java)
-                        //"NoteModel" -> gson.fromJson(jsonData, NoteModel::class.java)
+                        "NoteModel" -> gson.fromJson(jsonData, NoteModel::class.java)
                         else -> null
                     }
+
                     val success = entity?.let { handleCreateOperation(it) }
                     success ?: false
                 }
@@ -111,7 +116,7 @@ class SynchronizationWorker(
                 Operation.UPDATE -> {
                     val entity: EntityModel? = when (entityType) {
                         "TodoModel" -> gson.fromJson(jsonData, TodoModel::class.java)
-                        //"NoteModel" -> gson.fromJson(jsonData, NoteModel::class.java)
+                        "NoteModel" -> gson.fromJson(jsonData, NoteModel::class.java)
                         else -> null
                     }
 
@@ -124,9 +129,17 @@ class SynchronizationWorker(
                     success
                 }
 
+
                 Operation.TOGGLE -> {
-                    val success = handleToggleOperation(jsonData)
-                    success
+
+                    val entity: EntityModel? = when (entityType) {
+                        "TodoModel" -> gson.fromJson(jsonData, TodoModel::class.java)
+                        "NoteModel" -> gson.fromJson(jsonData, NoteModel::class.java)
+                        else -> null
+                    }
+
+                    val success = entity?.let { handleToggleOperation(jsonData, it) }
+                    success ?: false
                 }
             }
         } catch (e: Exception) {
@@ -151,16 +164,17 @@ class SynchronizationWorker(
                     entity.description,
                 )
 
-                when (response) {
-                    is ApiResponse.Success -> {
-                        todoRepository.deleteTodoLocalDatabase(entity.id)
-                        true
-                    }
+                handleApiResponse(response, entity.id, todoRepository::deleteTodoLocalDatabase)
+            }
+            is NoteModel -> {
+                val response = noteRepository.createNote(
+                    entity.title,
+                    entity.message,
+                    entity.tags,
+                    entity.theme,
+                )
 
-                    else -> {
-                        false
-                    }
-                }
+                handleApiResponse(response, entity.id, noteRepository::deleteNoteLocalDatabase)
             }
 
             else -> {
@@ -180,15 +194,18 @@ class SynchronizationWorker(
                     entity.description,
                 )
 
-                when (response) {
-                    is ApiResponse.Success -> {
-                        true
-                    }
+                handleApiResponse(response)
+            }
+            is NoteModel -> {
+                val response = noteRepository.updateNoteById(
+                    entity.id,
+                    entity.title,
+                    entity.message,
+                    entity.tags,
+                    entity.theme,
+                )
 
-                    else -> {
-                        false
-                    }
-                }
+                handleApiResponse(response)
             }
 
             else -> {
@@ -217,17 +234,45 @@ class SynchronizationWorker(
         }
     }
 
+    private suspend fun handleToggleOperation(idEntity: String, entity: EntityModel): Boolean {
+        return when (entity) {
+            is TodoModel -> {
+                when (todoRepository.toggleTodoState(idEntity)) {
+                    is ApiResponse.Success -> {true}
+                    else -> {false}
+                }
+            }
+            is NoteModel -> {
+                when (noteRepository.toggleTrashNoteById(idEntity)) {
+                    is ApiResponse.Success -> {true}
+                    else -> {false}
+                }
+            }
 
-    private suspend fun handleToggleOperation(idEntity: String): Boolean {
-        return when (todoRepository.toggleTodoState(idEntity)) {
+            else -> {false}
+        }
+    }
+
+    private suspend fun <T> handleApiResponse(
+        response: ApiResponse<T>,
+        entityId: String,
+        deleteLocalDatabase: suspend (String) -> Unit
+    ): Boolean {
+        return when (response) {
             is ApiResponse.Success -> {
-
+                deleteLocalDatabase(entityId)
                 true
             }
+            else -> false
+        }
+    }
 
-            else -> {
-                false
-            }
+    private fun <T> handleApiResponse(
+        response: ApiResponse<T>
+    ): Boolean {
+        return when (response) {
+            is ApiResponse.Success -> true
+            else -> false
         }
     }
 
