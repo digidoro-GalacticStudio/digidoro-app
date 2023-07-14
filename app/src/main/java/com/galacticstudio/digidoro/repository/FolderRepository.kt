@@ -58,7 +58,12 @@ class FolderRepository(
     }
 
     suspend fun getSelectedFolders(folderId: String): ApiResponse<SelectedFolderResponse> {
-        return handleApiCall { folderService.getSelectedFolders(folderId).data }
+        return handleApiCall {
+            val response = if(CheckInternetConnectivity(context)) folderService.getSelectedFolders(folderId).data
+            else folderDao.getSelectedFolder(folderId)
+
+            response
+        }
     }
 
     suspend fun getFolderById(folderId: String, populateFields: String? = null): ApiResponse<FolderData> {

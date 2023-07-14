@@ -9,6 +9,10 @@ import androidx.room.Transaction
 import com.galacticstudio.digidoro.data.db.models.FolderModelEntity
 import com.galacticstudio.digidoro.data.db.models.NoteModelEntity
 import com.galacticstudio.digidoro.network.dto.folder.FolderData
+import com.galacticstudio.digidoro.network.dto.folder.SelectedFolderResponse
+import com.galacticstudio.digidoro.network.dto.folder.toFolderData
+import com.galacticstudio.digidoro.network.dto.folder.toListFolderData
+import com.galacticstudio.digidoro.network.dto.folder.toPopulatedFolderData
 import com.galacticstudio.digidoro.network.dto.note.toListNotesId
 import com.google.gson.Gson
 
@@ -36,7 +40,7 @@ interface FolderDao {
 
     //set notes by id with given notes array
     @Query("UPDATE folder SET notes_id =:notes WHERE _id =:id")
-    suspend fun updateFolderNotes(id: String, notes: List<String>)
+    suspend fun updateFolderNotes(id: String, notes: List<NoteModelEntity>)
     @Query("UPDATE folder SET theme =:theme WHERE _id =:id")
     suspend fun updateThemeById(id: String, theme:String)
 
@@ -63,8 +67,19 @@ interface FolderDao {
         }
         else folder.plusElement(getNote(noteId))
 
-        val notesId = updatedNotes.map { it._id }
-        updateFolderNotes(folderId, notesId)
+        updateFolderNotes(folderId, updatedNotes)
         return getFolderById(folderId)
+    }
+
+    //transaction get all folders and current note selected folder
+    @Transaction
+    suspend fun getSelectedFolder(folderId: String): SelectedFolderResponse {
+        val folders = getAllFolder().toListFolderData()
+        val selectedFolder = try {
+            getFolderById(folderId).toFolderData()
+        }
+        catch (_: Exception){ null }
+
+        return SelectedFolderResponse(actualFolder = selectedFolder, folders = folders)
     }
 }

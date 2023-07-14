@@ -97,6 +97,20 @@ fun  List<FolderModelEntity>.toPopulatedFolderData(): List<FolderDataPopulated>{
         )
     }
 }
+
+fun  List<FolderModelEntity>.toListFolderData(): List<FolderData>{
+    return map{ element ->
+        FolderData(
+            id = element._id,
+            userId = element.user_id,
+            name = element.name,
+            theme = element.theme,
+            notesId = element.notes_id.map { it._id },
+            createdAt = element.createdAt,
+            updatedAt = element.updatedAt
+        )
+    }
+}
 fun  FolderModelEntity.toFolderData(): FolderData{
     val arrayId = this.notes_id.map { element -> element._id }
     return FolderData(
