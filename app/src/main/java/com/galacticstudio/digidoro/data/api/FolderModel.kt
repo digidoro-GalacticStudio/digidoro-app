@@ -21,7 +21,7 @@ data class FolderPopulatedModel(
 ): EntityModel()
 
 fun convertToFolderPopulatedModel(folder: FolderModel): FolderPopulatedModel {
-    val emptyNotes = folder.notesId.map { NoteModel(it, "", "", "", listOf(), "", false) }
+    val emptyNotes = folder.notesId.map { NoteModel(it, "", "", listOf(), "", false) }
     return FolderPopulatedModel(
         folder.id,
         folder.userId,

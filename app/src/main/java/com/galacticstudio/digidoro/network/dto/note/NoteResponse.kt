@@ -1,5 +1,6 @@
 package com.galacticstudio.digidoro.network.dto.note
 
+import com.galacticstudio.digidoro.data.api.NoteModel
 import com.galacticstudio.digidoro.data.db.models.FolderModelEntity
 import com.galacticstudio.digidoro.data.db.models.NoteModelEntity
 import com.galacticstudio.digidoro.network.dto.folder.FolderNotesListResponse
@@ -30,8 +31,8 @@ data class NoteData(
     @SerializedName("theme") val theme: String,
     @SerializedName("is_trashed") val isTrashed: Boolean,
     @SerializedName("_id") val id: String,
-    @SerializedName("createdAt") val createdAt: String,
-    @SerializedName("updatedAt") val updatedAt: String,
+    @SerializedName("createdAt") val createdAt: Date,
+    @SerializedName("updatedAt") val updatedAt: Date,
 )
 
 fun List<NoteData>.toNoteModelEntity(): List<NoteModelEntity>{
@@ -75,6 +76,19 @@ fun NoteModelEntity.toNoteData(): NoteData{
         tags = this.tags,
         theme = this.theme,
         isTrashed = this.is_trashed,
+        createdAt = this.createdAt,
+        updatedAt = this.updatedAt
+    )
+}
+
+fun NoteModelEntity.toNoteModelData(): NoteModel{
+    return NoteModel(
+        id = this._id,
+        title = this.title,
+        message = this.message,
+        tags = this.tags,
+        theme = this.theme,
+        is_trashed = this.is_trashed,
         createdAt = this.createdAt,
         updatedAt = this.updatedAt
     )

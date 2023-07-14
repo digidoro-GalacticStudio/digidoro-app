@@ -1,5 +1,6 @@
 package com.galacticstudio.digidoro.ui.screens.noteitem.viewmodel
 
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -106,6 +107,7 @@ class NoteItemViewModel(
 
     private fun submitData() {
         if (!validateData()) {
+            Log.d("MyErrors", "Wrong information")
             apiState = NoteItemResponseState.ErrorWithMessage("Wrong information")
             return
         }
@@ -304,14 +306,13 @@ class NoteItemViewModel(
     private fun mapToNoteModel(noteData: NoteData): NoteModel {
         return NoteModel(
             id = noteData.id,
-            user_id = noteData.userId,
             title = noteData.title,
             message = noteData.message,
             tags = noteData.tags,
             theme = noteData.theme,
             is_trashed = noteData.isTrashed,
-            createdAt = DateUtils.convertISO8601ToDate(noteData.createdAt),
-            updatedAt = DateUtils.convertISO8601ToDate(noteData.updatedAt)
+            createdAt = noteData.createdAt,
+            updatedAt = noteData.updatedAt
         )
     }
 

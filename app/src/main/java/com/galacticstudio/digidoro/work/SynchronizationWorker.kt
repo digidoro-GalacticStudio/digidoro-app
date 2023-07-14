@@ -47,7 +47,6 @@ class SynchronizationWorker(
             syncStatusLiveData.postValue(SyncStatus.IN_PROGRESS)
         } else return Result.success()
 
-
         Log.d("MyErrors", "Do Work [" +pendingRequests.size + "] : "+ pendingRequests)
 
         for (request in pendingRequests) {
@@ -129,17 +128,9 @@ class SynchronizationWorker(
                     success
                 }
 
-
                 Operation.TOGGLE -> {
-
-                    val entity: EntityModel? = when (entityType) {
-                        "TodoModel" -> gson.fromJson(jsonData, TodoModel::class.java)
-                        "NoteModel" -> gson.fromJson(jsonData, NoteModel::class.java)
-                        else -> null
-                    }
-
-                    val success = entity?.let { handleToggleOperation(jsonData, it) }
-                    success ?: false
+                    val success = handleToggleOperation(jsonData, entityType)
+                    success
                 }
             }
         } catch (e: Exception) {
@@ -162,6 +153,7 @@ class SynchronizationWorker(
                     entity.theme.removePrefix("#"),
                     entity.reminder,
                     entity.description,
+                    entity.state
                 )
 
                 handleApiResponse(response, entity.id, todoRepository::deleteTodoLocalDatabase)
@@ -172,6 +164,7 @@ class SynchronizationWorker(
                     entity.message,
                     entity.tags,
                     entity.theme,
+                    entity.is_trashed
                 )
 
                 handleApiResponse(response, entity.id, noteRepository::deleteNoteLocalDatabase)
@@ -203,6 +196,7 @@ class SynchronizationWorker(
                     entity.message,
                     entity.tags,
                     entity.theme,
+                    entity.is_trashed,
                 )
 
                 handleApiResponse(response)
@@ -228,21 +222,33 @@ class SynchronizationWorker(
                 }
             }
 
+            "NoteModel" -> {
+                when (noteRepository.deleteNoteById(idEntity)) {
+                    is ApiResponse.Success -> {
+                        true
+                    }
+
+                    else -> {
+                        false
+                    }
+                }
+            }
+
             else -> {
                 false
             }
         }
     }
 
-    private suspend fun handleToggleOperation(idEntity: String, entity: EntityModel): Boolean {
+    private suspend fun handleToggleOperation(idEntity: String, entity: String): Boolean {
         return when (entity) {
-            is TodoModel -> {
+            "TodoModel" -> {
                 when (todoRepository.toggleTodoState(idEntity)) {
                     is ApiResponse.Success -> {true}
                     else -> {false}
                 }
             }
-            is NoteModel -> {
+            "NoteModel" -> {
                 when (noteRepository.toggleTrashNoteById(idEntity)) {
                     is ApiResponse.Success -> {true}
                     else -> {false}

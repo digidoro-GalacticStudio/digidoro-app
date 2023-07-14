@@ -64,6 +64,7 @@ class TodoRepository(
         theme: String,
         reminder: Date,
         description: String = "",
+        status: Boolean = false,
     ): ApiResponse<TodoModel> {
         return handleApiCall {
             if (CheckInternetConnectivity(context)) {
@@ -80,8 +81,9 @@ class TodoRepository(
                     theme = response.theme,
                     reminder = reminder
                 )
-                //Update the remote database with the new to-do
                 todoDao.insertTodo(requestRoom)
+
+                if (status) todoService.toggleTodoDone(response.id)
 
                 response
             } else {
@@ -90,7 +92,7 @@ class TodoRepository(
                 )
 
                 val jsonString =
-                    Gson().toJson(request.toTodosModel()) // Convert the Note object to a JSON String
+                    Gson().toJson(request.toTodosModel()) // Convert the to-do object to a JSON String
                 // Create a pending request with the values of the new to-do object
                 requestDao.insertPendingRequest(
                     PendingRequestEntity(
@@ -104,7 +106,6 @@ class TodoRepository(
             }
         }
     }
-
 
     suspend fun updateTodo(
         id: String,

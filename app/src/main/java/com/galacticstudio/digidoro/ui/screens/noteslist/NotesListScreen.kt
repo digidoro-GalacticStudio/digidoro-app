@@ -2,6 +2,7 @@ package com.galacticstudio.digidoro.ui.screens.noteslist
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
@@ -43,6 +44,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -81,6 +83,7 @@ import com.galacticstudio.digidoro.ui.screens.noteslist.components.NoteItem
 import com.galacticstudio.digidoro.ui.screens.noteslist.viewmodel.FolderResponseState
 import com.galacticstudio.digidoro.ui.screens.noteslist.viewmodel.FolderViewModel
 import com.galacticstudio.digidoro.ui.screens.noteslist.viewmodel.NotesViewModel
+import com.galacticstudio.digidoro.ui.screens.todo.list.TodosEvent
 import com.galacticstudio.digidoro.ui.shared.dialogs.ExitConfirmationDialog
 import com.galacticstudio.digidoro.ui.shared.floatingCards.BottomSheetLayout
 import com.galacticstudio.digidoro.ui.shared.titles.CustomMessageData
@@ -89,6 +92,8 @@ import com.galacticstudio.digidoro.ui.theme.DigidoroTheme
 import com.galacticstudio.digidoro.util.DateUtils
 import com.galacticstudio.digidoro.util.WindowSize
 import com.galacticstudio.digidoro.util.shimmerEffect
+import com.galacticstudio.digidoro.work.SyncStatus
+import com.galacticstudio.digidoro.work.SynchronizationWorker
 import java.util.Date
 
 /**
@@ -182,6 +187,29 @@ fun NotesListScreen(
         }
     }
 
+    val syncStatus = SynchronizationWorker.syncStatusLiveData.observeAsState(initial = SyncStatus.INITIAL)
+
+    LaunchedEffect(syncStatus.value) {
+        if (syncStatus.value == SyncStatus.COMPLETED) {
+            Toast.makeText(
+                context,
+                "Synchronization finished",
+                Toast.LENGTH_SHORT
+            ).show()
+            notesViewModel.onEvent(NotesEvent.Rebuild(notesViewModel.resultsMode.value))
+
+            SynchronizationWorker.syncStatusLiveData.value = SyncStatus.INITIAL
+        }
+        if (syncStatus.value == SyncStatus.IN_PROGRESS) {
+            Toast.makeText(
+                context,
+                "Synchronization started",
+                Toast.LENGTH_SHORT
+            ).show()
+            notesViewModel.onEvent(NotesEvent.LoadingChanged(true))
+        }
+    }
+
     LaunchedEffect(Unit) {
         selectionMode(
             isSelectionMode,
@@ -241,7 +269,10 @@ fun NotesListScreen(
                     Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
                 }
 
-                else -> {}
+                else -> {
+//                    if (syncStatus.value != SyncStatus.IN_PROGRESS)
+//                        notesViewModel.onEvent(NotesEvent.Rebuild(notesViewModel.resultsMode.value))
+                }
             }
         }
 

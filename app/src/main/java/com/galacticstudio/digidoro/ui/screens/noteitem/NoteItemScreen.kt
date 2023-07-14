@@ -1,6 +1,7 @@
 package com.galacticstudio.digidoro.ui.screens.noteitem
 
 import android.content.res.Configuration
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
@@ -65,6 +66,7 @@ import com.galacticstudio.digidoro.ui.theme.DigidoroTheme
 import com.galacticstudio.digidoro.util.ColorCustomUtils
 import com.galacticstudio.digidoro.util.ColorCustomUtils.Companion.convertColorToString
 import com.galacticstudio.digidoro.util.dropShadow
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /**
@@ -219,7 +221,12 @@ fun NoteItemScreen(
             }
 
             if (noteItemViewModel.state.value.noteError == null) {
-                navController.popBackStack()
+
+                scope.launch {
+                    delay(300)
+                    navController.popBackStack()
+                }
+
             } else {
                 scope.launch {
                     snackbarHostState.showSnackbar(
@@ -341,6 +348,8 @@ fun TopBarNote(
     var showMenu by remember { mutableStateOf(false) }
     val color = ColorCustomUtils.returnLuminanceColor(noteColor)
 
+    val scope = rememberCoroutineScope()
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -380,7 +389,10 @@ fun TopBarNote(
                         TextButton(
                             onClick = {
                                 noteItemViewModel.onEvent(NoteItemEvent.ToggleTrash)
-                                onReturnClick()
+                                scope.launch {
+                                    delay(300)
+                                    onReturnClick()
+                                }
                             }
                         ) {
                             Text(
